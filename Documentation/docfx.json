@@ -3,9 +3,9 @@
     {
       "src": [
         {
-          "src": "../PackageName",
+          "src": "../UAI.LiteRT",
           "files": [
-            "Packages/com.uralstech.package-name/Runtime/**/*.cs"
+            "Packages/com.uralstech.uai.litert/Runtime/**/*.cs"
           ]
         }
       ],
@@ -39,9 +39,9 @@
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "PackageName",
-      "_appTitle": "PackageName",
-      "_appFooter": "(C) 2025 URAV ADVANCED LEARNING SYSTEMS PRIVATE LIMITED, licensed under the <a href=\"https://github.com/Uralstech/PackageName/blob/master/LICENSE\">Apache License, Version 2.0</a>.",
+      "_appName": "UAI.LiteRT",
+      "_appTitle": "UAI.LiteRT",
+      "_appFooter": "(C) 2025 URAV ADVANCED LEARNING SYSTEMS PRIVATE LIMITED, licensed under the <a href=\"https://github.com/Uralstech/UAI.LiteRT/blob/master/LICENSE\">Apache License, Version 2.0</a>.",
       "_enableSearch": true
     },
     "fileMetadata": {
@@ -59,7 +59,7 @@
       }
     },
     "sitemap": {
-      "baseUrl": "https://uralstech.github.io/PackageName",
+      "baseUrl": "https://uralstech.github.io/UAI.LiteRT",
       "priority": 1.0,
       "changefreq": "monthly"
     }

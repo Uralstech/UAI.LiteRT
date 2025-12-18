@@ -1,22 +1,24 @@
 {
-    "name": "com.uralstech.uai.litert",
-    "displayName": "UAI.LiteRT",
-    "description": "LiteRT model inference support for Unity Android apps.",
-    "keywords": [],
-    "version": "1.0.0-preview.1",
-    "unity": "6000.0",
-    "hideInEditor": false,
-    "documentationUrl": "https://uralstech.github.io/UAI.LiteRT/",
-    "changelogUrl": "https://github.com/Uralstech/UAI.LiteRT/releases",
-    "licensesUrl": "https://github.com/Uralstech/UAI.LiteRT/blob/master/LICENSE",
-    "license": "Apache-2.0",
-    "repository": {
-      "type": "git",
-      "repository": "https://github.com/Uralstech/UAI.LiteRT.git"
-    },
-    "author": {
-      "name": "Udayshankar Ravikumar",
-      "url": "https://github.com/Uralstech"
-    },
-    "dependencies": { }
+  "name": "com.uralstech.uai.litert",
+  "displayName": "UAI.LiteRT",
+  "description": "LiteRT model inference support for Unity Android apps.",
+  "keywords": [],
+  "version": "1.0.0-preview.1",
+  "unity": "6000.0",
+  "hideInEditor": false,
+  "documentationUrl": "https://uralstech.github.io/UAI.LiteRT/",
+  "changelogUrl": "https://github.com/Uralstech/UAI.LiteRT/releases",
+  "licensesUrl": "https://github.com/Uralstech/UAI.LiteRT/blob/master/LICENSE",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "repository": "https://github.com/Uralstech/UAI.LiteRT.git"
+  },
+  "author": {
+    "name": "Udayshankar Ravikumar",
+    "url": "https://github.com/Uralstech"
+  },
+  "dependencies": {
+    "com.unity.modules.androidjni": "1.0.0"
   }
+}

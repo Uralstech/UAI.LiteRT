@@ -59,7 +59,7 @@ namespace Uralstech.UAI.LiteRT
                     if (content.Disposed)
                         throw new ObjectDisposedException(nameof(LiteRTContent));
 
-                    _native.Call("add", content._native);
+                    _native.Call<bool>("add", content._native);
                 }
             }
             catch

@@ -211,6 +211,13 @@ namespace Uralstech.UAI.LiteRTLM
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc/>
+        public override string? ToString()
+        {
+            return Type is ContentType.Text or ContentType.ImagePath or ContentType.AudioPath
+                ? StringContent : ((object?)_csBytesContent ?? _jvmBytesContent)?.ToString();
+        }
+
         /// <summary>
         /// Creates a <see cref="Content"/> for text.
         /// </summary>

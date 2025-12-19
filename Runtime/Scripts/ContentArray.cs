@@ -31,10 +31,10 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// The contents contained in this array.
         /// </summary>
-        public readonly IReadOnlyCollection<Content> Contents;
+        public readonly IReadOnlyList<Content> Elements;
 
         /// <summary>
-        /// Is disposal of the elements of <see cref="Contents"/> handled by this instance?
+        /// Is disposal of the elements of <see cref="Elements"/> handled by this instance?
         /// </summary>
         public readonly bool HandleElementsDispose;
 
@@ -46,9 +46,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// </summary>
         /// <param name="contents">The contents contained in this array.</param>
         /// <param name="handleChildDispose">Should disposal of <paramref name="contents"/> be handled by this instance?</param>
-        public ContentArray(IReadOnlyCollection<Content> contents, bool handleChildDispose = true)
+        public ContentArray(IReadOnlyList<Content> contents, bool handleChildDispose = true)
         {
-            Contents = contents;
+            Elements = contents;
             HandleElementsDispose = handleChildDispose;
             _native = new AndroidJavaObject("java.util.ArrayList");
 
@@ -75,7 +75,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <remarks>
         /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
         /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and a shallow
-        /// copy of each of <paramref name="other"/>'s elements is added into a new array and stored as <see cref="Contents"/>.
+        /// copy of each of <paramref name="other"/>'s elements is added into a new array and stored as <see cref="Elements"/>.
         /// The new instance's <see cref="HandleElementsDispose"/> is set to <see langword="true"/>.
         /// 
         /// For more detail on how the elements are shallow copied, see <see cref="Content(Content)"/>.
@@ -92,10 +92,10 @@ namespace Uralstech.UAI.LiteRTLM
                 List<Content> contents = new();
                 HandleElementsDispose = true;
 
-                foreach (Content content in other.Contents)
+                foreach (Content content in other.Elements)
                     contents.Add(new Content(content));
 
-                Contents = contents;
+                Elements = contents;
             }
             catch
             {
@@ -118,7 +118,7 @@ namespace Uralstech.UAI.LiteRTLM
                         ?? throw new NullReferenceException($"Could not access contents array element at index {i}."));
                 }
                 
-                Contents = contents;
+                Elements = contents;
             }
             catch
             {
@@ -140,7 +140,7 @@ namespace Uralstech.UAI.LiteRTLM
             if (!HandleElementsDispose)
                 return;
 
-            foreach (Content content in Contents)
+            foreach (Content content in Elements)
                 content.Dispose();
         }
 

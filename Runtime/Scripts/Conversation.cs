@@ -81,6 +81,7 @@ namespace Uralstech.UAI.LiteRTLM
         public async IAsyncEnumerable<Message> StreamSendMessageAsync(Message message, MessageCallbacks? callbacks = null,
             [EnumeratorCancellation] CancellationToken token = default)
         {
+            ThrowIfDisposed();
             Channel<Message> channel = Channel.CreateUnbounded<Message>();
 
             void OnDone() => channel.Writer.TryComplete();

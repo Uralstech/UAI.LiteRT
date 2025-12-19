@@ -112,6 +112,12 @@ namespace Uralstech.UAI.LiteRT
         /// <summary>
         /// Creates a new <see cref="LiteRTContent"/> from an existing one.
         /// </summary>
+        /// <remarks>
+        /// This creates a shallow copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
+        /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and
+        /// the text and binary data of <paramref name="other"/> is also copied by reference. The new
+        /// object takes on the same <see cref="Type"/> as <paramref name="other"/>.
+        /// </remarks>
         public LiteRTContent(LiteRTContent other)
         {
             if (other.Disposed)

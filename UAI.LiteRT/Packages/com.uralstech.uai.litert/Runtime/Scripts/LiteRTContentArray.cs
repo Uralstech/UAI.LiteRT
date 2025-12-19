@@ -34,9 +34,9 @@ namespace Uralstech.UAI.LiteRT
         public readonly IReadOnlyCollection<LiteRTContent> Contents;
 
         /// <summary>
-        /// Is disposal of <see cref="Contents"/> handled by this instance?
+        /// Is disposal of the elements of <see cref="Contents"/> handled by this instance?
         /// </summary>
-        public readonly bool HandleChildDispose;
+        public readonly bool HandleElementsDispose;
 
         internal readonly AndroidJavaObject _native;
         internal bool Disposed { get; private set; }
@@ -49,7 +49,7 @@ namespace Uralstech.UAI.LiteRT
         public LiteRTContentArray(IReadOnlyCollection<LiteRTContent> contents, bool handleChildDispose = true)
         {
             Contents = contents;
-            HandleChildDispose = handleChildDispose;
+            HandleElementsDispose = handleChildDispose;
             _native = new AndroidJavaObject("java.util.ArrayList");
 
             try
@@ -72,6 +72,14 @@ namespace Uralstech.UAI.LiteRT
         /// <summary>
         /// Creates a new <see cref="LiteRTContentArray"/> from an existing one.
         /// </summary>
+        /// <remarks>
+        /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
+        /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and a shallow
+        /// copy of each of <paramref name="other"/>'s elements is added into a new array and stored as <see cref="Contents"/>.
+        /// The new instance's <see cref="HandleElementsDispose"/> is set to <see langword="true"/>.
+        /// 
+        /// For more detail on how the elements are shallow copied, see <see cref="LiteRTContent(LiteRTContent)"/>.
+        /// </remarks>
         public LiteRTContentArray(LiteRTContentArray other)
         {
             if (other.Disposed)
@@ -82,7 +90,7 @@ namespace Uralstech.UAI.LiteRT
             try
             {
                 List<LiteRTContent> contents = new();
-                HandleChildDispose = true;
+                HandleElementsDispose = true;
 
                 foreach (LiteRTContent content in other.Contents)
                     contents.Add(new LiteRTContent(content));
@@ -99,7 +107,7 @@ namespace Uralstech.UAI.LiteRT
         internal LiteRTContentArray(AndroidJavaObject native, int size)
         {
             _native = native;
-            HandleChildDispose = true;
+            HandleElementsDispose = true;
 
             try
             {
@@ -129,7 +137,7 @@ namespace Uralstech.UAI.LiteRT
             _native.Dispose();
             
             GC.SuppressFinalize(this);
-            if (!HandleChildDispose)
+            if (!HandleElementsDispose)
                 return;
 
             foreach (LiteRTContent content in Contents)

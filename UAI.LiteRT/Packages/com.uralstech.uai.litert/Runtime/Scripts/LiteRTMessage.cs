@@ -61,6 +61,15 @@ namespace Uralstech.UAI.LiteRT
         /// <summary>
         /// Creates a new <see cref="LiteRTMessage"/> from an existing one.
         /// </summary>
+        /// <remarks>
+        /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
+        /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and a semi-deep
+        /// copy of <paramref name="other"/>'s <see cref="Contents"/> is created. <see cref="TextMessage"/> is copied by reference.
+        /// The new instance's <see cref="HandleContentsDispose"/> is set to <see langword="true"/>.
+        /// 
+        /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="LiteRTContentArray(LiteRTContentArray)"/>.
+        /// </remarks>
+
         public LiteRTMessage(LiteRTMessage other)
         {
             if (other.Disposed)

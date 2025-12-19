@@ -56,7 +56,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Send a message to the model and returns the response aysnc with callbacks.
+        /// Sends a message to the model and returns the response aysnc with callbacks.
         /// </summary>
         /// <param name="message">The message to send to the model.</param>
         /// <param name="callbacks">The callback to receive the streaming responses.</param>
@@ -73,7 +73,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
         
         /// <summary>
-        /// Send a message to the model and returns the streamed response messages.
+        /// Sends a message to the model and returns the partial response messages as an <see cref="IAsyncEnumerable{T}"/>.
         /// </summary>
         /// <remarks>
         /// <see cref="CancelProcess"/> is automatically called if this method is cancelled using <paramref name="token"/>.

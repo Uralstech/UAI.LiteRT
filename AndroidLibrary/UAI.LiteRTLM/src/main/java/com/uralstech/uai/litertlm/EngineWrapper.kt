@@ -26,7 +26,7 @@ import com.google.ai.edge.litertlm.SamplerConfig
 import com.unity3d.player.UnityPlayer
 import java.util.concurrent.Executors
 
-class EngineWrapper private constructor(modelPath: String, backend: Backend, visionBackend: Backend?, audioBackend: Backend?, maxTokens: Int, useExternalCacheDir: Boolean) {
+class EngineWrapper private constructor(modelPath: String, backend: Backend, visionBackend: Backend?, audioBackend: Backend?, maxNumTokens: Int?, cacheDir: String) {
 
     companion object {
         private const val TAG = "EngineWrapper"
@@ -58,7 +58,20 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
             val visionBackend = toBackend(visionBackendType)
             val audioBackend = toBackend(audioBackendType)
 
-            return EngineWrapper(modelPath, backend, visionBackend, audioBackend, maxTokens, useExternalCacheDir)
+            val maxNumTokens = if (maxTokens == 0) null else maxTokens
+            val context = UnityPlayer.currentContext
+
+            val cacheDir = if (useExternalCacheDir && Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED)
+                context.externalCacheDir?.path ?: context.cacheDir?.path
+            else
+                context.cacheDir?.path
+
+            if (cacheDir.isNullOrEmpty()) {
+                Log.e(TAG, "Could not get path to cache directory.")
+                return null
+            }
+
+            return EngineWrapper(modelPath, backend, visionBackend, audioBackend, maxNumTokens, cacheDir)
         }
 
         @JvmStatic
@@ -86,21 +99,15 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
     private val engine: Engine
 
     init {
-        val maxNumTokens = if (maxTokens == 0) null else maxTokens
-
-        val context = UnityPlayer.currentContext
-        val cacheDir = if (useExternalCacheDir && Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED)
-            context.externalCacheDir?.path ?: context.cacheDir?.path
-        else
-            context.cacheDir?.path
-
         val engineConfig = EngineConfig(modelPath, backend, visionBackend, audioBackend, maxNumTokens, cacheDir)
         engine = Engine(engineConfig)
 
         Log.i(TAG, "Initializing engine...")
         executor.submit {
             engine.initialize()
+
             Log.i(TAG, "Engine initialized!")
+            executor.shutdown()
         }
     }
 

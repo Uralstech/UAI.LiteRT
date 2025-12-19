@@ -40,18 +40,28 @@ class ConversationWrapper(private val conversation: Conversation) {
         if (!checkInitForConvo()) return null
         Log.i(TAG, "Sending message (sync).")
 
-        val result = conversation.sendMessage(message)
-        Log.i(TAG, "Conversation turn completed.")
+        try {
+            val result = conversation.sendMessage(message)
 
-        return result
+            Log.i(TAG, "Conversation turn completed.")
+            return result
+        } catch (ex: RuntimeException) {
+            Log.e(TAG, "Could not send message due to exception", ex)
+            return null
+        }
     }
 
     fun sendMessageAsync(message: Message, callbacks: MessageCallback) : Boolean {
         if (!checkInitForConvo()) return false
         Log.i(TAG, "Sending message (async).")
 
-        conversation.sendMessageAsync(message, callbacks)
-        return true
+        return try {
+            conversation.sendMessageAsync(message, callbacks)
+            true
+        } catch (ex: IllegalStateException) {
+            Log.e(TAG, "Could not send message due to exception", ex)
+            false
+        }
     }
 
     fun cancelProcess() : Boolean {

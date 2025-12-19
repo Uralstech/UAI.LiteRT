@@ -87,30 +87,17 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
         return engine.isInitialized()
     }
 
-    fun createConversation() : ConversationWrapper? {
-        if (!checkInitForConvo()) return null
-        Log.i(TAG, "Creating conversation wrapper.")
-
-        val conversation = engine.createConversation()
-        return ConversationWrapper(conversation)
-    }
-
     fun createConversation(systemMessage: Message?, samplerConfig: SamplerConfig?) : ConversationWrapper? {
-        if (!checkInitForConvo()) return null
+        if (!engine.isInitialized()) {
+            Log.e(TAG, "Tried to create conversation with uninitialized engine!")
+            return null
+        }
+
         Log.i(TAG, "Creating conversation wrapper.")
 
         val config = ConversationConfig(systemMessage, samplerConfig = samplerConfig)
         val conversation = engine.createConversation(config)
         return ConversationWrapper(conversation)
-    }
-
-    private fun checkInitForConvo() : Boolean {
-        if (!engine.isInitialized()) {
-            Log.e(TAG, "Tried to create conversation while engine is initializing!")
-            return false
-        }
-
-        return true
     }
 
     fun close() {

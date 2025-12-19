@@ -13,133 +13,112 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Threading.Channels;
 using UnityEngine;
 
 #nullable enable
 namespace Uralstech.UAI.LiteRT
 {
-    public class LiteRTConversation : AndroidJavaProxy, IDisposable
+    /// <summary>
+    /// Represents a conversation with the LiteRT-LM model.
+    /// </summary>
+    /// <remarks>
+    /// This object manages a native wrapper for a <c>com.google.ai.edge.litertlm.Conversation</c> object and must be disposed after usage
+    /// to close the <c>Conversation</c> object and to release the wrapper object.
+    /// </remarks>
+    public class LiteRTConversation : IDisposable
     {
-        public event Action? OnAsyncInferenceDone;
-        public event Action<string?>? OnAsyncInferenceErred;
-        public event Action<string>? OnAsyncInferenceMessagePart;
-
         private readonly AndroidJavaObject _wrapper;
         private bool _disposed;
 
-        internal LiteRTConversation(AndroidJavaObject wrapper) : base("com.uralstech.uai.litert.ConversationWrapper$AsyncInferenceCallbacks")
+        internal LiteRTConversation(AndroidJavaObject wrapper)
         {
             _wrapper = wrapper;
         }
 
-        public override IntPtr Invoke(string methodName, IntPtr javaArgs)
-        {
-            switch (methodName)
-            {
-                case "onDone":
-                    OnAsyncInferenceDone?.Invoke();
-                    return IntPtr.Zero;
-
-                case "onError":
-                    IntPtr ptr = AndroidJNI.GetObjectArrayElement(javaArgs, 0);
-                    string? value = AndroidJNI.GetStringUTFChars(ptr);
-
-                    AndroidJNI.DeleteLocalRef(ptr);
-
-                    Debug.LogError($"{nameof(LiteRTConversation)}: Could not process async inference due to error: {value}");
-                    OnAsyncInferenceErred?.Invoke(value);
-                    return IntPtr.Zero;
-
-                case "onMessage":
-                    ptr = AndroidJNI.GetObjectArrayElement(javaArgs, 0);
-                    value = AndroidJNI.GetStringUTFChars(ptr);
-
-                    AndroidJNI.DeleteLocalRef(ptr);
-                    OnAsyncInferenceMessagePart?.Invoke(value);
-                    return IntPtr.Zero;
-            }
-
-            return base.Invoke(methodName, javaArgs);
-        }
-
-        public string? SendMessage(LiteRTMessage message)
+        /// <summary>
+        /// Sends a message to the model and returns the response. This is a synchronous call.
+        /// </summary>
+        /// <param name="message">The message to send to the model.</param>
+        /// <returns>The model's response message or <see langword="null"/> if the call failed</returns>
+        public LiteRTMessage? SendMessage(LiteRTMessage message)
         {
             ThrowIfDisposed();
 
-            if (_wrapper.Call<string>("sendMessage", message._native) is string result)
-                return result;
+            if (_wrapper.Call<AndroidJavaObject>("sendMessage", message._native) is AndroidJavaObject result)
+                return new LiteRTMessage(result);
 
             Debug.LogError($"{nameof(LiteRTConversation)}: Could not send message.");
             return null;
         }
 
-        public bool SendMessageAsync(LiteRTMessage message)
+        /// <summary>
+        /// Send a message to the model and returns the response aysnc with callbacks.
+        /// </summary>
+        /// <param name="message">The message to send to the model.</param>
+        /// <param name="callbacks">The callback to receive the streaming responses.</param>
+        /// <returns>Returns <see langword="true"/> if the call succeeded; <see langword="false"/> otherwise.</returns>
+        public bool SendMessageAsync(LiteRTMessage message, AsyncInferenceCallbacks callbacks)
         {
             ThrowIfDisposed();
 
-            if (_wrapper.Call<bool>("sendMessageAsync", message._native, this))
+            if (_wrapper.Call<bool>("sendMessageAsync", message._native, callbacks))
                 return true;
 
             Debug.LogError($"{nameof(LiteRTConversation)}: Could not send message.");
             return false;
         }
-
-        public async IAsyncEnumerable<string> StreamSendMessageAsync(LiteRTMessage message, [EnumeratorCancellation] CancellationToken token = default)
+        
+        /// <summary>
+        /// Send a message to the model and returns the streamed response messages.
+        /// </summary>
+        /// <param name="message">The message to send to the model.</param>
+        /// <param name="callbacks">Callback object to use in processing. Creates new if not provided.</param>
+        /// <returns>Returns the streamed <see cref="LiteRTMessage"/> objects. Their disposal is the responsibility of the consumer.</returns>
+        public async IAsyncEnumerable<LiteRTMessage> StreamSendMessageAsync(LiteRTMessage message, AsyncInferenceCallbacks? callbacks = null,
+            [EnumeratorCancellation] CancellationToken token = default)
         {
-            TaskCompletionSource<bool> statusTcs = new();
-            ConcurrentQueue<string> partsQueue = new ();
-            using SemaphoreSlim waitHandle = new(0, 1);
+            Channel<LiteRTMessage> channel = Channel.CreateUnbounded<LiteRTMessage>();
 
-            void OnDone()
+            void OnDone() => channel.Writer.TryComplete();
+            void OnError(AndroidJavaObject _, string? error) => channel.Writer.TryComplete(new Exception(error ?? "Unknown error during inference."));
+            void OnMessage(LiteRTMessage message)
             {
-                statusTcs.SetResult(true);
-                waitHandle.Release();
+                LiteRTMessage copy = new(message);
+                channel.Writer.TryWrite(copy);
             }
 
-            void OnErred(string? _)
-            {
-                statusTcs.SetResult(false);
-                waitHandle.Release();
-            }
-
-            void OnPartReceived(string part)
-            {
-                partsQueue.Enqueue(part);
-                waitHandle.Release();
-            }
-
-            OnAsyncInferenceDone += OnDone;
-            OnAsyncInferenceErred += OnErred;
-            OnAsyncInferenceMessagePart += OnPartReceived;
+            callbacks ??= new AsyncInferenceCallbacks();
+            callbacks.OnDone += OnDone;
+            callbacks.OnError += OnError;
+            callbacks.OnMessage += OnMessage;
 
             try
             {
-                if (!SendMessageAsync(message))
-                    yield break;
-
-                while (!token.IsCancellationRequested)
+                if (!SendMessageAsync(message, callbacks))
                 {
-                    await waitHandle.WaitAsync(token);
-                    if (token.IsCancellationRequested || statusTcs.Task.IsCompleted)
-                        break;
-
-                    while (partsQueue.TryDequeue(out string part))
-                        yield return part;
+                    channel.Writer.TryComplete();
+                    yield break;
                 }
+
+                using CancellationTokenRegistration _ = token.Register(static (convo) => ((LiteRTConversation)convo).CancelProcess(), this);
+                await foreach (LiteRTMessage part in channel.Reader.ReadAllAsync(token))
+                    yield return part;
             }
             finally
             {
-                OnAsyncInferenceDone -= OnDone;
-                OnAsyncInferenceErred -= OnErred;
-                OnAsyncInferenceMessagePart -= OnPartReceived;
-            }
+                callbacks.OnDone -= OnDone;
+                callbacks.OnError -= OnError;
+                callbacks.OnMessage -= OnMessage;
+            }    
         }
 
+        /// <summary>
+        /// Cancels any ongoing inference process.
+        /// </summary>
         public bool CancelProcess()
         {
             ThrowIfDisposed();
@@ -156,6 +135,7 @@ namespace Uralstech.UAI.LiteRT
                 throw new ObjectDisposedException(nameof(LiteRTConversation));
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (_disposed)

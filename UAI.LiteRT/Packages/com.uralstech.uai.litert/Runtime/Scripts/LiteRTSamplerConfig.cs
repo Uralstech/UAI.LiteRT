@@ -18,16 +18,44 @@ using UnityEngine;
 #nullable enable
 namespace Uralstech.UAI.LiteRT
 {
-    public record LiteRTSamplerConfig : IDisposable
+    /// <summary>
+    /// Configuration for the sampling process.
+    /// </summary>
+    /// <remarks>
+    /// This object manages a native <c>com.google.ai.edge.litertlm.SamplerConfig</c> object and must be disposed after usage.
+    /// </remarks>
+    public class LiteRTSamplerConfig : IDisposable
     {
+        /// <summary>
+        /// The temperature to use for sampling.
+        /// </summary>
         public readonly double Temperature;
+
+        /// <summary>
+        /// The cumulative probability threshold for nucleus sampling.
+        /// </summary>
         public readonly double TopP;
+
+        /// <summary>
+        /// The number of top logits used during sampling.
+        /// </summary>
         public readonly int TopK;
+
+        /// <summary>
+        /// The seed to use for randomization. Default to 0 (same default as engine code).
+        /// </summary>
         public readonly int Seed;
 
         internal readonly AndroidJavaObject _native;
         private bool _disposed;
 
+        /// <summary>
+        /// Creates a new <see cref="LiteRTSamplerConfig"/> object.
+        /// </summary>
+        /// <param name="temperature">The temperature to use for sampling.</param>
+        /// <param name="topP">The cumulative probability threshold for nucleus sampling.</param>
+        /// <param name="topK">The number of top logits used during sampling.</param>
+        /// <param name="seed">The seed to use for randomization. Default to 0 (same default as engine code).</param>
         public LiteRTSamplerConfig(double temperature = 1f, double topP = 0.95f, int topK = 64, int seed = 0)
         {
             Temperature = temperature;
@@ -38,6 +66,7 @@ namespace Uralstech.UAI.LiteRT
             _native = new AndroidJavaObject("com.google.ai.edge.litertlm.SamplerConfig", topK, topP, temperature, seed);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (_disposed)

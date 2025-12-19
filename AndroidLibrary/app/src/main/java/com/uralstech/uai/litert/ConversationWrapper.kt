@@ -36,44 +36,22 @@ class ConversationWrapper(private val conversation: Conversation) {
         }
     }
 
-    interface AsyncInferenceCallbacks {
-        fun onDone()
-        fun onError(message: String?)
-        fun onMessage(content: String)
-    }
-
-    fun sendMessage(message: Message) : String? {
+    fun sendMessage(message: Message) : Message? {
         if (!checkInitForConvo()) return null
         Log.i(TAG, "Sending message (sync).")
 
-        val result = conversation.sendMessage(message).toString()
-        Message
-
+        val result = conversation.sendMessage(message)
         Log.i(TAG, "Conversation turn completed.")
+
         return result
     }
 
-    fun sendMessageAsync(message: Message, callbacks: AsyncInferenceCallbacks) : Boolean {
+    fun sendMessageAsync(message: Message, callbacks: MessageCallback) : Boolean {
         if (!checkInitForConvo()) return false
         Log.i(TAG, "Sending message (async).")
 
-        conversation.sendMessageAsync(message, object : MessageCallback {
-            override fun onMessage(message: Message) {
-                callbacks.onMessage(message.toString())
-            }
-
-            override fun onDone() {
-                Log.i(TAG, "Conversation turn completed.")
-                callbacks.onDone()
-            }
-
-            override fun onError(throwable: Throwable) {
-                Log.e(TAG, "An exception occurred during the conversation", throwable)
-                callbacks.onError(throwable.message)
-            }
-        })
-
-        return true;
+        conversation.sendMessageAsync(message, callbacks)
+        return true
     }
 
     fun cancelProcess() : Boolean {

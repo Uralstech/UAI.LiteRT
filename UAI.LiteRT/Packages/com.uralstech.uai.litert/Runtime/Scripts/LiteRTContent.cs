@@ -13,66 +13,226 @@
 // limitations under the License.
 
 using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 #nullable enable
 namespace Uralstech.UAI.LiteRT
 {
-    public record LiteRTContent : IDisposable
+    /// <summary>
+    /// Represents a content in the <see cref="LiteRTMessage"/> of the conversation.
+    /// </summary>
+    /// <remarks>
+    /// This can store text or binary content, based on its <see cref="Type"/>.
+    /// This object manages a native <c>com.google.ai.edge.litertlm.Content</c> object and must be disposed after usage
+    /// OR must be managed by a <see cref="LiteRTContentArray"/> to handle its disposal.
+    /// </remarks>
+    public class LiteRTContent : IDisposable
     {
+        /// <summary>
+        /// The data type of the <see cref="LiteRTContent"/>.
+        /// </summary>
         public enum ContentType
         {
+            /// <summary>Text.</summary>
             Text        = 0,
+
+            /// <summary>Image provided as raw bytes.</summary>
             ImageBytes  = 1,
+
+            /// <summary>Image provided by a file.</summary>
             ImagePath   = 2,
+
+            /// <summary>Audio provided as raw bytes.</summary>
             AudioBytes  = 3,
+
+            /// <summary>Audio provided by a file.</summary>
             AudioPath   = 4,
         }
 
-        public readonly ContentType Type;
-        public readonly string? StringContent;
-        public readonly byte[]? BytesContent;
+        internal const string TextContentClass = "com.google.ai.edge.litertlm.Content$Text";
+        internal const string ImageFileContentClass = "com.google.ai.edge.litertlm.Content$ImageFile";
+        internal const string AudioFileContentClass = "com.google.ai.edge.litertlm.Content$AudioFile";
+        internal const string ImageBytesContentClass = "com.google.ai.edge.litertlm.Content$ImageBytes";
+        internal const string AudioBytesContentClass = "com.google.ai.edge.litertlm.Content$AudioBytes";
 
+        /// <summary>
+        /// The type of the data contained in this object.
+        /// </summary>
+        public readonly ContentType Type;
+
+        /// <summary>
+        /// String content (<see cref="ContentType.Text"/>, <see cref="ContentType.ImagePath"/>, <see cref="ContentType.AudioPath"/>).
+        /// </summary>
+        public readonly string? StringContent;
+
+        /// <summary>
+        /// Binary content (<see cref="ContentType.ImageBytes"/>, <see cref="ContentType.AudioBytes"/>).
+        /// </summary>
+        public ReadOnlySpan<byte> BytesContent
+        {
+            get
+            {
+#pragma warning disable IDE0046 // Convert to conditional expression
+
+                if (_csBytesContent is null && _jvmBytesContent is null)
+                    return ReadOnlySpan<byte>.Empty;
+#pragma warning restore IDE0046 // Convert to conditional expression
+
+
+                return _csBytesContent is null
+                    ? MemoryMarshal.Cast<sbyte, byte>(_jvmBytesContent)
+                    : _csBytesContent;
+            }
+        }
+        
+        private readonly byte[]? _csBytesContent;
+        private readonly sbyte[]? _jvmBytesContent;
         internal readonly AndroidJavaObject _native;
-        private bool _disposed;
+        internal bool Disposed { get; private set; }
 
         private LiteRTContent(ContentType type, string? stringContent = null, byte[]? bytesContent = null)
         {
             Type = type;
             StringContent = stringContent;
-            BytesContent = bytesContent;
+            _csBytesContent = bytesContent;
 
             _native = Type switch
             {
-                ContentType.Text => new AndroidJavaObject("com.google.ai.edge.litertlm.Content$Text", stringContent),
-                ContentType.ImagePath => new AndroidJavaObject("com.google.ai.edge.litertlm.Content$ImageFile", stringContent),
-                ContentType.AudioPath => new AndroidJavaObject("com.google.ai.edge.litertlm.Content$AudioFile", stringContent),
+                ContentType.Text => new AndroidJavaObject(TextContentClass, stringContent),
+                ContentType.ImagePath => new AndroidJavaObject(ImageFileContentClass, stringContent),
+                ContentType.AudioPath => new AndroidJavaObject(AudioFileContentClass, stringContent),
 
-                ContentType.ImageBytes => new AndroidJavaObject("com.google.ai.edge.litertlm.Content$ImageBytes", bytesContent),
-                ContentType.AudioBytes => new AndroidJavaObject("com.google.ai.edge.litertlm.Content$AudioBytes", bytesContent),
+                ContentType.ImageBytes => new AndroidJavaObject(ImageBytesContentClass, bytesContent),
+                ContentType.AudioBytes => new AndroidJavaObject(AudioBytesContentClass, bytesContent),
                 _ => throw new NotImplementedException()
             };
         }
 
+        /// <summary>
+        /// Creates a new <see cref="LiteRTContent"/> from an existing one.
+        /// </summary>
+        public LiteRTContent(LiteRTContent other)
+        {
+            if (other.Disposed)
+                throw new ObjectDisposedException(nameof(LiteRTContent));
+
+            _native = new AndroidJavaObject(other._native.GetRawObject());
+            _csBytesContent = other._csBytesContent;
+            _jvmBytesContent = other._jvmBytesContent;
+            StringContent = other.StringContent;
+            Type = other.Type;
+        }
+
+        internal LiteRTContent(AndroidJavaObject native)
+        {
+            _native = native;
+
+            try
+            {
+                IntPtr nativeObjectPtr = native.GetRawObject();
+                using AndroidJavaClass textClass = new(TextContentClass);
+                if (AndroidJNI.IsInstanceOf(nativeObjectPtr, textClass.GetRawClass()))
+                {
+                    Type = ContentType.Text;
+                    StringContent = native.Get<string>("text")
+                        ?? throw new NullReferenceException("Text content was null.");
+                    
+                    return;
+                }
+
+                using AndroidJavaClass imageBytesClass = new(ImageBytesContentClass);
+                if (AndroidJNI.IsInstanceOf(nativeObjectPtr, imageBytesClass.GetRawClass()))
+                {
+                    Type = ContentType.ImageBytes;
+                    _jvmBytesContent = native.Get<sbyte[]>("bytes")
+                        ?? throw new NullReferenceException("Image content (sbyte[]) was null.");
+
+                    return;
+                }
+
+                using AndroidJavaClass imageFileClass = new(ImageFileContentClass);
+                if (AndroidJNI.IsInstanceOf(nativeObjectPtr, imageFileClass.GetRawClass()))
+                {
+                    Type = ContentType.ImagePath;
+                    StringContent = native.Get<string>("absolutePath")
+                        ?? throw new NullReferenceException("Image content (path) was null.");
+                    
+                    return;
+                }
+
+                using AndroidJavaClass audioBytesClass = new(AudioBytesContentClass);
+                if (AndroidJNI.IsInstanceOf(nativeObjectPtr, audioBytesClass.GetRawClass()))
+                {
+                    Type = ContentType.AudioBytes;
+                    _jvmBytesContent = native.Get<sbyte[]>("bytes")
+                        ?? throw new NullReferenceException("Audio content (sbyte[]) was null.");
+
+                    return;
+                }
+
+                using AndroidJavaClass audioFileClass = new(AudioFileContentClass);
+                if (AndroidJNI.IsInstanceOf(nativeObjectPtr, audioFileClass.GetRawClass()))
+                {
+                    Type = ContentType.AudioPath;
+                    StringContent = native.Get<string>("absolutePath")
+                        ?? throw new NullReferenceException("Audio content (path) was null.");
+                    
+                    return;
+                }
+
+                using AndroidJavaObject nativeClass = native.Call<AndroidJavaObject>("getClass")
+                    ?? throw new NullReferenceException("Could not get class of unknown content object.");
+
+                throw new NotImplementedException($"Encountered unknown content type: {nativeClass.Call<string>("getName")}");
+            }
+            catch
+            {
+                native.Dispose();
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Dispose()
         {
-            if (_disposed)
+            if (Disposed)
                 return;
 
-            _disposed = true;
+            Disposed = true;
             _native.Dispose();
 
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Creates a <see cref="LiteRTContent"/> for text.
+        /// </summary>
         public static LiteRTContent Text(string content) => new(ContentType.Text, stringContent: content);
 
+        /// <summary>
+        /// Creates a <see cref="LiteRTContent"/> for an image from bytes.
+        /// </summary>
         public static LiteRTContent ImageBytes(byte[] data) => new(ContentType.ImageBytes, bytesContent: data);
+
+        /// <summary>
+        /// Creates a <see cref="LiteRTContent"/> for an image from a filepath.
+        /// </summary>
         public static LiteRTContent ImageFile(string path) => new(ContentType.ImagePath, stringContent: path);
 
+        /// <summary>
+        /// Creates a <see cref="LiteRTContent"/> for audio from bytes.
+        /// </summary>
         public static LiteRTContent AudioBytes(byte[] data) => new(ContentType.AudioBytes, bytesContent: data);
+
+        /// <summary>
+        /// Creates a <see cref="LiteRTContent"/> for audio from a filepath.
+        /// </summary>
         public static LiteRTContent AudioFile(string path) => new(ContentType.AudioPath, stringContent: path);
 
         public static implicit operator LiteRTContent(string current) => Text(current);
+        
+        public static implicit operator string?(LiteRTContent current) => current.StringContent;
+        public static implicit operator ReadOnlySpan<byte>(LiteRTContent current) => current.BytesContent;
     }
 }

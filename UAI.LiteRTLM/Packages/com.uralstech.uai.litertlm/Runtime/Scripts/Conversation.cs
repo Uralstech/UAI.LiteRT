@@ -20,7 +20,7 @@ using System.Threading.Channels;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRT
+namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
     /// Represents a conversation with the LiteRT-LM model.
@@ -29,12 +29,12 @@ namespace Uralstech.UAI.LiteRT
     /// This object manages a native wrapper for a <c>com.google.ai.edge.litertlm.Conversation</c> object and must be disposed after usage
     /// to close the <c>Conversation</c> object and to release the wrapper object.
     /// </remarks>
-    public class LiteRTConversation : IDisposable
+    public class Conversation : IDisposable
     {
         private readonly AndroidJavaObject _wrapper;
         private bool _disposed;
 
-        internal LiteRTConversation(AndroidJavaObject wrapper)
+        internal Conversation(AndroidJavaObject wrapper)
         {
             _wrapper = wrapper;
         }
@@ -44,14 +44,14 @@ namespace Uralstech.UAI.LiteRT
         /// </summary>
         /// <param name="message">The message to send to the model.</param>
         /// <returns>The model's response message or <see langword="null"/> if the call failed</returns>
-        public LiteRTMessage? SendMessage(LiteRTMessage message)
+        public Message? SendMessage(Message message)
         {
             ThrowIfDisposed();
 
             if (_wrapper.Call<AndroidJavaObject>("sendMessage", message._native) is AndroidJavaObject result)
-                return new LiteRTMessage(result);
+                return new Message(result);
 
-            Debug.LogError($"{nameof(LiteRTConversation)}: Could not send message.");
+            Debug.LogError($"{nameof(Conversation)}: Could not send message.");
             return null;
         }
 
@@ -61,14 +61,14 @@ namespace Uralstech.UAI.LiteRT
         /// <param name="message">The message to send to the model.</param>
         /// <param name="callbacks">The callback to receive the streaming responses.</param>
         /// <returns>Returns <see langword="true"/> if the call succeeded; <see langword="false"/> otherwise.</returns>
-        public bool SendMessageAsync(LiteRTMessage message, AsyncInferenceCallbacks callbacks)
+        public bool SendMessageAsync(Message message, MessageCallbacks callbacks)
         {
             ThrowIfDisposed();
 
             if (_wrapper.Call<bool>("sendMessageAsync", message._native, callbacks))
                 return true;
 
-            Debug.LogError($"{nameof(LiteRTConversation)}: Could not send message.");
+            Debug.LogError($"{nameof(Conversation)}: Could not send message.");
             return false;
         }
         
@@ -77,21 +77,21 @@ namespace Uralstech.UAI.LiteRT
         /// </summary>
         /// <param name="message">The message to send to the model.</param>
         /// <param name="callbacks">Callback object to use in processing. Creates new if not provided.</param>
-        /// <returns>Returns the streamed <see cref="LiteRTMessage"/> objects. Their disposal is the responsibility of the consumer.</returns>
-        public async IAsyncEnumerable<LiteRTMessage> StreamSendMessageAsync(LiteRTMessage message, AsyncInferenceCallbacks? callbacks = null,
+        /// <returns>Returns the streamed <see cref="Message"/> objects. Their disposal is the responsibility of the consumer.</returns>
+        public async IAsyncEnumerable<Message> StreamSendMessageAsync(Message message, MessageCallbacks? callbacks = null,
             [EnumeratorCancellation] CancellationToken token = default)
         {
-            Channel<LiteRTMessage> channel = Channel.CreateUnbounded<LiteRTMessage>();
+            Channel<Message> channel = Channel.CreateUnbounded<Message>();
 
             void OnDone() => channel.Writer.TryComplete();
             void OnError(AndroidJavaObject _, string? error) => channel.Writer.TryComplete(new Exception(error ?? "Unknown error during inference."));
-            void OnMessage(LiteRTMessage message)
+            void OnMessage(Message message)
             {
-                LiteRTMessage copy = new(message);
+                Message copy = new(message);
                 channel.Writer.TryWrite(copy);
             }
 
-            callbacks ??= new AsyncInferenceCallbacks();
+            callbacks ??= new MessageCallbacks();
             callbacks.OnDone += OnDone;
             callbacks.OnError += OnError;
             callbacks.OnMessage += OnMessage;
@@ -104,8 +104,8 @@ namespace Uralstech.UAI.LiteRT
                     yield break;
                 }
 
-                using CancellationTokenRegistration _ = token.Register(static (convo) => ((LiteRTConversation)convo).CancelProcess(), this);
-                await foreach (LiteRTMessage part in channel.Reader.ReadAllAsync(token))
+                using CancellationTokenRegistration _ = token.Register(static (convo) => ((Conversation)convo).CancelProcess(), this);
+                await foreach (Message part in channel.Reader.ReadAllAsync(token))
                     yield return part;
             }
             finally
@@ -125,14 +125,14 @@ namespace Uralstech.UAI.LiteRT
             if (_wrapper.Call<bool>("cancelProcess"))
                 return true;
             
-            Debug.LogError($"{nameof(LiteRTConversation)}: Could not cancel process.");
+            Debug.LogError($"{nameof(Conversation)}: Could not cancel process.");
             return false;
         }
 
         private void ThrowIfDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException(nameof(LiteRTConversation));
+                throw new ObjectDisposedException(nameof(Conversation));
         }
 
         /// <inheritdoc/>

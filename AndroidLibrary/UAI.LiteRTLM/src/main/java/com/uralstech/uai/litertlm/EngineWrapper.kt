@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.uralstech.uai.litert
+package com.uralstech.uai.litertlm
 
 import android.os.Environment
 import android.util.Log

@@ -17,20 +17,20 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRT
+namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
-    /// Represents a content in the <see cref="LiteRTMessage"/> of the conversation.
+    /// Represents a content in the <see cref="Message"/> of the conversation.
     /// </summary>
     /// <remarks>
     /// This can store text or binary content, based on its <see cref="Type"/>.
     /// This object manages a native <c>com.google.ai.edge.litertlm.Content</c> object and must be disposed after usage
-    /// OR must be managed by a <see cref="LiteRTContentArray"/> to handle its disposal.
+    /// OR must be managed by a <see cref="ContentArray"/> to handle its disposal.
     /// </remarks>
-    public class LiteRTContent : IDisposable
+    public class Content : IDisposable
     {
         /// <summary>
-        /// The data type of the <see cref="LiteRTContent"/>.
+        /// The data type of the <see cref="Content"/>.
         /// </summary>
         public enum ContentType
         {
@@ -91,7 +91,7 @@ namespace Uralstech.UAI.LiteRT
         internal readonly AndroidJavaObject _native;
         internal bool Disposed { get; private set; }
 
-        private LiteRTContent(ContentType type, string? stringContent = null, byte[]? bytesContent = null)
+        private Content(ContentType type, string? stringContent = null, byte[]? bytesContent = null)
         {
             Type = type;
             StringContent = stringContent;
@@ -110,7 +110,7 @@ namespace Uralstech.UAI.LiteRT
         }
 
         /// <summary>
-        /// Creates a new <see cref="LiteRTContent"/> from an existing one.
+        /// Creates a new <see cref="Content"/> from an existing one.
         /// </summary>
         /// <remarks>
         /// This creates a shallow copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
@@ -118,10 +118,10 @@ namespace Uralstech.UAI.LiteRT
         /// the text and binary data of <paramref name="other"/> is also copied by reference. The new
         /// object takes on the same <see cref="Type"/> as <paramref name="other"/>.
         /// </remarks>
-        public LiteRTContent(LiteRTContent other)
+        public Content(Content other)
         {
             if (other.Disposed)
-                throw new ObjectDisposedException(nameof(LiteRTContent));
+                throw new ObjectDisposedException(nameof(Content));
 
             _native = new AndroidJavaObject(other._native.GetRawObject());
             _csBytesContent = other._csBytesContent;
@@ -130,7 +130,7 @@ namespace Uralstech.UAI.LiteRT
             Type = other.Type;
         }
 
-        internal LiteRTContent(AndroidJavaObject native)
+        internal Content(AndroidJavaObject native)
         {
             _native = native;
 
@@ -212,33 +212,33 @@ namespace Uralstech.UAI.LiteRT
         }
 
         /// <summary>
-        /// Creates a <see cref="LiteRTContent"/> for text.
+        /// Creates a <see cref="Content"/> for text.
         /// </summary>
-        public static LiteRTContent Text(string content) => new(ContentType.Text, stringContent: content);
+        public static Content Text(string content) => new(ContentType.Text, stringContent: content);
 
         /// <summary>
-        /// Creates a <see cref="LiteRTContent"/> for an image from bytes.
+        /// Creates a <see cref="Content"/> for an image from bytes.
         /// </summary>
-        public static LiteRTContent ImageBytes(byte[] data) => new(ContentType.ImageBytes, bytesContent: data);
+        public static Content ImageBytes(byte[] data) => new(ContentType.ImageBytes, bytesContent: data);
 
         /// <summary>
-        /// Creates a <see cref="LiteRTContent"/> for an image from a filepath.
+        /// Creates a <see cref="Content"/> for an image from a filepath.
         /// </summary>
-        public static LiteRTContent ImageFile(string path) => new(ContentType.ImagePath, stringContent: path);
+        public static Content ImageFile(string path) => new(ContentType.ImagePath, stringContent: path);
 
         /// <summary>
-        /// Creates a <see cref="LiteRTContent"/> for audio from bytes.
+        /// Creates a <see cref="Content"/> for audio from bytes.
         /// </summary>
-        public static LiteRTContent AudioBytes(byte[] data) => new(ContentType.AudioBytes, bytesContent: data);
+        public static Content AudioBytes(byte[] data) => new(ContentType.AudioBytes, bytesContent: data);
 
         /// <summary>
-        /// Creates a <see cref="LiteRTContent"/> for audio from a filepath.
+        /// Creates a <see cref="Content"/> for audio from a filepath.
         /// </summary>
-        public static LiteRTContent AudioFile(string path) => new(ContentType.AudioPath, stringContent: path);
+        public static Content AudioFile(string path) => new(ContentType.AudioPath, stringContent: path);
 
-        public static implicit operator LiteRTContent(string current) => Text(current);
+        public static implicit operator Content(string current) => Text(current);
         
-        public static implicit operator string?(LiteRTContent current) => current.StringContent;
-        public static implicit operator ReadOnlySpan<byte>(LiteRTContent current) => current.BytesContent;
+        public static implicit operator string?(Content current) => current.StringContent;
+        public static implicit operator ReadOnlySpan<byte>(Content current) => current.BytesContent;
     }
 }

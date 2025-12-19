@@ -5,4 +5,4 @@ It may not represent best practices for production use.
 
 ## Breaking Changes Notice
 
-If you've just updated the package, it is recommended to check the [*changelogs*](https://github.com/Uralstech/UAI.LiteRT/releases) for information on breaking changes.
+If you've just updated the package, it is recommended to check the [*changelogs*](https://github.com/Uralstech/UAI.LiteRTLM/releases) for information on breaking changes.

@@ -16,12 +16,12 @@ using System;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRT
+namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
     /// Callbacks for receiving streaming message responses.
     /// </summary>
-    public class AsyncInferenceCallbacks : AndroidJavaProxy
+    public class MessageCallbacks : AndroidJavaProxy
     {
         /// <summary>
         /// Called when all message chunks are sent for a given SendMessageAsync call.
@@ -41,11 +41,11 @@ namespace Uralstech.UAI.LiteRT
         /// </summary>
         /// <remarks>
         /// This method may be called multiple times for a single SendMessageAsync call as the model streams its response.
-        /// The <see cref="LiteRTMessage"/> object is disposed of immediately after the event's Invoke is completed.
+        /// The <see cref="Message"/> object is disposed of immediately after the event's Invoke is completed.
         /// </remarks>
-        public event Action<LiteRTMessage>? OnMessage;
+        public event Action<Message>? OnMessage;
 
-        public AsyncInferenceCallbacks() : base("com.google.ai.edge.litertlm.MessageCallback") { }
+        public MessageCallbacks() : base("com.google.ai.edge.litertlm.MessageCallback") { }
 
         /// <inheritdoc/>
         public override IntPtr Invoke(string methodName, IntPtr javaArgs)
@@ -61,7 +61,7 @@ namespace Uralstech.UAI.LiteRT
                     {    
                         string? errorMessage = error.Get<string>("message");
 
-                        Debug.LogError($"{nameof(AsyncInferenceCallbacks)}: Could not process async inference due to error: {errorMessage}");
+                        Debug.LogError($"{nameof(MessageCallbacks)}: Could not process async inference due to error: {errorMessage}");
                         OnError?.Invoke(error, errorMessage);
                     }
                     
@@ -71,7 +71,7 @@ namespace Uralstech.UAI.LiteRT
                     if (OnMessage is null)
                         return IntPtr.Zero;
 
-                    using (LiteRTMessage wrapper = new(UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0)))
+                    using (Message wrapper = new(UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0)))
                         OnMessage?.Invoke(wrapper);
                         
                     return IntPtr.Zero;

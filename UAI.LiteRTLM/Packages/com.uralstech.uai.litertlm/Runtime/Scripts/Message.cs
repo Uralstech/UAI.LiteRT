@@ -16,21 +16,21 @@ using System;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRT
+namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
-    /// Represents a message in the conversation. A message can contain multiple <see cref="LiteRTContent"/>s.
+    /// Represents a message in the conversation. A message can contain multiple <see cref="Content"/>s.
     /// </summary>
     /// <remarks>
-    /// This can store a <see cref="LiteRTContentArray"/> (<see cref="Contents"/>) OR a <see cref="string"/> message (<see cref="TextMessage"/>).
+    /// This can store a <see cref="ContentArray"/> (<see cref="Contents"/>) OR a <see cref="string"/> message (<see cref="TextMessage"/>).
     /// This object manages a native <c>com.google.ai.edge.litertlm.Message</c> object and must be disposed after usage.
     /// </remarks>
-    public class LiteRTMessage : IDisposable
+    public class Message : IDisposable
     {
         /// <summary>
         /// The managed content array stored by this object.
         /// </summary>
-        public readonly LiteRTContentArray? Contents;
+        public readonly ContentArray? Contents;
 
         /// <summary>
         /// Is disposal of <see cref="Contents"/> handled by this instance?
@@ -45,21 +45,21 @@ namespace Uralstech.UAI.LiteRT
         internal readonly AndroidJavaObject _native;
         internal bool Disposed { get; private set; }
 
-        private LiteRTMessage(LiteRTContentArray? contents, string? textMessage, bool handleContentsDispose)
+        private Message(ContentArray? contents, string? textMessage, bool handleContentsDispose)
         {
             Contents = contents;
             TextMessage = textMessage;
             HandleContentsDispose = handleContentsDispose;
 
             if (contents is not null && contents.Disposed)
-                throw new ObjectDisposedException(nameof(LiteRTContentArray));
+                throw new ObjectDisposedException(nameof(ContentArray));
 
-            using AndroidJavaClass nativeWrapper = new("com.uralstech.uai.litert.ConversationWrapper");
+            using AndroidJavaClass nativeWrapper = new("com.uralstech.uai.litertlm.ConversationWrapper");
             _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", (object?)contents?._native ?? textMessage);
         }
 
         /// <summary>
-        /// Creates a new <see cref="LiteRTMessage"/> from an existing one.
+        /// Creates a new <see cref="Message"/> from an existing one.
         /// </summary>
         /// <remarks>
         /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
@@ -67,13 +67,13 @@ namespace Uralstech.UAI.LiteRT
         /// copy of <paramref name="other"/>'s <see cref="Contents"/> is created. <see cref="TextMessage"/> is copied by reference.
         /// The new instance's <see cref="HandleContentsDispose"/> is set to <see langword="true"/>.
         /// 
-        /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="LiteRTContentArray(LiteRTContentArray)"/>.
+        /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="ContentArray(ContentArray)"/>.
         /// </remarks>
 
-        public LiteRTMessage(LiteRTMessage other)
+        public Message(Message other)
         {
             if (other.Disposed)
-                throw new ObjectDisposedException(nameof(LiteRTMessage));
+                throw new ObjectDisposedException(nameof(Message));
 
             _native = new AndroidJavaObject(other._native.GetRawObject());
             
@@ -83,7 +83,7 @@ namespace Uralstech.UAI.LiteRT
 
                 if (other.Contents is not null)
                 {
-                    Contents = new LiteRTContentArray(other.Contents);
+                    Contents = new ContentArray(other.Contents);
                     HandleContentsDispose = true;
                 }
             }
@@ -94,7 +94,7 @@ namespace Uralstech.UAI.LiteRT
             }
         }
 
-        internal LiteRTMessage(AndroidJavaObject native)
+        internal Message(AndroidJavaObject native)
         {
             _native = native;
 
@@ -113,7 +113,7 @@ namespace Uralstech.UAI.LiteRT
                     using AndroidJavaObject element = nativeContents.Call<AndroidJavaObject>("get", 0)
                         ?? throw new NullReferenceException("Could not access contents array element.");
 
-                    using AndroidJavaClass textClass = new(LiteRTContent.TextContentClass);
+                    using AndroidJavaClass textClass = new(Content.TextContentClass);
                     if (AndroidJNI.IsInstanceOf(element.GetRawObject(), textClass.GetRawClass()))
                     {
                         TextMessage = element.Get<string>("text")
@@ -126,7 +126,7 @@ namespace Uralstech.UAI.LiteRT
 
                 shouldDisposeNativeContents = false;
 
-                Contents = new LiteRTContentArray(nativeContents, nativeContentsSize);
+                Contents = new ContentArray(nativeContents, nativeContentsSize);
                 HandleContentsDispose = true;
             }
             catch
@@ -158,16 +158,16 @@ namespace Uralstech.UAI.LiteRT
         }
 
         /// <summary>
-        /// Creates a <see cref="LiteRTMessage"/> from the <see cref="LiteRTContentArray"/>.
+        /// Creates a <see cref="Message"/> from the <see cref="ContentArray"/>.
         /// </summary>
         /// <param name="handleContentsDispose">Should the message object handle the disposing of the array?</param>
-        public static LiteRTMessage Of(LiteRTContentArray contents, bool handleContentsDispose = true) =>
+        public static Message Of(ContentArray contents, bool handleContentsDispose = true) =>
             new(contents, textMessage: null, handleContentsDispose);
         
         /// <summary>
-        /// Creates a <see cref="LiteRTMessage"/> from a text string.
+        /// Creates a <see cref="Message"/> from a text string.
         /// </summary>
-        public static LiteRTMessage Of(string textMessage) =>
+        public static Message Of(string textMessage) =>
             new(contents: null, textMessage, handleContentsDispose: false);
     }
 }

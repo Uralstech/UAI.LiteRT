@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.uralstech.uai.litert"
+    namespace = "com.uralstech.uai.litertlm"
     compileSdk = 36
     defaultConfig {
         minSdk = 26

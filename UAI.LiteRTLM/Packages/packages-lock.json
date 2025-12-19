@@ -55,8 +55,8 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
-    "com.uralstech.uai.litert": {
-      "version": "file:com.uralstech.uai.litert",
+    "com.uralstech.uai.litertlm": {
+      "version": "file:com.uralstech.uai.litertlm",
       "depth": 0,
       "source": "embedded",
       "dependencies": {

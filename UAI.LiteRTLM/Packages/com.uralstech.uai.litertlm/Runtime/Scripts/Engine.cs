@@ -17,7 +17,7 @@ using System.Threading;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRT
+namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
     /// Manages the lifecycle of a LiteRT-LM engine, providing an interface for interacting with the
@@ -27,7 +27,7 @@ namespace Uralstech.UAI.LiteRT
     /// This object manages a native wrapper for a <c>com.google.ai.edge.litertlm.Engine</c> object and must be disposed after usage
     /// to close the <c>Engine</c> object and to release the wrapper object.
     /// </remarks>
-    public class LiteRTEngine : IDisposable
+    public class Engine : IDisposable
     {
         /// <summary>
         /// Backend for the LiteRT-LM engine.
@@ -50,12 +50,12 @@ namespace Uralstech.UAI.LiteRT
         /// <summary>
         /// Returns <see langword="true"/> if the engine is initialized and ready for use; <see langword="false"/> otherwise.
         /// </summary>
-        public bool IsInitialized => !_disposed ? _wrapper.Call<bool>("isInitialized") : throw new ObjectDisposedException(nameof(LiteRTEngine));
+        public bool IsInitialized => !_disposed ? _wrapper.Call<bool>("isInitialized") : throw new ObjectDisposedException(nameof(Engine));
         
         private readonly AndroidJavaObject _wrapper;
         private bool _disposed;
 
-        private LiteRTEngine(AndroidJavaObject wrapper)
+        private Engine(AndroidJavaObject wrapper)
         {
             _wrapper = wrapper;
         }
@@ -73,11 +73,11 @@ namespace Uralstech.UAI.LiteRT
         /// <param name="maxTokens">The maximum number of the sum of input and output tokens. It is equivalent to the size of the kv-cache. When 0, use the default value from the model or the engine.</param>
         /// <param name="useExternalCacheDir">Should cache files be placed in the external or internal cache dir appointed to the app by Android?</param>
         /// <returns>The uninitialized engine or <see langword="null"/> if the call failed.</returns>
-        public static LiteRTEngine? Create(string modelPath, Backend backend = Backend.CPU,
+        public static Engine? Create(string modelPath, Backend backend = Backend.CPU,
             Backend visionBackend = Backend.Undefined, Backend audioBackend = Backend.Undefined,
             int maxTokens = 0, bool useExternalCacheDir = true)
         {
-            using AndroidJavaClass wrapperClass = new("com.uralstech.uai.litert.EngineWrapper");
+            using AndroidJavaClass wrapperClass = new("com.uralstech.uai.litertlm.EngineWrapper");
             AndroidJavaObject? wrapper = wrapperClass.CallStatic<AndroidJavaObject>("create",
                 modelPath,
                 (int)backend,
@@ -87,9 +87,9 @@ namespace Uralstech.UAI.LiteRT
                 useExternalCacheDir);
 
             if (wrapper is not null)
-                return new LiteRTEngine(wrapper);
+                return new Engine(wrapper);
 
-            Debug.LogError($"{nameof(LiteRTEngine)}: Could not create engine wrapper.");
+            Debug.LogError($"{nameof(Engine)}: Could not create engine wrapper.");
             return null;
         }
         
@@ -99,12 +99,12 @@ namespace Uralstech.UAI.LiteRT
         /// <remarks></remarks>
         /// <returns>The initialized engine or <see langword="null"/> if the call failed.</returns>
         /// <inheritdoc cref="Create"/>
-        public static async Awaitable<LiteRTEngine?> CreateAsync(string modelPath, Backend backend = Backend.CPU,
+        public static async Awaitable<Engine?> CreateAsync(string modelPath, Backend backend = Backend.CPU,
             Backend visionBackend = Backend.Undefined, Backend audioBackend = Backend.Undefined,
             int maxTokens = 0, bool useExternalCacheDir = true, CancellationToken token = default)
         {
             await Awaitable.MainThreadAsync();
-            if (Create(modelPath, backend, visionBackend, audioBackend, maxTokens, useExternalCacheDir) is not LiteRTEngine engine)
+            if (Create(modelPath, backend, visionBackend, audioBackend, maxTokens, useExternalCacheDir) is not Engine engine)
                 return null;
 
             while (!engine.IsInitialized && !token.IsCancellationRequested)
@@ -115,26 +115,26 @@ namespace Uralstech.UAI.LiteRT
         }
 
         /// <summary>
-        /// Creates a new <see cref="LiteRTConversation"/> from the initialized engine.
+        /// Creates a new <see cref="Conversation"/> from the initialized engine.
         /// </summary>
         /// <param name="systemMessage">The optional system message to be used in the conversation.</param>
         /// <param name="samplerConfig">The optional configuration for the sampling process. If <see langword="null"/>, then uses the engine's default values.</param>
         /// <returns>The conversation or <see langword="null"/> if the call failed.</returns>
-        public LiteRTConversation? CreateConversation(LiteRTMessage? systemMessage = null, LiteRTSamplerConfig? samplerConfig = null)
+        public Conversation? CreateConversation(Message? systemMessage = null, SamplerConfig? samplerConfig = null)
         {
             ThrowIfDisposed();
 
             if (_wrapper.Call<AndroidJavaObject>("createConversation", systemMessage?._native, samplerConfig?._native) is AndroidJavaObject wrapper)
-                return new LiteRTConversation(wrapper);
+                return new Conversation(wrapper);
 
-            Debug.LogError($"{nameof(LiteRTEngine)}: Could not create conversation wrapper.");
+            Debug.LogError($"{nameof(Engine)}: Could not create conversation wrapper.");
             return null;
         }
 
         private void ThrowIfDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException(nameof(LiteRTEngine));
+                throw new ObjectDisposedException(nameof(Engine));
         }
 
         /// <inheritdoc/>

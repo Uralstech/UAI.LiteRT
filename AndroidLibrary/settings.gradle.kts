@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UAI.LiteRT"
-include(":app")
+rootProject.name = "UAI.LiteRTLM"
+include(":UAI.LiteRTLM")

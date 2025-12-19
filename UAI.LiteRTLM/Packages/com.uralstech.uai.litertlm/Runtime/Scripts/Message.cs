@@ -47,18 +47,20 @@ namespace Uralstech.UAI.LiteRTLM
             HandleContentsDispose = handleContentsDispose;
 
             using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
-            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", contents._native);
+            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", contents._native)
+                ?? throw new NullReferenceException("Could not create message object from wrapper.");
         }
 
         private Message(string content)
         {
             using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
-            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", content);
+            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", content)
+                ?? throw new NullReferenceException("Could not create message object from wrapper.");
 
             try
             {
                 AndroidJavaObject nativeContents = _native.Get<AndroidJavaObject>("contents")
-                    ?? throw new NullReferenceException("Could not get native contents array from message.");
+                    ?? throw new NullReferenceException("Could not get contents array from message.");
 
                 Contents = new ContentArray(nativeContents, 1);
             }
@@ -106,7 +108,7 @@ namespace Uralstech.UAI.LiteRTLM
 
             bool shouldDisposeNativeContents = true;
             AndroidJavaObject nativeContents = native.Get<AndroidJavaObject>("contents")
-                ?? throw new NullReferenceException("Could not get native contents array from message.");
+                ?? throw new NullReferenceException("Could not get contents array from message.");
             
             try
             {
@@ -144,12 +146,11 @@ namespace Uralstech.UAI.LiteRTLM
             if (!HandleContentsDispose)
                 return;
 
-            Contents!.Dispose();
+            Contents.Dispose();
         }
 
         /// <inheritdoc/>
         public override string ToString() => string.Join(string.Empty, Contents.Elements);
-
 
         /// <summary>
         /// Creates a <see cref="Message"/> from the <see cref="ContentArray"/>.
@@ -161,7 +162,6 @@ namespace Uralstech.UAI.LiteRTLM
                 ? new Message(contents, handleContentsDispose)
                 : throw new ObjectDisposedException(nameof(ContentArray));
         }
-
 
         /// <summary>
         /// Creates a <see cref="Message"/> from a text string.

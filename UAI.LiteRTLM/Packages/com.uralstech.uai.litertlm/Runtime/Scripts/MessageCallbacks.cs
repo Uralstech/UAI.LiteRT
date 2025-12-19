@@ -59,7 +59,7 @@ namespace Uralstech.UAI.LiteRTLM
                 case "onError":
                     using (AndroidJavaObject error = UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0))
                     {
-                        string? errorMessage = error.Call<string?>("getMessage");
+                        string? errorMessage = error.Call<string>("getMessage");
 
                         Debug.LogError($"{nameof(MessageCallbacks)}: Could not process async inference due to error: {errorMessage}");
                         OnError?.Invoke(error, errorMessage);
@@ -72,7 +72,7 @@ namespace Uralstech.UAI.LiteRTLM
                         return IntPtr.Zero;
 
                     using (Message wrapper = new(UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0)))
-                        OnMessage?.Invoke(wrapper);
+                        OnMessage.Invoke(wrapper);
                         
                     return IntPtr.Zero;
             }

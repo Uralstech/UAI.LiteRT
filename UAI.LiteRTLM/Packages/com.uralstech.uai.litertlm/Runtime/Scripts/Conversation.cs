@@ -75,6 +75,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Send a message to the model and returns the streamed response messages.
         /// </summary>
+        /// <remarks>
+        /// <see cref="CancelProcess"/> is automatically called if this method is cancelled using <paramref name="token"/>.
+        /// </remarks>
         /// <param name="message">The message to send to the model.</param>
         /// <param name="callbacks">Callback object to use in processing. Creates new if not provided.</param>
         /// <returns>Returns the streamed <see cref="Message"/> objects. Their disposal is the responsibility of the consumer.</returns>

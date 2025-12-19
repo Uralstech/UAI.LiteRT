@@ -47,6 +47,19 @@ namespace Uralstech.UAI.LiteRTLM
             NPU = 2
         }
 
+        public enum LogSeverity
+        {
+            Verbose     = 0,
+            Debug       = 1,
+            Info        = 2,
+            Warning     = 3,
+            Error       = 4,
+            Fatal       = 5,
+            Infinity    = 1000,
+        }
+
+        internal const string EngineWrapperClass = "com.uralstech.uai.litertlm.EngineWrapper";
+
         /// <summary>
         /// Returns <see langword="true"/> if the engine is initialized and ready for use; <see langword="false"/> otherwise.
         /// </summary>
@@ -58,6 +71,16 @@ namespace Uralstech.UAI.LiteRTLM
         private Engine(AndroidJavaObject wrapper)
         {
             _wrapper = wrapper;
+        }
+
+        /// <summary>
+        /// Sets the minimum log severity for the native (C++) libraries. This affects global logging for all
+        /// engine instances. If not set, it uses the native libraries' default.
+        /// </summary>
+        public static void SetNativeLogSeverity(LogSeverity severity)
+        {
+            using AndroidJavaClass wrapperClass = new(EngineWrapperClass);
+            wrapperClass.CallStatic("setEngineLogSeverity", (int)severity);
         }
 
         /// <summary>
@@ -77,7 +100,7 @@ namespace Uralstech.UAI.LiteRTLM
             Backend visionBackend = Backend.Undefined, Backend audioBackend = Backend.Undefined,
             int maxTokens = 0, bool useExternalCacheDir = true)
         {
-            using AndroidJavaClass wrapperClass = new("com.uralstech.uai.litertlm.EngineWrapper");
+            using AndroidJavaClass wrapperClass = new(EngineWrapperClass);
             AndroidJavaObject? wrapper = wrapperClass.CallStatic<AndroidJavaObject>("create",
                 modelPath,
                 (int)backend,

@@ -20,6 +20,7 @@ import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
+import com.google.ai.edge.litertlm.LogSeverity
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.SamplerConfig
 import com.unity3d.player.UnityPlayer
@@ -58,6 +59,26 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
             val audioBackend = toBackend(audioBackendType)
 
             return EngineWrapper(modelPath, backend, visionBackend, audioBackend, maxTokens, useExternalCacheDir)
+        }
+
+        @JvmStatic
+        fun setEngineLogSeverity(severity: Int) {
+            val logSeverity = when (severity) {
+                LogSeverity.VERBOSE.severity    -> LogSeverity.VERBOSE
+                LogSeverity.DEBUG.severity      -> LogSeverity.DEBUG
+                LogSeverity.INFO.severity       -> LogSeverity.INFO
+                LogSeverity.WARNING.severity    -> LogSeverity.WARNING
+                LogSeverity.ERROR.severity      -> LogSeverity.ERROR
+                LogSeverity.FATAL.severity      -> LogSeverity.FATAL
+                LogSeverity.INFINITY.severity   -> LogSeverity.INFINITY
+                else -> {
+                    Log.e(TAG, "Unrecognized log severity level: $severity, defaulting to ${LogSeverity.INFO}")
+                    return
+                }
+            }
+
+            Engine.setNativeMinLogServerity(logSeverity)
+            Log.i(TAG, "Log severity set to: $logSeverity")
         }
     }
 

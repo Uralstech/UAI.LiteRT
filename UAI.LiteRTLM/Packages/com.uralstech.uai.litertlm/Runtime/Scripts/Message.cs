@@ -22,40 +22,51 @@ namespace Uralstech.UAI.LiteRTLM
     /// Represents a message in the conversation. A message can contain multiple <see cref="Content"/>s.
     /// </summary>
     /// <remarks>
-    /// This can store a <see cref="ContentArray"/> (<see cref="Contents"/>) OR a <see cref="string"/> message (<see cref="TextMessage"/>).
     /// This object manages a native <c>com.google.ai.edge.litertlm.Message</c> object and must be disposed after usage.
     /// </remarks>
     public class Message : IDisposable
     {
+        internal const string ConversationWrapperClass = "com.uralstech.uai.litertlm.ConversationWrapper";
+
         /// <summary>
         /// The managed content array stored by this object.
         /// </summary>
-        public readonly ContentArray? Contents;
+        public readonly ContentArray Contents;
 
         /// <summary>
         /// Is disposal of <see cref="Contents"/> handled by this instance?
         /// </summary>
         public readonly bool HandleContentsDispose;
 
-        /// <summary>
-        /// The single text content handled by this object.
-        /// </summary>
-        public readonly string? TextMessage;
-
         internal readonly AndroidJavaObject _native;
         internal bool Disposed { get; private set; }
 
-        private Message(ContentArray? contents, string? textMessage, bool handleContentsDispose)
+        private Message(ContentArray contents, bool handleContentsDispose)
         {
             Contents = contents;
-            TextMessage = textMessage;
             HandleContentsDispose = handleContentsDispose;
 
-            if (contents is not null && contents.Disposed)
-                throw new ObjectDisposedException(nameof(ContentArray));
+            using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
+            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", contents._native);
+        }
 
-            using AndroidJavaClass nativeWrapper = new("com.uralstech.uai.litertlm.ConversationWrapper");
-            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", (object?)contents?._native ?? textMessage);
+        private Message(string content)
+        {
+            using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
+            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", content);
+
+            try
+            {
+                AndroidJavaObject nativeContents = _native.Get<AndroidJavaObject>("contents")
+                    ?? throw new NullReferenceException("Could not get native contents array from message.");
+
+                Contents = new ContentArray(nativeContents, 1);
+            }
+            catch
+            {
+                _native.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -64,7 +75,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <remarks>
         /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
         /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and a semi-deep
-        /// copy of <paramref name="other"/>'s <see cref="Contents"/> is created. <see cref="TextMessage"/> is copied by reference.
+        /// copy of <paramref name="other"/>'s <see cref="Contents"/> is created.
         /// The new instance's <see cref="HandleContentsDispose"/> is set to <see langword="true"/>.
         /// 
         /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="ContentArray(ContentArray)"/>.
@@ -79,13 +90,8 @@ namespace Uralstech.UAI.LiteRTLM
             
             try
             {
-                TextMessage = other.TextMessage;
-
-                if (other.Contents is not null)
-                {
-                    Contents = new ContentArray(other.Contents);
-                    HandleContentsDispose = true;
-                }
+                Contents = new ContentArray(other.Contents);
+                HandleContentsDispose = true;
             }
             catch
             {
@@ -107,22 +113,6 @@ namespace Uralstech.UAI.LiteRTLM
                 int nativeContentsSize = nativeContents.Get<int>("size");
                 if (nativeContentsSize == 0)
                     throw new InvalidOperationException("Contents array was empty.");
-
-                if (nativeContentsSize == 1)
-                {
-                    using AndroidJavaObject element = nativeContents.Call<AndroidJavaObject>("get", 0)
-                        ?? throw new NullReferenceException("Could not access contents array element.");
-
-                    using AndroidJavaClass textClass = new(Content.TextContentClass);
-                    if (AndroidJNI.IsInstanceOf(element.GetRawObject(), textClass.GetRawClass()))
-                    {
-                        TextMessage = element.Get<string>("text")
-                            ?? throw new NullReferenceException("Text content was null.");
-
-                        HandleContentsDispose = false;
-                        return;
-                    }
-                }
 
                 shouldDisposeNativeContents = false;
 
@@ -157,17 +147,25 @@ namespace Uralstech.UAI.LiteRTLM
             Contents!.Dispose();
         }
 
+        /// <inheritdoc/>
+        public override string ToString() => string.Join(string.Empty, Contents.Elements);
+
+
         /// <summary>
         /// Creates a <see cref="Message"/> from the <see cref="ContentArray"/>.
         /// </summary>
         /// <param name="handleContentsDispose">Should the message object handle the disposing of the array?</param>
-        public static Message Of(ContentArray contents, bool handleContentsDispose = true) =>
-            new(contents, textMessage: null, handleContentsDispose);
-        
+        public static Message Of(ContentArray contents, bool handleContentsDispose = true)
+        {
+            return !contents.Disposed
+                ? new Message(contents, handleContentsDispose)
+                : throw new ObjectDisposedException(nameof(ContentArray));
+        }
+
+
         /// <summary>
         /// Creates a <see cref="Message"/> from a text string.
         /// </summary>
-        public static Message Of(string textMessage) =>
-            new(contents: null, textMessage, handleContentsDispose: false);
+        public static Message Of(string textMessage) => new(textMessage);
     }
 }

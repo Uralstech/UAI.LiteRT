@@ -58,8 +58,8 @@ namespace Uralstech.UAI.LiteRTLM
 
                 case "onError":
                     using (AndroidJavaObject error = UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0))
-                    {    
-                        string? errorMessage = error.Get<string>("message");
+                    {
+                        string? errorMessage = error.Call<string?>("getMessage");
 
                         Debug.LogError($"{nameof(MessageCallbacks)}: Could not process async inference due to error: {errorMessage}");
                         OnError?.Invoke(error, errorMessage);

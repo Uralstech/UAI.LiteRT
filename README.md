@@ -9,8 +9,12 @@ LiteRT-LM model inference support for Unity Android and Meta Quest apps. Support
 
 This package was designed for Unity 6.0 and above. Built and tested in Unity 6.3.
 
-This package utilizes `System.Threading.Channels`. You can install it through [*NuGetForUnity*](https://github.com/GlitchEnzo/NuGetForUnity)
+This package uses `System.Threading.Channels`. You can install it through [*NuGetForUnity*](https://github.com/GlitchEnzo/NuGetForUnity)
 if you do not have the `System.Threading.Channels` library in your project. See [*How do I use NuGetForUnity?*](https://github.com/GlitchEnzo/NuGetForUnity?tab=readme-ov-file#how-do-i-use-nugetforunity) on how to use NuGetForUnity.
+
+Since this package contains a native AAR plugin, it depends on the [External Dependency Manager for Unity (EDM4U)](https://github.com/googlesamples/unity-jar-resolver) to resolve native dependencies.
+You may already have EDM4U if you use Google or Firebase SDKs in your Unity project. If you do not, the installation steps are available
+here: [EDM4U - Getting Started](https://github.com/googlesamples/unity-jar-resolver?tab=readme-ov-file#getting-started)
 
 ### OpenUPM
 
@@ -21,7 +25,6 @@ if you do not have the `System.Threading.Channels` library in your project. See 
     - URL: `https://package.openupm.com`
     - Scope(s)
         - `com.uralstech`
-        - `com.google.external-dependency-manager` (Skip this if you already have EDM4U installed through Firebase or other Google SDKs)
 4. Open the Unity Package Manager window (`Window` -> `Package Manager`)
 5. Change the registry from `Unity` to `My Registries`
 6. Add the `UAI.LiteRTLM` package
@@ -33,16 +36,10 @@ if you do not have the `System.Threading.Channels` library in your project. See 
 3. Paste the UPM branch URL and press enter:
     - `https://github.com/Uralstech/UAI.LiteRTLM.git#upm`
 
-See [*EDM4U - Getting Started*](https://github.com/googlesamples/unity-jar-resolver?tab=readme-ov-file#getting-started) on how to install EDM4U.
-You may already have EDM4U installed through Firebase or other Google SDKs
-
 ### GitHub Clone
 
 1. Clone or download the repository from the desired branch (master, preview/unstable)
 2. Drag the package folder `UAI.LiteRTLM/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm` into your Unity project's `Packages` folder
-
-See [*EDM4U - Getting Started*](https://github.com/googlesamples/unity-jar-resolver?tab=readme-ov-file#getting-started) on how to install EDM4U.
-You may already have EDM4U installed through Firebase or other Google SDKs
 
 ## Preview Versions
 

@@ -11,6 +11,9 @@ If you've just updated the package, it is recommended to check the [*changelogs*
 
 This documentation is still a WIP. This is an example script for a sustained conversational experience, tested with [gemma-3n-E2B-it-int4](https://huggingface.co/google/gemma-3n-E2B-it-litert-lm) on a Quest 3. Please refer to the reference manual for more information on each class.
 
+Before running this script, push your LiteRT-LM model to your device at `/data/local/tmp/model.litertlm` using ADB, like:
+`adb push /Path/to/your/model.litertlm /data/local/tmp/model.litertlm`
+
 ```csharp
 using TMPro;
 using UnityEngine;

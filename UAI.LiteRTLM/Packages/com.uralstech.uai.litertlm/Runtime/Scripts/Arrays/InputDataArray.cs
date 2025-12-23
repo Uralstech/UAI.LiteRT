@@ -36,8 +36,5 @@ namespace Uralstech.UAI.LiteRTLM
         
         /// <summary>This method is not supported for this type.</summary>
         protected override InputData ElementFactory(InputData other) => throw new NotSupportedException(); // Ignored since this type doesn't need Java-to-C# conversion.
-        
-        public static implicit operator InputDataArray(InputData[] current) => new(current, true);
-        public static implicit operator InputDataArray(List<InputData> current) => new(current, true);
     }
 }

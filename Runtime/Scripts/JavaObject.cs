@@ -39,7 +39,9 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new ObjectDisposedException(nameof(JavaObject));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Disposes the handle and its associated resources.
+        /// </summary>
         public virtual void Dispose()
         {
             if (IsDisposed)

@@ -35,7 +35,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Returns <see langword="true"/> if the session is alive and ready to be used; <see langword="false"/> otherwise.
         /// </summary>
-        public bool IsAlive => !IsDisposed ? Handle.Call<bool>("isAlive") : throw new ObjectDisposedException(nameof(Conversation));
+        public bool IsAlive => !IsDisposed ? Handle.Call<bool>("isAlive") : throw new ObjectDisposedException(nameof(Session));
 
         /// <inheritdoc/>
         public override AndroidJavaObject Handle { get; }
@@ -67,7 +67,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <remarks>
         /// User can break down their <see cref="InputData"/> into multiple chunks and call this function multiple times.
-        /// Cancellation of this operation <b>does not</b> cancel the prefill task, but cancels the awaition of it.
+        /// Cancellation of this operation <b>does not</b> cancel the prefill task, but cancels the awaiting of it.
         /// </remarks>
         /// <inheritdoc cref="RunPrefill(InputDataArray)"/>
         public async Awaitable<bool> RunPrefillAsync(InputDataArray input, CancellationToken token = default)
@@ -104,7 +104,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <remarks>
-        /// Cancellation of this operation <b>does not</b> cancel the decode task, but cancels the awaition of it.
+        /// Cancellation of this operation <b>does not</b> cancel the decode task, but cancels the awaiting of it.
         /// </remarks>
         /// <param name="callback">Optional cached callback proxy.</param>
         /// <inheritdoc cref="RunDecode"/>
@@ -140,9 +140,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// </summary>
         /// <remarks>
         /// This handles both the prefilling and decoding steps.
-        /// </remarls>
+        /// </remarks>
         /// <param name="input">An array of <see cref="InputData"/> to be processed by the model. If the user wants to run the decode loop only, they can pass an empty array.</param>
-        /// <returns>The generated content as a <see cref="string"/> if successfull; <see langword="null"/> otherwise.</returns>
+        /// <returns>The generated content as a <see cref="string"/> if successful; <see langword="null"/> otherwise.</returns>
         public string? GenerateContent(InputDataArray input)
         {
             ThrowIfDisposed();
@@ -154,7 +154,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <param name="callbacks">The callback to receive the streaming responses.</param>
-        /// <returns><see langword="true"/> if the request was executed successfully; <see langword="false"/> otherwise.<returns>
+        /// <returns><see langword="true"/> if the request was executed successfuly; <see langword="false"/> otherwise.</returns>
         /// <inheritdoc cref="GenerateContent(InputDataArray)"/>
         public bool GenerateContentStream(InputDataArray input, ResponseCallbacks callbacks)
         {
@@ -171,7 +171,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <see cref="CancelProcess"/> is automatically called if this method is cancelled using <paramref name="token"/>.
         /// </remarks>
         /// <param name="callbacks">Optional cached callback to receive the streaming responses.</param>
-        /// <returns>The streamed response chunks.<returns>
+        /// <returns>The streamed response chunks.</returns>
         /// <inheritdoc cref="GenerateContent(InputDataArray)"/>
         public async IAsyncEnumerable<string> GenerateContentStreamAsync(InputDataArray input, ResponseCallbacks? callbacks = null, [EnumeratorCancellation] CancellationToken token = default)
         {

@@ -20,7 +20,7 @@ using UnityEngine;
 namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
-    /// An array of <see cref="T"/>s backed by a native <c>java.util.ArrayList</c>.
+    /// An array of <typeparamref name="T"/>s backed by a native <c>java.util.ArrayList</c>.
     /// </summary>
     /// <remarks>
     /// This object manages a native <c>java.util.ArrayList</c> object and must be disposed after usage.
@@ -138,12 +138,12 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Creates a new <see cref="T"/> from a native handle.
+        /// Creates a new <typeparamref name="T"/> from a native handle.
         /// </summary>
         protected abstract T ElementFactory(AndroidJavaObject native);
 
         /// <summary>
-        /// Creates a new <see cref="T"/> from an existing instance.
+        /// Creates a new <typeparamref name="T"/> from an existing instance.
         /// </summary>
         protected abstract T ElementFactory(T other);
 

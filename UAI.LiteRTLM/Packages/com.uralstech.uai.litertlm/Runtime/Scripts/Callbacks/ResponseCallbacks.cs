@@ -19,33 +19,32 @@ using UnityEngine;
 namespace Uralstech.UAI.LiteRTLM
 {
     /// <summary>
-    /// Callbacks for receiving streaming message responses.
+    /// Callbacks for receiving streaming responses.
     /// </summary>
-    public class MessageCallbacks : AndroidJavaProxy
+    public sealed class ResponseCallbacks : AndroidJavaProxy
     {
         /// <summary>
-        /// Called when all message chunks are sent for a given SendMessageAsync call.
+        /// Called when the stream is complete.
         /// </summary>
         public event Action? OnDone;
 
         /// <summary>
-        /// Called when an error occurs during the response streaming process, with the Kotlin <c>Throwable</c> and any error message.
+        /// Called when an error occurs, with the Kotlin <c>Throwable</c> and any error message.
         /// </summary>
         /// <remarks>
+        /// The error will be a <c>java.util.concurrent.CancellationException</c> if the stream was cancelled normally,
+        /// and a <c>LiteRtLmJniException</c> for other errors.
+        /// 
         /// The <see cref="AndroidJavaObject"/> is disposed of immediately after the event's Invoke is completed.
         /// </remarks>
         public event Action<AndroidJavaObject, string?>? OnError;
 
         /// <summary>
-        /// Called when a new message chunk is available from the model, along with the message.
+        /// Called when a new response is available, with the message chunk.
         /// </summary>
-        /// <remarks>
-        /// This method may be called multiple times for a single SendMessageAsync call as the model streams its response.
-        /// The <see cref="Message"/> object is disposed of immediately after the event's Invoke is completed.
-        /// </remarks>
-        public event Action<Message>? OnMessage;
+        public event Action<string>? OnNext;
 
-        public MessageCallbacks() : base("com.google.ai.edge.litertlm.MessageCallback") { }
+        public ResponseCallbacks() : base("com.google.ai.edge.litertlm.ResponseCallback") { }
 
         /// <inheritdoc/>
         public override IntPtr Invoke(string methodName, IntPtr javaArgs)
@@ -57,36 +56,22 @@ namespace Uralstech.UAI.LiteRTLM
                     return IntPtr.Zero;
 
                 case "onError":
-                    using (AndroidJavaObject error = UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0))
+                    using (AndroidJavaObject error = JNIHelpers.UnwrapObjectFromArray(javaArgs, 0))
                     {
                         string? errorMessage = error.Call<string>("getMessage");
 
-                        Debug.LogError($"{nameof(MessageCallbacks)}: Could not process async inference due to error: {errorMessage}");
+                        Debug.LogError($"{nameof(ResponseCallbacks)}: Could not process streamed inference due to error: {errorMessage}");
                         OnError?.Invoke(error, errorMessage);
                     }
                     
                     return IntPtr.Zero;
 
-                case "onMessage":
-                    if (OnMessage is null)
-                        return IntPtr.Zero;
-
-                    using (Message wrapper = new(UnwrapJavaObjectInArrayDeleteRef(javaArgs, 0)))
-                        OnMessage.Invoke(wrapper);
-                        
+                case "onNext":
+                    OnNext?.Invoke(JNIHelpers.UnwrapStringFromArray(javaArgs, 0)!);
                     return IntPtr.Zero;
             }
 
             return base.Invoke(methodName, javaArgs);
-        }
-
-        private static AndroidJavaObject UnwrapJavaObjectInArrayDeleteRef(IntPtr array, int index)
-        {
-            IntPtr objPtr = AndroidJNI.GetObjectArrayElement(array, index);
-            AndroidJavaObject message = new(objPtr);
-
-            AndroidJNI.DeleteLocalRef(objPtr);
-            return message;
         }
     }
 }

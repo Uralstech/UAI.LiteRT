@@ -25,9 +25,9 @@ namespace Uralstech.UAI.LiteRTLM
     /// <remarks>
     /// This can store text or binary content, based on its <see cref="Type"/>.
     /// This object manages a native <c>com.google.ai.edge.litertlm.Content</c> object and must be disposed after usage
-    /// OR must be managed by a <see cref="ContentArray"/> to handle its disposal.
+    /// OR must be managed by a <see cref="ContentArray"/>/<see cref="JavaArrayList{T}"/> to handle its disposal.
     /// </remarks>
-    public class Content : IDisposable
+    public sealed class Content : JavaObject
     {
         /// <summary>
         /// The data type of the <see cref="Content"/>.
@@ -50,11 +50,11 @@ namespace Uralstech.UAI.LiteRTLM
             AudioPath   = 4,
         }
 
-        internal const string TextContentClass = "com.google.ai.edge.litertlm.Content$Text";
-        internal const string ImageFileContentClass = "com.google.ai.edge.litertlm.Content$ImageFile";
-        internal const string AudioFileContentClass = "com.google.ai.edge.litertlm.Content$AudioFile";
-        internal const string ImageBytesContentClass = "com.google.ai.edge.litertlm.Content$ImageBytes";
-        internal const string AudioBytesContentClass = "com.google.ai.edge.litertlm.Content$AudioBytes";
+        private const string TextContentClass = "com.google.ai.edge.litertlm.Content$Text";
+        private const string ImageFileContentClass = "com.google.ai.edge.litertlm.Content$ImageFile";
+        private const string AudioFileContentClass = "com.google.ai.edge.litertlm.Content$AudioFile";
+        private const string ImageBytesContentClass = "com.google.ai.edge.litertlm.Content$ImageBytes";
+        private const string AudioBytesContentClass = "com.google.ai.edge.litertlm.Content$AudioBytes";
 
         /// <summary>
         /// The type of the data contained in this object.
@@ -88,8 +88,9 @@ namespace Uralstech.UAI.LiteRTLM
         
         private readonly byte[]? _csBytesContent;
         private readonly sbyte[]? _jvmBytesContent;
-        internal readonly AndroidJavaObject _native;
-        internal bool Disposed { get; private set; }
+
+        /// <inheritdoc/>
+        public override AndroidJavaObject Handle { get; }
 
         private Content(ContentType type, string? stringContent = null, byte[]? bytesContent = null)
         {
@@ -97,7 +98,7 @@ namespace Uralstech.UAI.LiteRTLM
             StringContent = stringContent;
             _csBytesContent = bytesContent;
 
-            _native = Type switch
+            Handle = type switch
             {
                 ContentType.Text => new AndroidJavaObject(TextContentClass, stringContent),
                 ContentType.ImagePath => new AndroidJavaObject(ImageFileContentClass, stringContent),
@@ -120,10 +121,10 @@ namespace Uralstech.UAI.LiteRTLM
         /// </remarks>
         public Content(Content other)
         {
-            if (other.Disposed)
+            if (other.IsDisposed)
                 throw new ObjectDisposedException(nameof(Content));
 
-            _native = new AndroidJavaObject(other._native.GetRawObject());
+            Handle = new AndroidJavaObject(other.Handle.GetRawObject());
             _csBytesContent = other._csBytesContent;
             _jvmBytesContent = other._jvmBytesContent;
             StringContent = other.StringContent;
@@ -132,7 +133,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         internal Content(AndroidJavaObject native)
         {
-            _native = native;
+            Handle = native;
 
             try
             {
@@ -197,18 +198,6 @@ namespace Uralstech.UAI.LiteRTLM
                 native.Dispose();
                 throw;
             }
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            if (Disposed)
-                return;
-
-            Disposed = true;
-            _native.Dispose();
-
-            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc/>

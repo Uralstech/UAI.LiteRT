@@ -24,12 +24,12 @@ namespace Uralstech.UAI.LiteRTLM
     /// <remarks>
     /// This object manages a native <c>com.google.ai.edge.litertlm.Message</c> object and must be disposed after usage.
     /// </remarks>
-    public class Message : IDisposable
+    public sealed class Message : JavaObject
     {
-        internal const string ConversationWrapperClass = "com.uralstech.uai.litertlm.ConversationWrapper";
+        private const string ConversationWrapperClass = "com.uralstech.uai.litertlm.ConversationWrapper";
 
         /// <summary>
-        /// The managed content array stored by this object.
+        /// The contents of this message.
         /// </summary>
         public readonly ContentArray Contents;
 
@@ -38,8 +38,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// </summary>
         public readonly bool HandleContentsDispose;
 
-        internal readonly AndroidJavaObject _native;
-        internal bool Disposed { get; private set; }
+        /// <inheritdoc/>
+        public override AndroidJavaObject Handle { get; }
 
         private Message(ContentArray contents, bool handleContentsDispose)
         {
@@ -47,26 +47,26 @@ namespace Uralstech.UAI.LiteRTLM
             HandleContentsDispose = handleContentsDispose;
 
             using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
-            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", contents._native)
+            Handle = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", contents.Handle)
                 ?? throw new NullReferenceException("Could not create message object from wrapper.");
         }
 
         private Message(string content)
         {
             using AndroidJavaClass nativeWrapper = new(ConversationWrapperClass);
-            _native = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", content)
+            Handle = nativeWrapper.CallStatic<AndroidJavaObject>("messageOf", content)
                 ?? throw new NullReferenceException("Could not create message object from wrapper.");
 
             try
             {
-                AndroidJavaObject nativeContents = _native.Get<AndroidJavaObject>("contents")
+                AndroidJavaObject nativeContents = Handle.Get<AndroidJavaObject>("contents")
                     ?? throw new NullReferenceException("Could not get contents array from message.");
 
                 Contents = new ContentArray(nativeContents, 1);
             }
             catch
             {
-                _native.Dispose();
+                Handle.Dispose();
                 throw;
             }
         }
@@ -80,15 +80,14 @@ namespace Uralstech.UAI.LiteRTLM
         /// copy of <paramref name="other"/>'s <see cref="Contents"/> is created.
         /// The new instance's <see cref="HandleContentsDispose"/> is set to <see langword="true"/>.
         /// 
-        /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="ContentArray(ContentArray)"/>.
+        /// For more detail on how <see cref="Contents"/> is semi-deep copied, see <see cref="ContentArray(JavaArrayList{Content})"/>.
         /// </remarks>
-
         public Message(Message other)
         {
-            if (other.Disposed)
+            if (other.IsDisposed)
                 throw new ObjectDisposedException(nameof(Message));
 
-            _native = new AndroidJavaObject(other._native.GetRawObject());
+            Handle = new AndroidJavaObject(other.Handle.GetRawObject());
             
             try
             {
@@ -97,14 +96,14 @@ namespace Uralstech.UAI.LiteRTLM
             }
             catch
             {
-                _native.Dispose();
+                Handle.Dispose();
                 throw;
             }
         }
 
         internal Message(AndroidJavaObject native)
         {
-            _native = native;
+            Handle = native;
 
             bool shouldDisposeNativeContents = true;
             AndroidJavaObject nativeContents = native.Get<AndroidJavaObject>("contents")
@@ -134,19 +133,14 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
-            if (Disposed)
-                return;
-            
-            Disposed = true;
-            _native.Dispose();
-            
-            GC.SuppressFinalize(this);
-            if (!HandleContentsDispose)
+            if (IsDisposed)
                 return;
 
-            Contents.Dispose();
+            base.Dispose();
+            if (HandleContentsDispose)
+                Contents.Dispose();
         }
 
         /// <inheritdoc/>
@@ -158,7 +152,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <param name="handleContentsDispose">Should the message object handle the disposing of the array?</param>
         public static Message Of(ContentArray contents, bool handleContentsDispose = true)
         {
-            return !contents.Disposed
+            return !contents.IsDisposed
                 ? new Message(contents, handleContentsDispose)
                 : throw new ObjectDisposedException(nameof(ContentArray));
         }

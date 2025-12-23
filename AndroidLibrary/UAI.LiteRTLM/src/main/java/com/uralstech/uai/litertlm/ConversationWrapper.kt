@@ -36,8 +36,12 @@ class ConversationWrapper(private val conversation: Conversation) {
         }
     }
 
+    fun isAlive() : Boolean {
+        return conversation.isAlive
+    }
+
     fun sendMessage(message: Message) : Message? {
-        if (!checkInitForConvo()) return null
+        if (!checkConversation()) return null
         Log.i(TAG, "Sending message (sync).")
 
         try {
@@ -52,7 +56,7 @@ class ConversationWrapper(private val conversation: Conversation) {
     }
 
     fun sendMessageAsync(message: Message, callbacks: MessageCallback) : Boolean {
-        if (!checkInitForConvo()) return false
+        if (!checkConversation()) return false
         Log.i(TAG, "Sending message (async).")
 
         return try {
@@ -65,16 +69,16 @@ class ConversationWrapper(private val conversation: Conversation) {
     }
 
     fun cancelProcess() : Boolean {
-        if (!checkInitForConvo()) return false
+        if (!checkConversation()) return false
 
         conversation.cancelProcess()
         Log.i(TAG, "Process cancelled.")
         return true
     }
 
-    private fun checkInitForConvo() : Boolean {
+    private fun checkConversation() : Boolean {
         if (!conversation.isAlive) {
-            Log.e(TAG, "Tried to modify dead conversation!")
+            Log.e(TAG, "Tried to use dead conversation!")
             return false
         }
 

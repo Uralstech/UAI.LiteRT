@@ -28,8 +28,8 @@ here: [EDM4U - Getting Started](https://github.com/googlesamples/unity-jar-resol
 4. Open the Unity Package Manager window (`Window` -> `Package Manager`)
 5. Change the registry from `Unity` to `My Registries`
 6. Add the `UAI.LiteRTLM` package
-    - Install `1.0.0-preview.1-litertlm0.9.0alpha01` (default) for litertlm-android v0.9.0-alpha01
-    - Install `1.0.0-preview.1` for litertlm-android v0.8.0
+    - Install `1.0.0-preview.2-litertlm0.9.0alpha01` (default) for litertlm-android v0.9.0-alpha01
+    - Install `1.0.0-preview.2` for litertlm-android v0.8.0
 
 ### Unity Package Manager
 
@@ -44,7 +44,7 @@ please choose a different installation method.
 
 ### GitHub Clone
 
-1. Clone or download the repository from the desired branch (master, preview/unstable) or tag (`1.0.0-preview.1` for litertlm-android v0.8.0, `1.0.0-preview.1-litertlm0.9.0alpha01` for litertlm-android v0.9.0-alpha01)
+1. Clone or download the repository from the desired branch (master, preview/unstable) or tag (`1.0.0-preview.2` for litertlm-android v0.8.0, `1.0.0-preview.2-litertlm0.9.0alpha01` for litertlm-android v0.9.0-alpha01)
 2. Drag the package folder `UAI.LiteRTLM/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm` into your Unity project's `Packages` folder
 
 ## Preview Versions

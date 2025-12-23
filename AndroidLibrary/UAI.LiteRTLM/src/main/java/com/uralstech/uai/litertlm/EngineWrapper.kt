@@ -91,7 +91,7 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
                 }
             }
 
-            Engine.setNativeMinLogSeverity(logSeverity)
+            Engine.setNativeMinLogServerity(logSeverity)
             Log.i(TAG, "Log severity set to: $logSeverity")
         }
     }

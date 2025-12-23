@@ -1,5 +1,5 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.google.ai.edge.litertlm:litertlm-android:0.9.0-alpha01" />
+        <androidPackage spec="com.google.ai.edge.litertlm:litertlm-android:0.8.0" />
     </androidPackages>
 </dependencies>

@@ -27,6 +27,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Called when the decode operation is completed with the result.
         /// </summary>
+        /// <remarks>
+        /// This event may be invoked from a background thread.
+        /// </remarks>
         public event Action<string>? OnDone;
 
         public AsyncDecodeCallback() : base("com.uralstech.uai.litertlm.SessionWrapper$AsyncDecodeCallback") { }

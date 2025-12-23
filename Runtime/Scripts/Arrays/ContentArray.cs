@@ -39,8 +39,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// <remarks>
         /// This creates a semi-deep copy of <paramref name="other"/>. A new <see cref="AndroidJavaObject"/>
         /// which refers to the same native Kotlin object as <paramref name="other"/> is created, and a shallow
-        /// copy of each of <paramref name="other"/>'s elements is added into a new array and stored as <see cref="Elements"/>.
-        /// The new instance's <see cref="HandleElementsDispose"/> is set to <see langword="true"/>.
+        /// copy of each of <paramref name="other"/>'s elements is added into a new array and stored as <see cref="JavaArrayList{T}.Elements"/>.
+        /// The new instance's <see cref="JavaArrayList{T}.HandleElementsDispose"/> is set to <see langword="true"/>.
         /// 
         /// For more detail on how the elements are shallow copied, see <see cref="Content(Content)"/>.
         /// </remarks>

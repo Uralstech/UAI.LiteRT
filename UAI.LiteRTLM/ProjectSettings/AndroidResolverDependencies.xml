@@ -1,6 +1,6 @@
 <dependencies>
   <packages>
-    <package>com.google.ai.edge.litertlm:litertlm-android:0.8.0</package>
+    <package>com.google.ai.edge.litertlm:litertlm-android:0.9.0-alpha01</package>
   </packages>
   <files />
   <settings>

@@ -26,6 +26,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Called when all message chunks are sent for a given SendMessageAsync call.
         /// </summary>
+        /// <remarks>
+        /// This event may be invoked from a background thread.
+        /// </remarks>
         public event Action? OnDone;
 
         /// <summary>
@@ -33,6 +36,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// </summary>
         /// <remarks>
         /// The <see cref="AndroidJavaObject"/> is disposed of immediately after the event's Invoke is completed.
+        /// This event may be invoked from a background thread.
         /// </remarks>
         public event Action<AndroidJavaObject, string?>? OnError;
 
@@ -42,6 +46,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <remarks>
         /// This method may be called multiple times for a single SendMessageAsync call as the model streams its response.
         /// The <see cref="Message"/> object is disposed of immediately after the event's Invoke is completed.
+        /// This event may be invoked from a background thread.
         /// </remarks>
         public event Action<Message>? OnMessage;
 

@@ -26,6 +26,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Called when the stream is complete.
         /// </summary>
+        /// <remarks>
+        /// This event may be invoked from a background thread.
+        /// </remarks>
         public event Action? OnDone;
 
         /// <summary>
@@ -36,12 +39,16 @@ namespace Uralstech.UAI.LiteRTLM
         /// and a <c>LiteRtLmJniException</c> for other errors.
         /// 
         /// The <see cref="AndroidJavaObject"/> is disposed of immediately after the event's Invoke is completed.
+        /// This event may be invoked from a background thread.
         /// </remarks>
         public event Action<AndroidJavaObject, string?>? OnError;
 
         /// <summary>
         /// Called when a new response is available, with the message chunk.
         /// </summary>
+        /// <remarks>
+        /// This event may be invoked from a background thread.
+        /// </remarks>
         public event Action<string>? OnNext;
 
         public ResponseCallbacks() : base("com.google.ai.edge.litertlm.ResponseCallback") { }

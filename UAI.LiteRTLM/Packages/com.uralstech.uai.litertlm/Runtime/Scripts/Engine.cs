@@ -120,7 +120,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// Creates a new LiteRT LM engine and waits for it to initialize.
         /// </summary>
         /// <remarks>
-        /// Cancellation of this operation <b>does not</b> cancel the initialization of the engine, but cancels the awaition of it.
+        /// Cancellation of this operation <b>does not</b> cancel the initialization of the engine, but cancels the awaiting of it.
         /// </remarks>
         /// <returns>The initialized engine or <see langword="null"/> if the call failed.</returns>
         /// <inheritdoc cref="Create"/>

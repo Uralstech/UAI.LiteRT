@@ -31,11 +31,11 @@ namespace Uralstech.UAI.LiteRTLM
         /// <inheritdoc cref="JavaArrayList{T}(IReadOnlyList{T}, bool)"/>
         public InputDataArray(IReadOnlyList<InputData> elements, bool handleChildDispose = true) : base(elements, handleChildDispose) { }
 
-        /// <inheritdoc/>
+        /// <summary>This method is not supported for this type.</summary>
         protected override InputData ElementFactory(AndroidJavaObject native) => throw new NotSupportedException();
-
-        /// <inheritdoc/>
-        protected override InputData ElementFactory(InputData other) => throw new NotSupportedException();
+        
+        /// <summary>This method is not supported for this type.</summary>
+        protected override InputData ElementFactory(InputData other) => throw new NotSupportedException(); // Ignored since this type doesn't need Java-to-C# conversion.
         
         public static implicit operator InputDataArray(InputData[] current) => new(current, true);
         public static implicit operator InputDataArray(List<InputData> current) => new(current, true);

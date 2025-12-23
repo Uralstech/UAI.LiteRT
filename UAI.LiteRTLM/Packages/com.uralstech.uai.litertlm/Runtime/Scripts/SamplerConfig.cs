@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using UnityEngine;
 
 #nullable enable
@@ -24,7 +23,7 @@ namespace Uralstech.UAI.LiteRTLM
     /// <remarks>
     /// This object manages a native <c>com.google.ai.edge.litertlm.SamplerConfig</c> object and must be disposed after usage.
     /// </remarks>
-    public class SamplerConfig : IDisposable
+    public sealed class SamplerConfig : JavaObject
     {
         /// <summary>
         /// The temperature to use for sampling.
@@ -46,8 +45,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// </summary>
         public readonly int Seed;
 
-        internal readonly AndroidJavaObject _native;
-        private bool _disposed;
+        /// <inheritdoc/>
+        public override AndroidJavaObject Handle { get; }
 
         /// <summary>
         /// Creates a new <see cref="SamplerConfig"/> object.
@@ -63,19 +62,7 @@ namespace Uralstech.UAI.LiteRTLM
             TopK = topK;
             Seed = seed;
 
-            _native = new AndroidJavaObject("com.google.ai.edge.litertlm.SamplerConfig", topK, topP, temperature, seed);
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            if (_disposed)
-                return;
-
-            _disposed = true;
-            _native.Dispose();
-
-            GC.SuppressFinalize(this);
+            Handle = new AndroidJavaObject("com.google.ai.edge.litertlm.SamplerConfig", topK, topP, temperature, seed);
         }
     }
 }

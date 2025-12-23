@@ -23,6 +23,7 @@ import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.LogSeverity
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.google.ai.edge.litertlm.SessionConfig
 import com.unity3d.player.UnityPlayer
 import java.util.concurrent.Executors
 
@@ -95,7 +96,6 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
     private val engine: Engine
 
     init {
@@ -103,6 +103,8 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
         engine = Engine(engineConfig)
 
         Log.i(TAG, "Initializing engine...")
+
+        val executor = Executors.newSingleThreadExecutor()
         executor.submit {
             engine.initialize()
 
@@ -116,16 +118,32 @@ class EngineWrapper private constructor(modelPath: String, backend: Backend, vis
     }
 
     fun createConversation(systemMessage: Message?, samplerConfig: SamplerConfig?) : ConversationWrapper? {
-        if (!engine.isInitialized()) {
-            Log.e(TAG, "Tried to create conversation with uninitialized engine!")
-            return null
-        }
+        if (!checkEngine()) return null
 
         Log.i(TAG, "Creating conversation wrapper.")
 
         val config = ConversationConfig(systemMessage, samplerConfig = samplerConfig)
         val conversation = engine.createConversation(config)
         return ConversationWrapper(conversation)
+    }
+
+    fun createSession(samplerConfig: SamplerConfig?) : SessionWrapper? {
+        if (!checkEngine()) return null
+
+        Log.i(TAG, "Creating session wrapper.")
+
+        val config = SessionConfig(samplerConfig)
+        val session = engine.createSession(config)
+        return SessionWrapper(session)
+    }
+
+    private fun checkEngine() : Boolean {
+        if (!engine.isInitialized()) {
+            Log.e(TAG, "Tried to use uninitialized engine!")
+            return false
+        }
+
+        return true
     }
 
     fun close() {

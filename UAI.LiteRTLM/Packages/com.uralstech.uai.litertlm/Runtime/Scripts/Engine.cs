@@ -27,7 +27,7 @@ namespace Uralstech.UAI.LiteRTLM
     /// This object manages a native wrapper for a <c>com.google.ai.edge.litertlm.Engine</c> object and must be disposed after usage
     /// to close the <c>Engine</c> object and to release the wrapper object.
     /// </remarks>
-    public class Engine : IDisposable
+    public sealed class Engine : JavaObject
     {
         /// <summary>
         /// Backend for the LiteRT-LM engine.
@@ -58,19 +58,19 @@ namespace Uralstech.UAI.LiteRTLM
             Infinity    = 1000,
         }
 
-        internal const string EngineWrapperClass = "com.uralstech.uai.litertlm.EngineWrapper";
+        private const string EngineWrapperClass = "com.uralstech.uai.litertlm.EngineWrapper";
 
         /// <summary>
         /// Returns <see langword="true"/> if the engine is initialized and ready for use; <see langword="false"/> otherwise.
         /// </summary>
-        public bool IsInitialized => !_disposed ? _wrapper.Call<bool>("isInitialized") : throw new ObjectDisposedException(nameof(Engine));
-        
-        private readonly AndroidJavaObject _wrapper;
-        private bool _disposed;
+        public bool IsInitialized => !IsDisposed ? Handle.Call<bool>("isInitialized") : throw new ObjectDisposedException(nameof(Engine));
+
+        /// <inheritdoc/>
+        public override AndroidJavaObject Handle { get; }
 
         private Engine(AndroidJavaObject wrapper)
         {
-            _wrapper = wrapper;
+            Handle = wrapper;
         }
 
         /// <summary>
@@ -119,7 +119,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>
         /// Creates a new LiteRT LM engine and waits for it to initialize.
         /// </summary>
-        /// <remarks></remarks>
+        /// <remarks>
+        /// Cancellation of this operation <b>does not</b> cancel the initialization of the engine, but cancels the awaition of it.
+        /// </remarks>
         /// <returns>The initialized engine or <see langword="null"/> if the call failed.</returns>
         /// <inheritdoc cref="Create"/>
         public static async Awaitable<Engine?> CreateAsync(string modelPath, Backend backend = Backend.CPU,
@@ -146,31 +148,36 @@ namespace Uralstech.UAI.LiteRTLM
         public Conversation? CreateConversation(Message? systemMessage = null, SamplerConfig? samplerConfig = null)
         {
             ThrowIfDisposed();
-
-            if (_wrapper.Call<AndroidJavaObject>("createConversation", systemMessage?._native, samplerConfig?._native) is AndroidJavaObject wrapper)
+            if (Handle.Call<AndroidJavaObject>("createConversation", systemMessage?.Handle, samplerConfig?.Handle) is AndroidJavaObject wrapper)
                 return new Conversation(wrapper);
 
             Debug.LogError($"{nameof(Engine)}: Could not create conversation wrapper.");
             return null;
         }
 
-        private void ThrowIfDisposed()
+        /// <summary>
+        /// Creates a new <see cref="Session"/> from the initialized engine.
+        /// </summary>
+        /// <param name="samplerConfig">The optional configuration for the sampling process. If <see langword="null"/>, then uses the engine's default values.</param>
+        /// <returns>The session or <see langword="null"/> if the call failed.</returns>
+        public Session? CreateSession(SamplerConfig? samplerConfig = null)
         {
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(Engine));
+            ThrowIfDisposed();
+            if (Handle.Call<AndroidJavaObject>("createSession", samplerConfig?.Handle) is AndroidJavaObject wrapper)
+                return new Session(wrapper);
+
+            Debug.LogError($"{nameof(Engine)}: Could not create session wrapper.");
+            return null;
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
-            if (_disposed)
+            if (IsDisposed)
                 return;
-
-            _disposed = true;
-            _wrapper.Call("close");
-            _wrapper.Dispose();
-
-            GC.SuppressFinalize(this);
+            
+            Handle.Call("close");
+            base.Dispose();
         }
     }
 }

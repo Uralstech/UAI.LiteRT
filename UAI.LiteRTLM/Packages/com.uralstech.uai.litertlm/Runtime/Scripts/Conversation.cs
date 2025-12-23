@@ -29,14 +29,19 @@ namespace Uralstech.UAI.LiteRTLM
     /// This object manages a native wrapper for a <c>com.google.ai.edge.litertlm.Conversation</c> object and must be disposed after usage
     /// to close the <c>Conversation</c> object and to release the wrapper object.
     /// </remarks>
-    public class Conversation : IDisposable
+    public sealed class Conversation : JavaObject
     {
-        private readonly AndroidJavaObject _wrapper;
-        private bool _disposed;
+        /// <summary>
+        /// Returns <see langword="true"/> if the session is alive and ready to be used; <see langword="false"/> otherwise.
+        /// </summary>
+        public bool IsAlive => !IsDisposed ? Handle.Call<bool>("isAlive") : throw new ObjectDisposedException(nameof(Conversation));
 
-        internal Conversation(AndroidJavaObject wrapper)
+        /// <inheritdoc/>
+        public override AndroidJavaObject Handle { get; }
+
+        internal Conversation(AndroidJavaObject native)
         {
-            _wrapper = wrapper;
+            Handle = native;
         }
 
         /// <summary>
@@ -48,7 +53,7 @@ namespace Uralstech.UAI.LiteRTLM
         {
             ThrowIfDisposed();
 
-            if (_wrapper.Call<AndroidJavaObject>("sendMessage", message._native) is AndroidJavaObject result)
+            if (Handle.Call<AndroidJavaObject>("sendMessage", message.Handle) is AndroidJavaObject result)
                 return new Message(result);
 
             Debug.LogError($"{nameof(Conversation)}: Could not send message.");
@@ -65,7 +70,7 @@ namespace Uralstech.UAI.LiteRTLM
         {
             ThrowIfDisposed();
 
-            if (_wrapper.Call<bool>("sendMessageAsync", message._native, callbacks))
+            if (Handle.Call<bool>("sendMessageAsync", message.Handle, callbacks))
                 return true;
 
             Debug.LogError($"{nameof(Conversation)}: Could not send message.");
@@ -117,7 +122,7 @@ namespace Uralstech.UAI.LiteRTLM
                 callbacks.OnDone -= OnDone;
                 callbacks.OnError -= OnError;
                 callbacks.OnMessage -= OnMessage;
-            }    
+            }
         }
 
         /// <summary>
@@ -126,30 +131,21 @@ namespace Uralstech.UAI.LiteRTLM
         public bool CancelProcess()
         {
             ThrowIfDisposed();
-            if (_wrapper.Call<bool>("cancelProcess"))
+            if (Handle.Call<bool>("cancelProcess"))
                 return true;
             
             Debug.LogError($"{nameof(Conversation)}: Could not cancel process.");
             return false;
         }
 
-        private void ThrowIfDisposed()
-        {
-            if (_disposed)
-                throw new ObjectDisposedException(nameof(Conversation));
-        }
-
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
-            if (_disposed)
+            if (IsDisposed)
                 return;
 
-            _disposed = true;
-            _wrapper.Call("close");
-            _wrapper.Dispose();
-            
-            GC.SuppressFinalize(this);
+            Handle.Call("close");
+            base.Dispose();
         }
     }
 }

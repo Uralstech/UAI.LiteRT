@@ -3,7 +3,7 @@
   "displayName": "UAI.LiteRTLM",
   "description": "LiteRT-LM model inference support for Unity Android and Meta Quest apps. Supports v0.9.0-alpha01 of the LiteRT-LM Kotlin package for Android.",
   "keywords": [],
-  "version": "1.0.0-preview.2-litertlm0.9.0alpha01",
+  "version": "2.0.0-preview.1",
   "unity": "6000.0",
   "hideInEditor": false,
   "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",
@@ -17,9 +17,5 @@
   "author": {
     "name": "Udayshankar Ravikumar",
     "url": "https://github.com/Uralstech"
-  },
-  "dependencies": {
-    "com.google.external-dependency-manager": "1.2.186",
-    "com.unity.modules.androidjni": "1.0.0"
   }
 }

@@ -1,7 +1,7 @@
 #nullable enable
 namespace Uralstech.UAI.LiteRTLM
 {
-    public enum LogLevel
+    public enum LogLevel : int
     {
         Verbose     = 0,
         Debug       = 1,
@@ -39,23 +39,23 @@ namespace Uralstech.UAI.LiteRTLM
         AudioEnd,
     }
     
-    public enum ActivationDataType
+    public enum ActivationDataType : int
     {
-        // <summary>Use float32 as the activation data type.</summary>
+        /// <summary>Use float32 as the activation data type.</summary>
         Float32,
 
-        // <summary>Use float16 as the activation data type.</summary>
+        /// <summary>Use float16 as the activation data type.</summary>
         Float16,
 
-        // <summary>Use int16 as the activation data type.</summary>
+        /// <summary>Use int16 as the activation data type.</summary>
         Int16,
 
-        // <summary>Use int8 as the activation data type.</summary>
+        /// <summary>Use int8 as the activation data type.</summary>
         Int8,
     }
     
     /// <summary>Represents the type of a TokenUnion.</summary>
-    public enum TokenUnionType
+    public enum TokenUnionType : int
     {
         String  = 0,
         Ids     = 1,

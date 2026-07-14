@@ -142,12 +142,12 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class SamplerParams : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates LiteRT LM Sampler Parameters with a specific sampler type.
-        /// The caller is responsible for destroying the parameters using
+        /// Creates a managed wrapper around LiteRT LM sampler parameters for a specific sampler type.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
         /// <param name="samplerType">The sampler type to use.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public SamplerParams(SamplerType samplerType)
         {
             Native = NativeAPI.SamplerParams.litert_lm_sampler_params_create(samplerType);
@@ -193,11 +193,11 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class SessionConfig : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Session Config.
-        /// The caller is responsible for destroying the config using
+        /// Creates a managed wrapper around a LiteRT LM session configuration.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public SessionConfig()
         {
             Native = NativeAPI.SessionConfig.litert_lm_session_config_create();
@@ -213,15 +213,15 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.SessionConfig.litert_lm_session_config_set_max_output_tokens(Native, maxOutputTokens);
         }
         
-        /// <summary>Sets whether to apply prompt template for this session.</summary>
-        /// <param name="applyPromptTemplate">Whether to apply prompt template.</param>
+        /// <summary>Sets whether to apply the prompt template for this session.</summary>
+        /// <param name="applyPromptTemplate">Whether to apply the prompt template.</param>
         public void SetApplyPromptTemplate(bool applyPromptTemplate)
         {
             ThrowIfDisposed();
             NativeAPI.SessionConfig.litert_lm_session_config_set_apply_prompt_template(Native, applyPromptTemplate);
         }
         
-        /// <summary>Sets the sampler parameters for this session config.</summary>
+        /// <summary>Sets the sampler parameters for this session configuration.</summary>
         /// <param name="samplerParams">The sampler parameters to use.</param>
         public void SetSamplerParams(SamplerParams samplerParams)
         {
@@ -238,7 +238,7 @@ namespace Uralstech.UAI.LiteRTLM
             return NativeAPI.SessionConfig.litert_lm_session_config_set_lora_path(Native, loraPath);
         }
         
-        /// <summary>Sets the path to the Audio LoRA weights file.</summary>
+        /// <summary>Sets the path to the audio LoRA weights file.</summary>
         /// <param name="audioLoraPath">The path to the audio LoRA weights file.</param>
         /// <returns>0 on success, non-zero on failure.</returns>
         public int SetAudioLoraPath(string audioLoraPath)
@@ -257,11 +257,11 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class ConversationConfig : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Conversation Config.
-        /// The caller is responsible for destroying the config using
+        /// Creates a managed wrapper around a LiteRT LM conversation configuration.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public ConversationConfig()
         {
             Native = NativeAPI.ConversationConfig.litert_lm_conversation_config_create();
@@ -269,7 +269,7 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new InvalidOperationException("Failed to create native conversation config.");
         }
 
-        /// <summary>Sets the session config for this conversation config.</summary>
+        /// <summary>Sets the session config for this conversation configuration.</summary>
         /// <param name="sessionConfig">The session config to use.</param>
         public void SetSessionConfig(SessionConfig sessionConfig)
         {
@@ -277,7 +277,7 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_session_config(Native, sessionConfig);
         }
 
-        /// <summary>Sets the system message for this conversation config.</summary>
+        /// <summary>Sets the system message for this conversation configuration.</summary>
         /// <param name="systemMessageJson">The system message in JSON format.</param>
         public void SetSystemMessage(string systemMessageJson)
         {
@@ -285,7 +285,7 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_system_message(Native, systemMessageJson);
         }
 
-        /// <summary>Sets the tools for this conversation config.</summary>
+        /// <summary>Sets the tools for this conversation configuration.</summary>
         /// <param name="toolsJson">The tools description in JSON array format.</param>
         public void SetTools(string toolsJson)
         {
@@ -293,7 +293,7 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_tools(Native, toolsJson);
         }
         
-        /// <summary>Sets the initial messages for this conversation config.</summary>
+        /// <summary>Sets the initial messages for this conversation configuration.</summary>
         /// <param name="messagesJson">The initial messages in JSON array format.</param>
         public void SetMessages(string messagesJson)
         {
@@ -309,7 +309,7 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_extra_context(Native, extraContextJson);
         }
         
-        /// <summary>Sets whether to enable constrained decoding for this conversation config.</summary>
+        /// <summary>Sets whether to enable constrained decoding for this conversation configuration.</summary>
         /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
         public void SetEnableConstrainedDecoding(bool enableConstrainedDecoding)
         {
@@ -344,11 +344,11 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class ConversationOptionalArgs : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Conversation Optional Args.
-        /// The caller is responsible for destroying the optional args using
+        /// Creates a managed wrapper around the optional arguments for conversation APIs.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public ConversationOptionalArgs()
         {
             Native = NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_create();
@@ -356,7 +356,7 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new InvalidOperationException("Failed to create native conversation optional args.");
         }
 
-        /// <summary>Sets the visual token budget for the conversation optional args.</summary>
+        /// <summary>Sets the visual token budget for the conversation optional arguments.</summary>
         /// <param name="visualTokenBudget">The visual token budget.</param>
         public void SetVisualTokenBudget(int visualTokenBudget)
         {
@@ -365,7 +365,7 @@ namespace Uralstech.UAI.LiteRTLM
                 Native, visualTokenBudget);
         }
         
-        /// <summary>Sets the maximum number of output tokens for the conversation optional args.</summary>
+        /// <summary>Sets the maximum number of output tokens for the conversation optional arguments.</summary>
         /// <param name="maxOutputTokens">The maximum number of output tokens.</param>
         public void SetMaxOutputTokens(int maxOutputTokens)
         {
@@ -384,14 +384,15 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class InputData : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Input Data.
-        /// The caller is responsible for destroying the input data using
+        /// Creates a managed wrapper around LiteRT LM input data.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
         /// <param name="dataType">The type of the input data.</param>
-        /// <param name="nativeData">The data pointer. The data is copied internally.</param>
+        /// <param name="nativeData">The data buffer. The data is copied internally.</param>
         /// <param name="size">The size of the data in bytes.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="nativeData"/> or <paramref name="size"/> is invalid.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public InputData(InputDataType dataType, IntPtr nativeData, UIntPtr size)
         {
             if (nativeData == IntPtr.Zero || size == UIntPtr.Zero)
@@ -403,12 +404,13 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Creates a LiteRT LM Input Data of type <see cref="InputDataType.Text"/>.
-        /// The caller is responsible for destroying the input data using
+        /// Creates a managed wrapper around text input data.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <param name="data">The text data.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="data"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public InputData(string data)
         {
             if (string.IsNullOrEmpty(data))
@@ -421,6 +423,15 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new InvalidOperationException("Failed to create native input data.");
         }
 
+        /// <summary>
+        /// Creates a managed wrapper around binary input data.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <param name="dataType">The type of the input data.</param>
+        /// <param name="data">The data buffer.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="data"/> is empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public unsafe InputData(InputDataType dataType, ReadOnlySpan<byte> data)
         {
             if (data.IsEmpty)
@@ -443,15 +454,16 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class EngineSettings : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates LiteRT LM Engine Settings. The caller is responsible for destroying
-        /// the settings using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Creates managed engine settings from a model path.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
         /// <remarks>See <see cref="BackendNames"/> for valid backend strings.</remarks>
         /// <param name="modelPath">The path to the model file.</param>
-        /// <param name="backend">The backend to use (e.g., "cpu", "gpu").</param>
+        /// <param name="backend">The backend to use (for example, "cpu" or "gpu").</param>
         /// <param name="visionBackend">The vision backend to use, or <see langword="null"/> if not set.</param>
         /// <param name="audioBackend">The audio backend to use, or <see langword="null"/> if not set.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public EngineSettings(string modelPath, string backend,
             string? visionBackend = null, string? audioBackend = null)
         {
@@ -467,17 +479,17 @@ namespace Uralstech.UAI.LiteRTLM
         }
         
         /// <summary>
-        /// Creates LiteRT LM Engine Settings from a raw file descriptor. The engine
-        /// takes ownership of the file descriptor and will close it when done.
-        /// The caller is responsible for destroying the settings using
+        /// Creates managed engine settings from a raw file descriptor.
+        /// The engine takes ownership of the file descriptor and closes it when done.
+        /// The caller is responsible for disposing the wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
         /// <remarks>See <see cref="BackendNames"/> for valid backend strings.</remarks>
         /// <param name="fd">The file descriptor of the model.</param>
-        /// <param name="backend">The backend to use (e.g., "cpu", "gpu").</param>
+        /// <param name="backend">The backend to use (for example, "cpu" or "gpu").</param>
         /// <param name="visionBackend">The vision backend to use, or <see langword="null"/> if not set.</param>
         /// <param name="audioBackend">The audio backend to use, or <see langword="null"/> if not set.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public EngineSettings(int fd, string backend,
             string? visionBackend = null, string? audioBackend = null)
         {
@@ -543,7 +555,7 @@ namespace Uralstech.UAI.LiteRTLM
             NativeAPI.EngineSettings.litert_lm_engine_settings_set_cache_dir(Native, cacheDir);
         }
         
-        /// <summary>Sets the LiteRT dispatch library directory for NPU backend.</summary>
+        /// <summary>Sets the LiteRT dispatch library directory for the NPU backend.</summary>
         /// <param name="libDir">The dispatch library directory.</param>
         public void SetLitertDispatchLibDir(string libDir)
         {
@@ -560,7 +572,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
         
         /// <summary>
-        /// Sets the prefill chunk size for the engine. Only applicable for CPU backend
+        /// Sets the prefill chunk size for the engine. Only applicable for the CPU backend
         /// with dynamic models.
         /// </summary>
         /// <param name="prefillChunkSize">The prefill chunk size.</param>
@@ -645,11 +657,12 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class Engine : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Engine from the given settings. The caller is responsible
-        /// for destroying the engine using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Creates a managed wrapper around a LiteRT LM engine from the given settings.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
         /// <param name="settings">The engine settings.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public Engine(EngineSettings settings)
         {
             Native = NativeAPI.Engine.litert_lm_engine_create(settings);
@@ -658,11 +671,12 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Creates a LiteRT LM Session. The caller is responsible for destroying the
-        /// session using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Creates a managed wrapper around a LiteRT LM session.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
-        /// <param name="config">The session config of the session. If <see langword="null"/>, use the default session config.</param>
-        /// <returns>The created session, or <see langword="null"/> on failure.</returns>
+        /// <param name="config">The session configuration to use. If <see langword="null"/>, the default session configuration is used.</param>
+        /// <returns>The created session wrapper, or <see langword="null"/> on failure.</returns>
         public Session? CreateSession(SessionConfig? config = null)
         {
             ThrowIfDisposed();
@@ -674,8 +688,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>Tokenizes text using the engine's tokenizer.</summary>
         /// <param name="text">The UTF-8 string to tokenize.</param>
         /// <returns>
-        /// The tokenize result, or <see langword="null"/> on failure.
-        /// The caller is responsible for deleting the result using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The tokenize result wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public TokenizeResult? Tokenize(string text)
         {
@@ -688,8 +702,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>Detokenizes token ids using the engine's tokenizer.</summary>
         /// <param name="tokens">An array of token ids to detokenize.</param>
         /// <returns>
-        /// The detokenize result, or <see langword="null"/> on failure.
-        /// The caller is responsible for deleting the result using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The detokenize result wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public DetokenizeResult? Detokenize(int[] tokens)
         {
@@ -701,8 +715,8 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the configured start token (BOS), if any.</summary>
         /// <returns>
-        /// The start token, or <see langword="null"/> if none configured.
-        /// The caller is responsible for deleting the result using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The start token wrapper, or <see langword="null"/> if none is configured.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public TokenUnion? GetStartToken()
         {
@@ -714,8 +728,8 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the configured stop tokens (EOS).</summary>
         /// <returns>
-        /// The stop tokens collection, or <see cref="IntPtr.Zero"/> if none configured.
-        /// The caller is responsible for deleting the result using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The stop tokens wrapper, or <see langword="null"/> if none are configured.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public TokenUnions? GetStopTokens()
         {
@@ -747,11 +761,10 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Adds the input prompt/query to the model for starting the prefilling
-        /// process. This is a blocking call and the function will return when the
-        /// prefill process is done.
+        /// Adds the input prompt or query to the model and starts the prefill process.
+        /// This is a blocking call and returns when prefill is complete.
         /// </summary>
-        /// <param name="inputs">An array of InputData objects representing the multimodal input.</param>
+        /// <param name="inputs">An array of input wrappers representing multimodal input.</param>
         /// <returns>0 on success, non-zero on failure.</returns>
         public int RunPrefill(ReadOnlySpan<InputData> inputs)
         {
@@ -760,14 +773,13 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Starts the decoding process for the model to predict the response based
-        /// on the input prompt/query added after using <see cref="RunPrefill"/>.
-        /// This is a blocking call and the function will return when the decoding
-        /// process is done.
+        /// Starts decoding for the model to predict a response based on the input prompt or query
+        /// added after calling <see cref="RunPrefill"/>.
+        /// This is a blocking call and returns when decoding is complete.
         /// </summary>
         /// <returns>
-        /// The responses, or <see langword="null"/> on failure. The caller is
-        /// responsible for deleting the responses using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The responses wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public Responses? RunDecode()
         {
@@ -777,12 +789,12 @@ namespace Uralstech.UAI.LiteRTLM
             return ptr != IntPtr.Zero ? new Responses(ptr) : null;
         }
 
-        /// <summary>Scores the target text after the prefill process is done.</summary>
+        /// <summary>Scores the target text after the prefill process is complete.</summary>
         /// <param name="targetText">An array of target text strings to score.</param>
         /// <param name="storeTokenLengths">Whether to store the token lengths of the target texts in the responses.</param>
         /// <returns>
-        /// The responses, or <see langword="null"/> on failure. The caller is
-        /// responsible for deleting the responses using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The responses wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public Responses? RunTextScoring(string[] targetText, bool storeTokenLengths)
         {
@@ -793,10 +805,10 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>Generates content from the input prompt.</summary>
-        /// <param name="inputs">An array of InputData objects representing the multimodal input.</param>
+        /// <param name="inputs">An array of input wrappers representing multimodal input.</param>
         /// <returns>
-        /// The responses, or <see langword="null"/> on failure. The caller is
-        /// responsible for deleting the responses using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The responses wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public Responses? GenerateContent(ReadOnlySpan<InputData> inputs)
         {
@@ -806,11 +818,10 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Retrieves the benchmark information from the session. The caller is
-        /// responsible for destroying the benchmark info using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Retrieves benchmark information for the session.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </summary>
-        /// <returns>The benchmark info, or <see langword="null"/> on failure.</returns>
+        /// <returns>The benchmark information wrapper, or <see langword="null"/> on failure.</returns>
         public BenchmarkInfo? GetBenchmarkInfo()
         {
             ThrowIfDisposed();
@@ -820,11 +831,11 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Starts the decoding process for the model to predict the response based
-        /// on the input prompt/query added after using <see cref="RunPrefill"/>.
-        /// This is a non-blocking call that will stream responses via a callback.
+        /// Starts decoding for the model to predict a response based on the input prompt or query
+        /// added after calling <see cref="RunPrefill"/>.
+        /// This is a non-blocking call that streams response chunks through a callback.
         /// </summary>
-        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) to receive response chunks.</param>
+        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) that receives response chunks.</param>
         /// <returns>0 on success, non-zero on failure.</returns>
         public int RunDecodeAsync(StreamCallback callback)
         {
@@ -839,6 +850,13 @@ namespace Uralstech.UAI.LiteRTLM
             return result;
         }
 
+        /// <summary>
+        /// Generates content from the input prompt and streams the response through a callback.
+        /// This is a non-blocking call and invokes the callback from a background thread for each chunk.
+        /// </summary>
+        /// <param name="inputs">An array of input wrappers representing multimodal input.</param>
+        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) that receives response chunks.</param>
+        /// <returns>0 on success, non-zero on failure to start the stream.</returns>
         public int GenerateContentStream(ReadOnlySpan<InputData> inputs, StreamCallback callback)
         {
             ThrowIfDisposed();
@@ -941,7 +959,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>Returns the response text at a given index.</summary>
         /// <param name="index">The index of the response.</param>
         /// <returns>The response text.</returns>
-        /// <exception cref="IndexOutOfRangeException">Thrown if index is out of bounds.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of bounds.</exception>
         private string GetResponseTextAt(int index)
         {
             ThrowIfDisposed();
@@ -961,7 +979,7 @@ namespace Uralstech.UAI.LiteRTLM
         
         /// <summary>Returns the score at a given index.</summary>
         /// <param name="index">The index of the response.</param>
-        /// <returns>The score. Returns 0.0f if index is out of bounds or no score is present.</returns>
+        /// <returns>The score. Returns 0.0f if the index is out of bounds or no score is present.</returns>
         private float GetScoreAt(int index)
         {
             ThrowIfDisposed();
@@ -980,7 +998,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>Returns the token length at a given index.</summary>
         /// <param name="index">The index of the response.</param>
         /// <returns>
-        /// The token length. Returns 0 if index is out of bounds or no token
+        /// The token length. Returns 0 if the index is out of bounds or no token
         /// length is present.
         /// </returns>
         private int GetTokenLengthAt(int index)
@@ -998,10 +1016,10 @@ namespace Uralstech.UAI.LiteRTLM
             return NativeAPI.Responses.litert_lm_responses_has_token_scores_at(Native, index);
         }
         
-        /// <summary>Returns the number of tokens for which scores are present at a given index.</summary>
+        /// <summary>Returns the number of token scores available for a candidate at a given index.</summary>
         /// <param name="index">The index of the response.</param>
         /// <returns>
-        /// The number of token scores. Returns 0 if index is out of bounds or no
+        /// The number of token scores. Returns 0 if the index is out of bounds or no
         /// token scores are present.
         /// </returns>
         private int GetNumTokenScoresAt(int index)
@@ -1010,11 +1028,11 @@ namespace Uralstech.UAI.LiteRTLM
             return NativeAPI.Responses.litert_lm_responses_get_num_token_scores_at(Native, index);
         }
 
-        /// <summary>Returns the token scores at a given index.</summary>
+        /// <summary>Returns the token scores for a candidate at a given index.</summary>
         /// <param name="index">The index of the response.</param>
         /// <returns>
-        /// A pointer to the internal array of token scores. Returns <see cref="IntPtr.Zero"/> if
-        /// index is out of bounds or no token scores are present.
+        /// The internal token score buffer. The returned data is valid only for the
+        /// lifetime of this <see cref="Responses"/> object.
         /// </returns>
         private IntPtr GetTokenScoresAt(int index)
         {
@@ -1054,9 +1072,9 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the time to the first token in seconds.</summary>
         /// <remarks>
-        /// Note that the first time to token doesn't include the time for
-        /// initialization. It is the sum of the prefill time for the first turn and
-        /// the time spent for decoding the first token.
+        /// Note that the time to first token does not include initialization time.
+        /// It is the sum of the prefill time for the first turn and the time spent
+        /// decoding the first token.
         /// </remarks>
         /// <returns>The time to the first token in seconds.</returns>
         public double GetTimeToFirstToken()
@@ -1073,7 +1091,7 @@ namespace Uralstech.UAI.LiteRTLM
             return NativeAPI.BenchmarkInfo.litert_lm_benchmark_info_get_total_init_time_in_second(Native);
         }
 
-        /// <summary>Returns the benchmark info for each prefill turn.</summary>
+        /// <summary>Returns the benchmark information for each prefill turn.</summary>
         public Turn[] GetPrefillTurns()
         {
             ThrowIfDisposed();
@@ -1091,7 +1109,7 @@ namespace Uralstech.UAI.LiteRTLM
             return turns;
         }
         
-        /// <summary>Returns the benchmark info for each decode turn.</summary>
+        /// <summary>Returns the benchmark information for each decode turn.</summary>
         public Turn[] GetDecodeTurns()
         {
             ThrowIfDisposed();
@@ -1171,12 +1189,13 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class Conversation : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a LiteRT LM Conversation. The caller is responsible for destroying
-        /// the conversation using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Creates a managed wrapper around a LiteRT LM conversation.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
         /// <param name="engine">The engine to create the conversation from.</param>
-        /// <param name="config">The conversation config to use. If <see langword="null"/>, the default config will be used.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object couldn't be created.</exception>
+        /// <param name="config">The conversation configuration to use. If <see langword="null"/>, the default configuration is used.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public Conversation(Engine engine, ConversationConfig? config = null)
         {
             Native = NativeAPI.Conversation.litert_lm_conversation_create(engine, config);
@@ -1190,11 +1209,11 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Clones a LiteRT LM Conversation, duplicating its prefilled state.
-        /// The caller is responsible for destroying the cloned conversation using
+        /// Clones a LiteRT LM conversation, duplicating its prefilled state.
+        /// The caller is responsible for disposing the cloned wrapper using
         /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
         /// </summary>
-        /// <returns>A pointer to the cloned conversation, or <see langword="null"/> on failure.</returns>
+        /// <returns>The cloned conversation wrapper, or <see langword="null"/> on failure.</returns>
         public Conversation? Clone()
         {
             ThrowIfDisposed();
@@ -1211,8 +1230,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// <param name="extraContext">A JSON string representing the extra context to use.</param>
         /// <param name="optionalArgs">The optional arguments to use.</param>
         /// <returns>
-        /// A pointer to the JSON Response, or <see langword="null"/> on failure.
-        /// The caller is responsible for deleting the response using <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// A JSON response wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </returns>
         public JsonResponse? SendMessage(string messageJson,
             string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
@@ -1224,14 +1243,14 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Sends a message to the conversation and streams the response via a
-        /// callback. This is a non-blocking call that will invoke the callback from a
+        /// Sends a message to the conversation and streams the response through a
+        /// callback. This is a non-blocking call that invokes the callback from a
         /// background thread for each chunk.
         /// </summary>
         /// <param name="messageJson">A JSON string representing the message to send.</param>
         /// <param name="extraContext">A JSON string representing the extra context to use.</param>
-        /// <param name="optionalArgs">A pointer to the optional arguments to use.</param>
-        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) to receive response chunks.</param>
+        /// <param name="optionalArgs">The optional arguments to use.</param>
+        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) that receives response chunks.</param>
         /// <returns>0 on success, non-zero on failure to start the stream.</returns>
         public int SendMessageStream(StreamCallback callback, string messageJson,
             string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
@@ -1249,9 +1268,9 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Renders the message into a string according to the template.</summary>
         /// <remarks>
-        /// This function does not need to be called for actual message sending, as the
-        /// <see cref="SendMessage"/> and <see cref="SendMessageStream"/>
-        /// functions will handle rendering internally.
+        /// This function does not need to be called for actual message sending, as
+        /// <see cref="SendMessage"/> and <see cref="SendMessageStream"/> render
+        /// messages internally.
         /// </remarks>
         /// <param name="messageJson">A JSON string representing the message to render.</param>
         /// <returns>The rendered string, or <see langword="null"/> on failure.</returns>
@@ -1273,7 +1292,7 @@ namespace Uralstech.UAI.LiteRTLM
             return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
         }
 
-        /// <summary>Cancels the ongoing inference process, for asynchronous inference.</summary>
+        /// <summary>Cancels the ongoing inference process for asynchronous inference.</summary>
         public void CancelProcess()
         {
             ThrowIfDisposed();
@@ -1281,11 +1300,10 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>
-        /// Retrieves the benchmark information from the conversation. The caller is
-        /// responsible for destroying the benchmark info using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// Retrieves benchmark information from the conversation.
+        /// The caller is responsible for disposing the returned wrapper.
         /// </summary>
-        /// <returns>The benchmark info, or <see langword="null"/> on failure.</returns>
+        /// <returns>The benchmark information wrapper, or <see langword="null"/> on failure.</returns>
         public BenchmarkInfo? GetBenchmarkInfo()
         {
             ThrowIfDisposed();
@@ -1294,7 +1312,7 @@ namespace Uralstech.UAI.LiteRTLM
             return ptr != IntPtr.Zero ? new BenchmarkInfo(ptr) : null;
         }
 
-        /// <summary>Gets the number of tokens in the conversation KV Cache (prefill + decode).</summary>
+        /// <summary>Gets the number of tokens in the conversation KV cache (prefill + decode).</summary>
         /// <returns>The number of tokens, or a negative value on failure.</returns>
         public int GetTokenCount()
         {
@@ -1339,10 +1357,10 @@ namespace Uralstech.UAI.LiteRTLM
             Native = native;
         }
 
-        /// <summary>Returns a span of the tokens.</summary>
+        /// <summary>Returns a span of the token ids.</summary>
         /// <remarks>
-        /// The returned span is only valid for the
-        /// lifetime of this <see cref="TokenizeResult"/> object.
+        /// The returned span is only valid for the lifetime of this
+        /// <see cref="TokenizeResult"/> object.
         /// </remarks>
         public unsafe ReadOnlySpan<int> AsReadOnlySpan()
         {
@@ -1352,7 +1370,7 @@ namespace Uralstech.UAI.LiteRTLM
             return new ReadOnlySpan<int>((void*)ptr, length);
         }
 
-        /// <summary>Copies the tokens into <paramref name="span"/>.</summary>
+        /// <summary>Copies the token ids into <paramref name="span"/>.</summary>
         /// <returns>The number of copied elements.</returns>
         public long CopyTo(Span<int> span)
         {
@@ -1364,8 +1382,8 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the token ids from a tokenize result.</summary>
         /// <returns>
-        /// A pointer to the internal array of token ids. The returned pointer
-        /// is valid only for the lifetime of the <see cref="TokenizeResult"/> object.
+        /// The internal token buffer. The returned data is valid only for the
+        /// lifetime of this <see cref="TokenizeResult"/> object.
         /// </returns>
         private IntPtr GetTokens()
         {
@@ -1429,8 +1447,8 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the string value from a token union.</summary>
         /// <returns>
-        /// The string value, or <see langword="null"/> if
-        /// the type is not <see cref="TokenUnionType.String"/>.
+        /// The string value, or <see langword="null"/> if the token union does not
+        /// contain a string value.
         /// </returns>
         public string? GetString()
         {
@@ -1442,7 +1460,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the token ids from a token union.</summary>
         /// <param name="tokenIds">The token IDs.</param>
-        /// <returns>0 on success, non-zero if the type is not <see cref="TokenUnionType.Ids"/>.</returns>
+        /// <returns>0 on success, non-zero if the token union does not contain token ids.</returns>
         public int GetIds(out int[]? tokenIds)
         {
             ThrowIfDisposed();
@@ -1469,8 +1487,8 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Gets the token unions in this collection.</summary>
         /// <returns>
-        /// The token unions. The caller is responsible for deleting each result using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The token union wrappers in the collection. The caller is responsible for
+        /// disposing each returned wrapper.
         /// </returns>
         public TokenUnion[] GetTokenUnions()
         {
@@ -1494,9 +1512,8 @@ namespace Uralstech.UAI.LiteRTLM
         /// <summary>Returns the token union at a given index from a collection.</summary>
         /// <param name="index">The index of the token union.</param>
         /// <returns>
-        /// The token union at the given index, or <see langword="null"/> if the index
-        /// is out of bounds. The caller is responsible for deleting the result using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// The token union wrapper at the given index, or <see langword="null"/> if the index
+        /// is out of bounds. The caller is responsible for disposing the returned wrapper.
         /// </returns>
         private TokenUnion? GetTokenAt(UIntPtr index)
         {

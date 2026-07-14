@@ -16,14 +16,15 @@ using System;
 using System.Runtime.InteropServices;
 
 #nullable enable
-namespace Uralstech.UAI.LiteRTLM
+namespace Uralstech.UAI.LiteRTLM.Native
 {
     public static class NativeAPI
     {
         public const string LibLiteRTLM = "litert-lm";
 
+        /// <summary>Sets the minimum log level for the LiteRT LM library.</summary>
         [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void litert_lm_set_min_log_level([MarshalAs(UnmanagedType.I4)] LogLevel level);
+        public static extern void litert_lm_set_min_log_level(int level);
 
         /// <summary>Callback for streaming responses.</summary>
         /// <param name="callbackData">A pointer to user-defined data passed to the stream function.</param>
@@ -305,7 +306,7 @@ namespace Uralstech.UAI.LiteRTLM
 
             /// <summary>
             /// Sets whether the engine should load different sections of the litertlm file
-            /// in parallel. Defaults to true.
+            /// in parallel. Defaults to <see langword="true"/>.
             /// </summary>
             /// <param name="settings">The engine settings.</param>
             /// <param name="parallelFileSectionLoading">Whether to load in parallel.</param>
@@ -341,7 +342,7 @@ namespace Uralstech.UAI.LiteRTLM
             /// <param name="activationDataType">The activation data type.</param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_engine_settings_set_activation_data_type(IntPtr settings,
-                [MarshalAs(UnmanagedType.I4)] ActivationDataType activationDataType);
+                int activationDataType);
 
             /// <summary>
             /// Sets the prefill chunk size for the engine. Only applicable for CPU backend
@@ -795,12 +796,10 @@ namespace Uralstech.UAI.LiteRTLM
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern int litert_lm_conversation_send_message_stream(IntPtr conversation,
                 [MarshalAs(UnmanagedType.LPUTF8Str)] string messageJson,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string extraContext, IntPtr optionalArgs, IntPtr callback,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string? extraContext, IntPtr optionalArgs, IntPtr callback,
                 IntPtr callbackData);
 
-            /// <summary>
-            /// Renders the message into a string according to the template.
-            /// </summary>
+            /// <summary>Renders the message into a string according to the template.</summary>
             /// <remarks>
             /// This function does not need to be called for actual message sending, as the
             /// <see cref="litert_lm_conversation_send_message"/> and <see cref="litert_lm_conversation_send_message_stream"/>
@@ -817,9 +816,7 @@ namespace Uralstech.UAI.LiteRTLM
             public static extern IntPtr litert_lm_conversation_render_message_to_string(IntPtr conversation,
                 [MarshalAs(UnmanagedType.LPUTF8Str)] string messageJson);
 
-            /// <summary>
-            /// Renders the preface into a string according to the template.
-            /// </summary>
+            /// <summary>Renders the preface into a string according to the template.</summary>
             /// <param name="conversation">The conversation instance.</param>
             /// <returns>
             /// A pointer to the rendered string, or <see cref="IntPtr.Zero"/> on failure. The returned

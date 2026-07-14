@@ -74,4 +74,14 @@ namespace Uralstech.UAI.LiteRTLM
         String  = 0,
         Ids     = 1,
     }
+
+    public static class BackendNames
+    {
+        public const string CPU = "cpu";
+        public const string GPU = "gpu";
+        public const string NPU = "npu";
+        public const string GPUArtisan = "gpu_artisan";
+        public const string CPUArtisan = "cpu_artisan";
+        public const string GoogleTensorArtisan = "google_tensor_artisan";
+    }
 }

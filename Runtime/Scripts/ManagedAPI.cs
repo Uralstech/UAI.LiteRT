@@ -97,7 +97,7 @@ namespace Uralstech.UAI.LiteRTLM
     }
     
     /// <summary>Callback for streaming responses.</summary>
-    /// <param name="chunk">The piece of text from the stream.</param>
+    /// <param name="chunk">The stream chunk object. It's only valid for the duration of the call.</param>
     public delegate void StreamCallback(StreamChunk chunk);
     
     public abstract class LiteRTLMNativeHandle : IDisposable

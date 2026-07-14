@@ -15,15 +15,16 @@
 #nullable enable
 namespace Uralstech.UAI.LiteRTLM
 {
-    public enum LogLevel : int
+    /// <summary>Represents the log severity / level.</summary>
+    public enum LogSeverity : int
     {
-        Verbose     = 0,
-        Debug       = 1,
-        Info        = 2,
-        Warning     = 3,
-        Error       = 4,
-        Fatal       = 5,
-        Silent      = 1000,
+        Verbose = 0,
+        Debug   = 1,
+        Info    = 2,
+        Warning = 3,
+        Error   = 4,
+        Fatal   = 5,
+        Silent  = 1000,
     }
     
     /// <summary>Represents the type of sampler.</summary>
@@ -56,16 +57,16 @@ namespace Uralstech.UAI.LiteRTLM
     public enum ActivationDataType : int
     {
         /// <summary>Use float32 as the activation data type.</summary>
-        Float32,
-
+        Float32 = 0,
+        
         /// <summary>Use float16 as the activation data type.</summary>
-        Float16,
-
+        Float16 = 1,
+        
         /// <summary>Use int16 as the activation data type.</summary>
-        Int16,
-
+        Int16   = 2,
+        
         /// <summary>Use int8 as the activation data type.</summary>
-        Int8,
+        Int8    = 3,
     }
     
     /// <summary>Represents the type of a TokenUnion.</summary>

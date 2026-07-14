@@ -14,9 +14,10 @@ LiteRT-LM is under active development, and its C API changes frequently. As a re
 
 The table below shows which LiteRT-LM version is used by each UAI.LiteRTLM release.
 
-| UAI.LiteRTLM    | LiteRT-LM           | Supported Platforms |
-| --------------- | ------------------- | ------------------- |
-| 2.0.0-preview.1 | v0.14.0 (`80f301f`) | Android (arm64)     |
+| UAI.LiteRTLM    | LiteRT-LM                  | Supported Platforms |
+| --------------- | -------------------------- | ------------------- |
+| 2.1.0-preview.1 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)     |
+| 2.0.0-preview.1 | v0.14.0 (`80f301f`)        | Android (arm64)     |
 
 Since UAI.LiteRTLM uses the LiteRT-LM C API, it can theoretically support any platform that LiteRT-LM supports. However, prebuilt native binaries are currently only provided for **Android (arm64)**.
 

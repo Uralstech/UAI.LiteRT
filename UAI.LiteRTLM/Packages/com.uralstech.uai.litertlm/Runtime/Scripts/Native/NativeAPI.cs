@@ -24,16 +24,13 @@ namespace Uralstech.UAI.LiteRTLM.Native
 
         /// <summary>Sets the minimum log level for the LiteRT LM library.</summary>
         [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void litert_lm_set_min_log_level(int level);
+        public static extern void litert_lm_set_min_log_level(LogSeverity level);
 
         /// <summary>Callback for streaming responses.</summary>
         /// <param name="callbackData">A pointer to user-defined data passed to the stream function.</param>
-        /// <param name="chunk">The piece of text from the stream. It's only valid for the duration of the call.</param>
-        /// <param name="isFinal"><see langword="true"/> if this is the last chunk in the stream.</param>
-        /// <param name="errorMsg">A null-terminated string with an error message, or <see cref="IntPtr.Zero"/> on success.</param>
+        /// <param name="chunk">A pointer to the stream chunk object. It's only valid for the duration of the call.</param>
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void StreamCallback(IntPtr callbackData, IntPtr chunk,
-            [MarshalAs(UnmanagedType.I1)] bool isFinal, IntPtr errorMsg);
+        public delegate void StreamCallback(IntPtr callbackData, IntPtr chunk);
 
         public static class SamplerParams
         {
@@ -194,8 +191,95 @@ namespace Uralstech.UAI.LiteRTLM.Native
             public static extern void litert_lm_conversation_config_set_stream_tool_calls(IntPtr config,
                 [MarshalAs(UnmanagedType.I1)] bool streamToolCalls,
                 [MarshalAs(UnmanagedType.LPUTF8Str)] string channelName);
+            
+            /// <summary>Sets the thinking config for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="thinkingConfig">
+            /// The thinking config to set. If <see cref="IntPtr.Zero"/>,
+            /// clears any previously set thinking config.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_thinking_config(
+                IntPtr config, IntPtr thinkingConfig);
         }
 
+        public static class ThinkingConfig
+        {
+            /// <summary>
+            /// Creates a default LiteRT LM Thinking Config (enabled with infinite budget -1).
+            /// The caller is responsible for destroying the config using
+            /// <see cref="litert_lm_thinking_config_delete"/>.
+            /// </summary>
+            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_thinking_config_create();
+
+            /// <summary>Destroys a LiteRT LM Thinking Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_delete(IntPtr config);
+
+            /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="enableThinking">Whether thinking is enabled.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_set_enable_thinking(
+                IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enableThinking);
+
+            /// <summary>Sets the thinking token budget.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="thinkingTokenBudget">
+            /// Budget for token-by-token reasoning generation (-1 for infinite).
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_set_thinking_token_budget(
+                IntPtr config, int thinkingTokenBudget);
+        }
+
+        public static class RepetitionPenaltyConfig
+        {
+            /// <summary>
+            /// Creates a LiteRT LM Repetition Penalty Config. The caller is responsible
+            /// for destroying the config using <see cref="litert_lm_repetition_penalty_config_delete"/>.
+            /// </summary>
+            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_repetition_penalty_config_create();
+
+            /// <summary>Destroys a LiteRT LM Repetition Penalty Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_repetition_penalty_config_delete(IntPtr config);
+
+            /// <summary>Sets the repetition penalty for the repetition penalty config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="repetitionPenalty">A multiplicative penalty for any token already generated.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_repetition_penalty_config_set_repetition_penalty(
+                IntPtr config, float repetitionPenalty);
+
+            /// <summary>Sets the presence penalty for the repetition penalty config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="presencePenalty">A scalar subtracted from a logit if a token has appeared at least once.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_repetition_penalty_config_set_presence_penalty(
+                IntPtr config, float presencePenalty);
+
+            /// Sets the frequency penalty for the repetition penalty config.
+            /// <param name="config">The config to modify.</param>
+            /// <param name="frequencyPenalty">A scalar subtracted from a token's logit scaled by previous appearances.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_repetition_penalty_config_set_frequency_penalty(
+                IntPtr config, float frequencyPenalty);
+
+            /// <summary>Sets the window size for the repetition penalty config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="windowSize">The maximum number of recent tokens to consider.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_repetition_penalty_config_set_window_size(
+                IntPtr config, int windowSize);
+        }
+        
         public static class ConversationOptionalArgs
         {
             /// <summary>
@@ -212,6 +296,13 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_optional_args_delete(IntPtr optionalArgs);
 
+            /// <summary>Sets the repetition penalty configuration for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="repetitionPenaltyConfig">The repetition penalty config to set. If <see cref="IntPtr.Zero"/>, clears any previously set repetition penalty config.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_repetition_penalty_config(
+                IntPtr optionalArgs, IntPtr repetitionPenaltyConfig);
+                
             /// <summary>Sets the visual token budget for the conversation optional args.</summary>
             /// <param name="optionalArgs">The optional args to modify.</param>
             /// <param name="visualTokenBudget">The visual token budget.</param>
@@ -225,6 +316,13 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_optional_args_set_max_output_tokens(IntPtr optionalArgs,
                 int maxOutputTokens);
+            
+            /// <summary>Sets the thinking config for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="thinkingConfig">The thinking config to set. If <see cref="IntPtr.Zero"/>, clears any previously set thinking config.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_thinking_config(
+                IntPtr optionalArgs, IntPtr thinkingConfig);
         }
 
         public static class InputData
@@ -342,7 +440,7 @@ namespace Uralstech.UAI.LiteRTLM.Native
             /// <param name="activationDataType">The activation data type.</param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_engine_settings_set_activation_data_type(IntPtr settings,
-                int activationDataType);
+                ActivationDataType activationDataType);
 
             /// <summary>
             /// Sets the prefill chunk size for the engine. Only applicable for CPU backend
@@ -736,6 +834,28 @@ namespace Uralstech.UAI.LiteRTLM.Native
             public static extern double litert_lm_benchmark_info_get_decode_tokens_per_sec_at(IntPtr benchmarkInfo,
                 int index);
         }
+        
+        public static class StreamChunk
+        {
+            /// <summary>Gets the text content of the chunk.</summary>
+            /// <remarks>
+            /// The returned string is owned by the chunk and is only valid as long as the
+            /// chunk is valid. Returns <see cref="IntPtr.Zero"/> if there is no text content in this chunk
+            /// (e.g. if it is an error or metadata-only chunk).
+            /// </remarks>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_stream_chunk_get_text(IntPtr chunk);
+
+            /// <summary>Returns <see langword="true"/> if this is the final chunk of the stream.</summary>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            [return: MarshalAs(UnmanagedType.I1)]
+            public static extern bool litert_lm_stream_chunk_is_final(IntPtr chunk);
+
+            /// <summary>Gets the error message associated with this chunk, if any.</summary>
+            /// <remarks>Returns <see cref="IntPtr.Zero"/> if there is no error.</remarks>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_stream_chunk_get_error(IntPtr chunk);
+        }
 
         public static class Conversation
         {
@@ -933,8 +1053,8 @@ namespace Uralstech.UAI.LiteRTLM.Native
             /// <param name="outNumTokens">A pointer to receive the number of token ids.</param>
             /// <returns>0 on success, non-zero if the type is not <see cref="TokenUnionType.Ids"/>.</returns>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int litert_lm_token_union_get_ids(IntPtr tokenUnion, ref IntPtr outTokens,
-                ref UIntPtr outNumTokens);
+            public static extern int litert_lm_token_union_get_ids(IntPtr tokenUnion, out IntPtr outTokens,
+                out UIntPtr outNumTokens);
         }
 
         public static class TokenUnions

@@ -36,9 +36,8 @@ copy_libs() {
 
     mkdir -p "$dst"
     for lib in libGemmaModelConstraintProvider  \
-               libLiteRtTopKWebGpuSampler       \
-               libLiteRtWebGpuAccelerator       \
-               libwebgpu_dawn; do
+               libLiteRtTopKOpenClSampler       \
+               libLiteRtOpenClAccelerator; do
 
         cp \
             "${src}/${lib}.${extension}" \
@@ -55,4 +54,4 @@ copy_libs() {
 
 build android_arm64 --linkopt=-Wl,-z,max-page-size=16384 || exit 1
 copy_libs android arm64 so Android
-patch_prebuilt_lib_android arm64 libLiteRtTopKWebGpuSampler
+patch_prebuilt_lib_android arm64 libLiteRtTopKOpenClSampler

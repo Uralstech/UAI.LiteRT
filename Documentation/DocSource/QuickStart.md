@@ -1,7 +1,7 @@
 # Quick Start
 
 The example code provided in this quick start guide is for educational and demonstration purposes only.
-It may not represent best practices for production use. This quick start was last updated for **UAI.LiteRTLM v2.0.0-preview.1**.
+It may not represent best practices for production use. This quick start was last updated for **UAI.LiteRTLM v2.1.0-preview.2**.
 
 > [!IMPORTANT]
 > **UAI.LiteRTLM v2.0.0+** is a complete rewrite of the package.
@@ -16,7 +16,7 @@ The table below shows which LiteRT-LM version is used by each UAI.LiteRTLM relea
 
 | UAI.LiteRTLM    | LiteRT-LM                  | Supported Platforms |
 | --------------- | -------------------------- | ------------------- |
-| 2.1.0-preview.1 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)     |
+| 2.1.0-preview.x | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)     |
 | 2.0.0-preview.1 | v0.14.0 (`80f301f`)        | Android (arm64)     |
 
 Since UAI.LiteRTLM uses the LiteRT-LM C API, it can theoretically support any platform that LiteRT-LM supports. However, prebuilt native binaries are currently only provided for **Android (arm64)**.
@@ -32,6 +32,15 @@ Native/build.sh
 Because LiteRT-LM's C API is still evolving, the UAI.LiteRTLM API may also change between releases.
 
 **Check the release notes before updating** to a newer version.
+
+## GPU Inference
+
+To support GPU inference on Android, add the following to the `<application>` group in your `AndroidManifest.xml` to enable OpenCL:
+
+```xml
+<uses-native-library android:name="libvndksupport.so" android:required="false"/>
+<uses-native-library android:name="libOpenCL.so" android:required="false"/>
+```
 
 ## Example
 

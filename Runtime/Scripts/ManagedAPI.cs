@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using AOT;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -45,21 +46,19 @@ namespace Uralstech.UAI.LiteRTLM
         public static void Deregister(IntPtr key) =>
             s_callbacks.TryRemove(key, out _);
 
-        private static void GlobalStreamCallbackListener(IntPtr key,
-            IntPtr chunk, bool isFinal, IntPtr errorMsg)
+        [MonoPInvokeCallback(typeof(NativeAPI.StreamCallback))]
+        private static void GlobalStreamCallbackListener(IntPtr key, IntPtr chunk)
         {
+            StreamChunk? managedChunk = null;
+            bool isFinal = false;
+            
             try
             {
-                if (!s_callbacks.TryGetValue(key, out StreamCallback? callback))
-                    return;
-
-                string? chunkStr = chunk != IntPtr.Zero
-                    ? UnsafeUtils.MarshalStringUTF8(chunk) : null;
-
-                string? errorStr = errorMsg != IntPtr.Zero
-                    ? UnsafeUtils.MarshalStringUTF8(errorMsg) : null;
-
-                callback?.Invoke(chunkStr, isFinal, errorStr);
+                managedChunk = new StreamChunk(chunk);
+                isFinal = managedChunk.IsFinal();
+                
+                if (s_callbacks.TryGetValue(key, out StreamCallback? callback))
+                    callback?.Invoke(managedChunk);
             }
             catch (Exception ex)
             {
@@ -69,6 +68,8 @@ namespace Uralstech.UAI.LiteRTLM
             {
                 if (isFinal)
                     s_callbacks.TryRemove(key, out _);
+                
+                managedChunk?.Invalidate();
             }
         }
     }
@@ -91,15 +92,13 @@ namespace Uralstech.UAI.LiteRTLM
     public static class LiteRTLMNativeLogging
     {
         /// <summary>Sets the minimum log level for the LiteRT LM library.</summary>
-        public static void SetMinLogLevel(LogLevel level) =>
-            NativeAPI.litert_lm_set_min_log_level((int)level);
+        public static void SetMinLogLevel(LogSeverity level) =>
+            NativeAPI.litert_lm_set_min_log_level(level);
     }
     
     /// <summary>Callback for streaming responses.</summary>
     /// <param name="chunk">The piece of text from the stream.</param>
-    /// <param name="isFinal"><see langword="true"/> if this is the last chunk in the stream.</param>
-    /// <param name="error">A string with an error message, or <see langword="null"/> on success.</param>
-    public delegate void StreamCallback(string? chunk, bool isFinal, string? error);
+    public delegate void StreamCallback(StreamChunk chunk);
     
     public abstract class LiteRTLMNativeHandle : IDisposable
     {
@@ -333,6 +332,17 @@ namespace Uralstech.UAI.LiteRTLM
             ThrowIfDisposed();
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_stream_tool_calls(Native, streamToolCalls, channelName);
         }
+
+        /// <summary>Sets the thinking config for this conversation config.</summary>
+        /// <param name="thinkingConfig">
+        /// The thinking config to set. If <see langword="null"/>,
+        /// clears any previously set thinking config.
+        /// </param>
+        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_thinking_config(Native, thinkingConfig);
+        }
         
         protected override void ReleaseUnmanagedResources()
         {
@@ -341,6 +351,100 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
 
+    public sealed class ThinkingConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around a LiteRT LM thinking configuration.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public ThinkingConfig()
+        {
+            Native = NativeAPI.ThinkingConfig.litert_lm_thinking_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native thinking config.");
+        }
+
+        /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
+        /// <param name="enableThinking">Whether thinking is enabled.</param>
+        public void SetEnableThinking(bool enableThinking)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_enable_thinking(Native, enableThinking);
+        }
+
+        /// <summary>Sets the thinking token budget.</summary>
+        /// <param name="thinkingTokenBudget">
+        /// Budget for token-by-token reasoning generation (-1 for infinite).
+        /// </param>
+        public void SetThinkingTokenBudget(int thinkingTokenBudget)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_thinking_token_budget(Native, thinkingTokenBudget);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.ThinkingConfig.litert_lm_thinking_config_delete(Native);
+        }
+    }
+
+    public sealed class RepetitionPenaltyConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around a LiteRT LM repetition penalty configuration.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public RepetitionPenaltyConfig()
+        {
+            Native = NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native repetition penalty config.");
+        }
+
+        /// <summary>Sets the repetition penalty for the repetition penalty config.</summary>
+        /// <param name="repetitionPenalty">A multiplicative penalty for any token already generated.</param>
+        public void SetRepetitionPenalty(float repetitionPenalty)
+        {
+            ThrowIfDisposed();
+            NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_repetition_penalty(Native, repetitionPenalty);
+        }
+        
+        /// <summary>Sets the presence penalty for the repetition penalty config.</summary>
+        /// <param name="presencePenalty">A scalar subtracted from a logit if a token has appeared at least once.</param>
+        public void SetPresencePenalty(float presencePenalty)
+        {
+            ThrowIfDisposed();
+            NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_presence_penalty(Native, presencePenalty);
+        }
+        
+        /// Sets the frequency penalty for the repetition penalty config.
+        /// <param name="frequencyPenalty">A scalar subtracted from a token's logit scaled by previous appearances.</param>
+        public void SetFrequencyPenalty(float frequencyPenalty)
+        {
+            ThrowIfDisposed();
+            NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_frequency_penalty(Native, frequencyPenalty);
+        }
+
+        /// <summary>Sets the window size for the repetition penalty config.</summary>
+        /// <param name="windowSize">The maximum number of recent tokens to consider.</param>
+        public void SetWindowSize(int windowSize)
+        {
+            ThrowIfDisposed();
+            NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_window_size(Native, windowSize);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_delete(Native);
+        }
+    }
+    
     public sealed class ConversationOptionalArgs : LiteRTLMNativeHandle
     {
         /// <summary>
@@ -354,6 +458,14 @@ namespace Uralstech.UAI.LiteRTLM
             Native = NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_create();
             if (Native == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to create native conversation optional args.");
+        }
+
+        /// <summary>Sets the repetition penalty configuration for the conversation optional args.</summary>
+        /// <param name="repetitionPenaltyConfig">The repetition penalty config to set. If <see langword="null"/>, clears any previously set repetition penalty config.</param>
+        public void SetRepetitionPenaltyConfig(RepetitionPenaltyConfig? repetitionPenaltyConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_repetition_penalty_config(Native, repetitionPenaltyConfig);
         }
 
         /// <summary>Sets the visual token budget for the conversation optional arguments.</summary>
@@ -372,6 +484,14 @@ namespace Uralstech.UAI.LiteRTLM
             ThrowIfDisposed();
             NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_max_output_tokens(
                 Native, maxOutputTokens);
+        }
+
+        /// <summary>Sets the thinking config for the conversation optional args.</summary>
+        /// <param name="thinkingConfig">The thinking config to set. If <see langword="null"/>, clears any previously set thinking config.</param>
+        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_thinking_config(Native, thinkingConfig);
         }
         
         protected override void ReleaseUnmanagedResources()
@@ -568,7 +688,7 @@ namespace Uralstech.UAI.LiteRTLM
         public void SetActivationDataType(ActivationDataType activationDataType)
         {
             ThrowIfDisposed();
-            NativeAPI.EngineSettings.litert_lm_engine_settings_set_activation_data_type(Native, (int)activationDataType);
+            NativeAPI.EngineSettings.litert_lm_engine_settings_set_activation_data_type(Native, activationDataType);
         }
         
         /// <summary>
@@ -1186,6 +1306,53 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
 
+    public sealed class StreamChunk
+    {
+        private readonly IntPtr _native;
+        private bool _isValid = true;
+        
+        public StreamChunk(IntPtr native)
+        {
+            _native = native;
+        }
+
+        /// <summary>Gets the text content of the chunk.</summary>
+        /// <returns>Returns <see langword="null"/> if there is no text content in this chunk (e.g. if it is an error or metadata-only chunk).</returns>
+        public string? GetText()
+        {
+            ThrowIfInvalid();
+
+            IntPtr ptr = NativeAPI.StreamChunk.litert_lm_stream_chunk_get_text(_native);
+            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
+        }
+
+        /// <summary>Returns <see langword="true"/> if this is the final chunk of the stream.</summary>
+        public bool IsFinal()
+        {
+            ThrowIfInvalid();
+            return NativeAPI.StreamChunk.litert_lm_stream_chunk_is_final(_native);
+        }
+        
+        /// <summary>Gets the error message associated with this chunk, if any.</summary>
+        /// <remarks>Returns <see langword="null"/> if there is no error.</remarks>
+        public string? GetError()
+        {
+            ThrowIfInvalid();
+
+            IntPtr ptr = NativeAPI.StreamChunk.litert_lm_stream_chunk_get_error(_native);
+            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
+        }
+
+        internal void Invalidate() =>
+            _isValid = false;
+
+        private void ThrowIfInvalid()
+        {
+            if (!_isValid)
+                throw new ObjectDisposedException(nameof(StreamChunk));
+        }
+    }
+    
     public sealed class Conversation : LiteRTLMNativeHandle
     {
         /// <summary>
@@ -1464,9 +1631,8 @@ namespace Uralstech.UAI.LiteRTLM
         public int GetIds(out int[]? tokenIds)
         {
             ThrowIfDisposed();
-            (IntPtr ptr, UIntPtr length) = (IntPtr.Zero, UIntPtr.Zero);
             
-            int result = NativeAPI.TokenUnion.litert_lm_token_union_get_ids(Native, ref ptr, ref length);
+            int result = NativeAPI.TokenUnion.litert_lm_token_union_get_ids(Native, out IntPtr ptr, out UIntPtr length);
             tokenIds = result == 0 ? UnsafeUtils.CopyFrom<int>(ptr, (int)length) : null;
             return result;
         }

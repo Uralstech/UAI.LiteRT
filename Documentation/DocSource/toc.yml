@@ -1,5 +1,5 @@
 pdfFileName: Documentation.pdf
-pdfTocPage: true
+pdfTocPage: false
 pdf: true
 pdfPrintBackground: true
 

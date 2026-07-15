@@ -62,6 +62,8 @@ patch_prebuilt_lib_android arm64 libLiteRtTopKOpenClSampler
 
 # ------------------------------  macOS  ------------------------------
 
+# Note: Unity needs to load the Metal accelerators on startup for
+# liblitert-lm.dylib to register it.
 
 build macos_arm64 --linkopt=-Wl,-rpath,@loader_path \
     --linkopt="-Wl,-exported_symbol,_LiteRt*"       \

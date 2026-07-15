@@ -1315,6 +1315,8 @@ namespace Uralstech.UAI.LiteRTLM
         {
             _native = native;
         }
+        
+        public static implicit operator IntPtr(StreamChunk? handle) => handle?._native ?? IntPtr.Zero;
 
         /// <summary>Gets the text content of the chunk.</summary>
         /// <returns>Returns <see langword="null"/> if there is no text content in this chunk (e.g. if it is an error or metadata-only chunk).</returns>

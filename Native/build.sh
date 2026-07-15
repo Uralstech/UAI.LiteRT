@@ -8,9 +8,9 @@ build() {
     local config="$1"
     shift
 
-    bazel build                                     \
-        --config="${config}"                        \
-        "$@"                                        \
+    bazel build                     \
+        --config="${config}"        \
+        -c opt "$@"                 \
         //c:litert-lm || return 1
 
 }
@@ -35,9 +35,12 @@ copy_libs() {
     local dst="${PLUGIN_DIR}/${plugin_subdir}/${arch}"
 
     mkdir -p "$dst"
-    for lib in libGemmaModelConstraintProvider  \
+    for lib in libLiteRt                        \
+               libGemmaModelConstraintProvider  \
                libLiteRtTopKOpenClSampler       \
-               libLiteRtOpenClAccelerator; do
+               libLiteRtOpenClAccelerator       \
+               libLiteRtTopKMetalSampler        \
+               libLiteRtMetalAccelerator; do
 
         cp \
             "${src}/${lib}.${extension}" \
@@ -55,3 +58,16 @@ copy_libs() {
 build android_arm64 --linkopt=-Wl,-z,max-page-size=16384 || exit 1
 copy_libs android arm64 so Android
 patch_prebuilt_lib_android arm64 libLiteRtTopKOpenClSampler
+
+
+# ------------------------------  macOS  ------------------------------
+
+
+build macos_arm64 --linkopt=-Wl,-rpath,@loader_path \
+    --linkopt="-Wl,-exported_symbol,_LiteRt*"       \
+    --linkopt="-Wl,-exported_symbol,_litert_lm_*"   \
+    --define=litert_link_capi_so=true               \
+    --define=litert_runtime_link_mode=dynamic       \
+    --define=resolve_symbols_in_exec=false || exit 1
+
+copy_libs macos arm64 dylib macOS

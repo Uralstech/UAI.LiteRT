@@ -1,6 +1,6 @@
 {
-    "name": "UAI.LiteRTLM",
-    "rootNamespace": "",
+    "name": "UAI.LiteRTLM.Runtime",
+    "rootNamespace": "Uralstech.UAI.LiteRTLM",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

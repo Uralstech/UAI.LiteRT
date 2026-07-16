@@ -52,7 +52,7 @@ PluginImporter:
     iOS:
       enabled: 1
       settings:
-        AddToEmbeddedBinaries: false
+        AddToEmbeddedBinaries: true
         CPU: ARM64
         CompileFlags: 
         FrameworkDependencies: CoreFoundation;Foundation;Metal;

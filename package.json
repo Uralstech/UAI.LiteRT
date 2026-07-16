@@ -3,7 +3,7 @@
   "displayName": "UAI.LiteRTLM",
   "description": "LiteRT-LM model inference support for Unity apps.",
   "keywords": [],
-  "version": "2.1.0-preview.3",
+  "version": "2.1.0-preview.4",
   "unity": "6000.0",
   "hideInEditor": false,
   "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",

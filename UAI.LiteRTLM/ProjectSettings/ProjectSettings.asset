@@ -165,7 +165,8 @@ PlayerSettings:
   androidMinAspectRatio: 1
   applicationIdentifier:
     Android: com.Uralstech.PackageTemplate
-    Standalone: com.Uralstech.3D-Project
+    Standalone: com.Uralstech.PackageTemplate
+    iPhone: com.Uralstech.PackageTemplate
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -189,8 +190,8 @@ PlayerSettings:
   StripUnusedMeshComponents: 1
   strictShaderVariantMatching: 0
   VertexChannelCompressionMask: 4054
-  iPhoneSdkVersion: 988
-  iOSSimulatorArchitecture: 0
+  iPhoneSdkVersion: 989
+  iOSSimulatorArchitecture: 1
   iOSTargetOSVersionString: 15.0
   tvOSSdkVersion: 0
   tvOSSimulatorArchitecture: 0
@@ -585,6 +586,9 @@ PlayerSettings:
   m_BuildTargetDefaultTextureCompressionFormat:
   - serializedVersion: 3
     m_BuildTarget: Android
+    m_Formats: 03000000
+  - serializedVersion: 3
+    m_BuildTarget: iOS
     m_Formats: 03000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0

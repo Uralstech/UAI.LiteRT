@@ -1,0 +1,16 @@
+{
+    "name": "UAI.LiteRTLM.Editor",
+    "rootNamespace": "Uralstech.UAI.LiteRTLM.Editor",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

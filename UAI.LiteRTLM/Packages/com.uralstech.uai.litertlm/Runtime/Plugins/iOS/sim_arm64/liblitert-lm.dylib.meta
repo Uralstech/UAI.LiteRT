@@ -52,7 +52,7 @@ PluginImporter:
     iOS:
       enabled: 1
       settings:
-        AddToEmbeddedBinaries: false
+        AddToEmbeddedBinaries: true
         CPU: ARM64Simulator
         CompileFlags: 
         FrameworkDependencies: AudioToolbox;AVFoundation;CoreFoundation;Foundation;Security;UIKit;Metal;

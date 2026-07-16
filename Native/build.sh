@@ -29,6 +29,13 @@ patch_prebuilt_lib_android() {
     fi
 }
 
+patch_lib_ios() {
+    local arch="$1"
+    local dst="${PLUGIN_DIR}/iOS/${arch}"
+
+    install_name_tool -id "@rpath/${BUILT_SYMBOL}.dylib" "${dst}/${BUILT_SYMBOL}.dylib"
+}
+
 force_copy_file() {
     local src_file="$1"
     local dst_file="$2"
@@ -85,6 +92,8 @@ copy_libs macos arm64 dylib macOS "${PREBUILT_LIBS_APPLE}"
 
 build ios_arm64 || exit 1
 copy_libs ios arm64 dylib iOS "${PREBUILT_LIBS_APPLE}"
+patch_lib_ios arm64
 
 build ios_sim_arm64 || exit 1
 copy_libs ios sim_arm64 dylib iOS "${PREBUILT_LIBS_APPLE}"
+patch_lib_ios sim_arm64

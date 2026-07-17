@@ -1,7 +1,7 @@
 # Quick Start
 
 The example code in this quick start guide is provided for educational and demonstration purposes only.
-It may not represent best practices for production use. This quick start was last updated for **UAI.LiteRTLM v2.1.0-preview.3**.
+It may not represent best practices for production use. This quick start was last updated for **UAI.LiteRTLM v2.1.0-preview.5**.
 
 ## Aim
 
@@ -30,8 +30,8 @@ This package tries to follow [semantic versioning](https://semver.org/), with a 
 
 While UAI.LiteRTLM aims to support all platforms supported by LiteRT-LM, it currently only includes prebuilt native binaries for a
 subset of them, depending on the package version. The package aims to provide LiteRT-LM binaries without C patches and builds the default
-`c:litert-lm` Bazel target with platform-specific command-line arguments. The build script for all platforms is available in
-[`Native/build.sh`](https://github.com/Uralstech/UAI.LiteRTLM/blob/master/Native/build.sh). You can build your own binaries for
+`c:litert-lm` Bazel target with platform-specific command-line arguments. The build scripts for all platforms are available in
+[`Native/`](https://github.com/Uralstech/UAI.LiteRTLM/blob/master/Native). You can build your own binaries for
 additional platforms and include them in your project's `Plugins` directory. UAI.LiteRTLM should use them as-is for that platform.
 
 UAI.LiteRTLM also does not include every LiteRT-LM GPU accelerator. Only one accelerator is included per platform.
@@ -64,6 +64,7 @@ data to streamed operations because the wrappers use their own data to track man
 
 | UAI.LiteRTLM    | LiteRT-LM                  | Included Platforms             | Included Accelerators                |
 | --------------- | -------------------------- | ------------------------------ | ------------------------------------ |
+| 2.1.0-preview.5 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*)<br/>WebGPU (Windows) |
 | 2.1.0-preview.4 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*) |
 | 2.1.0-preview.3 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS) |
 | 2.1.0-preview.2 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>OpenCL                          |
@@ -98,7 +99,7 @@ private async Awaitable RunConversation()
     Directory.CreateDirectory(cacheDir);
     
     using EngineSettings engineSettings = new(modelPath, BackendNames.GPU);
-    engineSettings.SetEnableSpeculativeDecoding(true);
+    engineSettings.SetEnableSpeculativeDecoding(true); // Can perform badly on WebGPU on Windows.
     engineSettings.SetCacheDir(cacheDir);
     engineSettings.EnableBenchmark();
     

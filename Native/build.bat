@@ -60,6 +60,8 @@ exit /b 0
 set "WIN_LIBS_SRC=.\bazel-bin\python\litert_lm"
 set "WIN_LIBS_DST=%PLUGIN_DIR%\Windows\x86_64"
 
+if not exist "%WIN_LIBS_DST%" mkdir "%WIN_LIBS_DST%"
+
 bazelisk                                    ^
     --output_base="%BAZEL_OUT%"             ^
     build                                   ^
@@ -97,17 +99,5 @@ if errorlevel 1 exit /b 1
 
 call :copy_libs "litert-lm" windows x86_64 dll Windows "%PREBUILT_LIBS_PC%"
 call :copy_windows_x64_libs
-
-
-:: ------------------------------  Linux  ------------------------------
-
-:: call :build linux_x86_64                        ^
-::     "--define=litert_link_capi_so=true"         ^
-::     "--define=litert_runtime_link_mode=dynamic" ^
-::     "--define=resolve_symbols_in_exec=false"
-:: 
-:: if errorlevel 1 exit /b 1
-:: 
-:: call :copy_libs "liblitert-lm" linux x86_64 so Linux "%PREBUILT_LIBS_PC%"
 
 exit /b 0

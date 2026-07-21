@@ -62,14 +62,14 @@ data to streamed operations because the wrappers use their own data to track man
 
 ### Version - LiteRT-LM - Platforms - Accelerators Table
 
-| UAI.LiteRTLM    | LiteRT-LM                  | Included Platforms             | Included Accelerators                |
-| --------------- | -------------------------- | ------------------------------ | ------------------------------------ |
-| 2.1.0-preview.5 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*)<br/>WebGPU (Windows) |
-| 2.1.0-preview.4 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*) |
-| 2.1.0-preview.3 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS) |
-| 2.1.0-preview.2 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>OpenCL                          |
-| 2.1.0-preview.1 | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>WebGPU                          |
-| 2.0.0-preview.1 | v0.14.0 (`80f301f`)        | Android (arm64)                | CPU<br/>WebGPU                          |
+| UAI.LiteRTLM     | LiteRT-LM                  | Included Platforms             | Included Accelerators                |
+| ---------------- | -------------------------- | ------------------------------ | ------------------------------------ |
+| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*)<br/>WebGPU (Windows) |
+| 2.1.0-preview.4  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*) |
+| 2.1.0-preview.3  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS) |
+| 2.1.0-preview.2  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>OpenCL                          |
+| 2.1.0-preview.1  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>WebGPU                          |
+| 2.0.0-preview.1  | v0.14.0 (`80f301f`)        | Android (arm64)                | CPU<br/>WebGPU                          |
 
 \* Complete Metal acceleration is available on iOS devices, but this LiteRT-LM version does not provide a Metal-accelerated `TopKSampler` for iOS simulators.
 

@@ -25,9 +25,16 @@ using Uralstech.UAI.LiteRTLM.Native;
 #nullable enable
 namespace Uralstech.UAI.LiteRTLM
 {
-    internal static class StreamCallbackHandler
+    internal static partial class StreamCallbackHandler
     {
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
+#endif
         private static int s_idCounter;
+
+#if UNITY_6000_5_OR_NEWER
+        [Unity.Scripting.LifecycleManagement.AutoStaticsCleanup]
+#endif
         private static readonly ConcurrentDictionary<IntPtr, StreamCallback> s_callbacks = new();
 
         private static readonly NativeAPI.StreamCallback s_globalCallbackListenerInst =

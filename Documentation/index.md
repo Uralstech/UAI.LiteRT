@@ -11,7 +11,7 @@ LiteRT-LM model inference support for Unity apps.
 
 ## Installation
 
-This package was designed for Unity 6.0 and above. Built and tested in Unity 6.4.
+This package was designed for Unity 6.0 and above. Built and tested in Unity 6.5.
 
 # [OpenUPM](#tab/openupm)
 

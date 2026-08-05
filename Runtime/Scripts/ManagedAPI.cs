@@ -314,6 +314,17 @@ namespace Uralstech.UAI.LiteRTLM
             ThrowIfDisposed();
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_extra_context(Native, extraContextJson);
         }
+
+        /// <summary>Sets the prompt template for this conversation config.</summary>
+        /// <param name="promptTemplate">
+        /// The prompt template string (e.g. Jinja template).
+        /// If not set, use the default provided by the model or the engine.
+        /// </param>
+        public void SetPromptTemplate(string promptTemplate)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_prompt_template(Native, promptTemplate);
+        }
         
         /// <summary>Sets whether to enable constrained decoding for this conversation configuration.</summary>
         /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
@@ -321,6 +332,22 @@ namespace Uralstech.UAI.LiteRTLM
         {
             ThrowIfDisposed();
             NativeAPI.ConversationConfig.litert_lm_conversation_config_set_enable_constrained_decoding(Native, enableConstrainedDecoding);
+        }
+
+        /// <summary>Sets the constraint provider type for this conversation config.</summary>
+        /// <param name="providerType">The constraint provider type to use, or <see langword="null"/> to unset.</param>
+        public unsafe void SetConstraintProvider(ConstraintProviderType? providerType)
+        {
+            ThrowIfDisposed();
+            if (!providerType.HasValue)
+            {
+                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, IntPtr.Zero);
+                return;
+            }
+            
+            Span<ConstraintProviderType> providerTypeSpan = stackalloc ConstraintProviderType[1] { providerType.Value };
+            fixed (ConstraintProviderType* providerTypePtr = providerTypeSpan)
+                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, (IntPtr)providerTypePtr);
         }
         
         /// <summary>Sets whether to filter channel content from the KV cache.</summary>
@@ -401,10 +428,20 @@ namespace Uralstech.UAI.LiteRTLM
     public sealed class RepetitionPenaltyConfig : LiteRTLMNativeHandle
     {
         /// <summary>
-        /// Creates a managed wrapper around a LiteRT LM repetition penalty configuration.
-        /// The caller is responsible for disposing the wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// Creates a LiteRT LM Repetition Penalty Config with default values
+        /// (<c>repetition_penalty</c> = 1.0f, <c>presence_penalty</c> = 0.0f,
+        /// <c>frequency_penalty</c> = 0.0f, <c>window_size</c> = 0, which means all history with
+        /// no penalties active).
         /// </summary>
+        /// <remarks>
+        /// When multiple penalties are configured and active, the order of application
+        /// to output logits during decoding is:
+        /// <list type="number">
+        /// <item><description>Multiplicative penalty (<c>repetition_penalty</c>)</description></item>
+        /// <item><description>Subtractive penalties (<c>presence_penalty</c> and <c>frequency_penalty</c>).</description></item>
+        /// </list>
+        /// The caller is responsible for disposing the wrapper using <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public RepetitionPenaltyConfig()
         {
@@ -413,24 +450,41 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new InvalidOperationException("Failed to create native repetition penalty config.");
         }
 
-        /// <summary>Sets the repetition penalty for the repetition penalty config.</summary>
-        /// <param name="repetitionPenalty">A multiplicative penalty for any token already generated.</param>
+        /// <summary>Sets the multiplicative repetition penalty for the repetition penalty config.</summary>
+        /// <param name="repetitionPenalty">
+        /// A multiplicative penalty applied to a token's logit
+        /// if that token has appeared at least once inside the generated window history
+        /// (e.g., 1.0 = no penalty, 1.2 = moderate penalty). Positive logits are divided
+        /// by this parameter, and negative logits are multiplied (HuggingFace style).
+        /// The parameter must be &gt;= 1.0f; values less than 1.0f are automatically
+        /// clamped to 1.0f during execution.
+        /// </param>
         public void SetRepetitionPenalty(float repetitionPenalty)
         {
             ThrowIfDisposed();
             NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_repetition_penalty(Native, repetitionPenalty);
         }
         
-        /// <summary>Sets the presence penalty for the repetition penalty config.</summary>
-        /// <param name="presencePenalty">A scalar subtracted from a logit if a token has appeared at least once.</param>
+        /// <summary>Sets the subtractive presence penalty for the repetition penalty config.</summary>
+        /// <param name="presencePenalty">
+        /// A scalar subtracted from a token's logit if that
+        /// token has appeared at least once inside the generated window history.
+        /// Positive values discourage repetition, while negative values reward repeating
+        /// tokens (OpenAI style). Defaults to 0.0f.
+        /// </param>
         public void SetPresencePenalty(float presencePenalty)
         {
             ThrowIfDisposed();
             NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_set_presence_penalty(Native, presencePenalty);
         }
         
-        /// Sets the frequency penalty for the repetition penalty config.
-        /// <param name="frequencyPenalty">A scalar subtracted from a token's logit scaled by previous appearances.</param>
+        /// <summary>Sets the subtractive frequency penalty for the repetition penalty config.</summary>
+        /// <param name="frequencyPenalty">
+        /// A scalar subtracted from a token's logit, scaled
+        /// linearly by the number of times that token has previously appeared inside the
+        /// generated window history. Positive values discourage repetition, while
+        /// negative values reward repeating tokens (OpenAI style). Defaults to 0.0f.
+        /// </param>
         public void SetFrequencyPenalty(float frequencyPenalty)
         {
             ThrowIfDisposed();
@@ -438,7 +492,12 @@ namespace Uralstech.UAI.LiteRTLM
         }
 
         /// <summary>Sets the window size for the repetition penalty config.</summary>
-        /// <param name="windowSize">The maximum number of recent tokens to consider.</param>
+        /// <param name="windowSize">
+        /// The maximum number of recent tokens in generation history
+        /// to consider when computing penalization. Tokens generated prior to this
+        /// window are forgotten. A value of 0 means tracking all infinite generation
+        /// history. Must be >= 0; negative values are clamped to 0 during execution.
+        /// </param>
         public void SetWindowSize(int windowSize)
         {
             ThrowIfDisposed();
@@ -449,6 +508,116 @@ namespace Uralstech.UAI.LiteRTLM
         {
             if (Native != IntPtr.Zero)
                 NativeAPI.RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_delete(Native);
+        }
+    }
+
+    public sealed class NoRepeatNgramConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a LiteRT LM No Repeat Ngram Config with default values
+        /// (<c>no_repeat_ngram_size</c> = 0, <c>window_size</c> = 0, which means no repeat ngram
+        /// banning is disabled).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <c>no_repeat_ngram_size</c> is set greater than 0, any sequence of tokens (an
+        /// ngram of that exact length) generated during decoding or present inside the
+        /// window history can only occur at most once. If generating a candidate token
+        /// would complete a repeating ngram, that candidate token's logit is set to
+        /// -inf.
+        ///</para>
+        /// <para>
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public NoRepeatNgramConfig()
+        {
+            Native = NativeAPI.NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native no-repeat ngram config.");
+        }
+
+        /// <summary>Sets the no repeat ngram size for the no repeat ngram config.</summary>
+        /// <param name="noRepeatNgramSize">
+        /// The size of ngrams (consecutive token sequences) that are banned from
+        /// repeating within the generation history window. If set &gt; 0, when generating
+        /// the next token would complete an already observed <c>no_repeat_ngram_size</c>
+        /// sequence, the logit of the candidate token is set to -inf. If set &lt;= 0,
+        /// no repeat ngram banning is disabled. Negative values are
+        /// automatically clamped to 0 during execution.
+        /// </param>
+        public void SetNoRepeatNgramSize(int noRepeatNgramSize)
+        {
+            ThrowIfDisposed();
+            NativeAPI.NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_set_no_repeat_ngram_size(Native, noRepeatNgramSize);
+        }
+
+        /// <summary>Sets the window size for the no repeat ngram config.</summary>
+        /// <param name="windowSize">
+        /// The maximum number of recent tokens in generation history to consider
+        /// when checking for repeating ngrams. Tokens generated prior to this window are forgotten.
+        /// A value of 0 means tracking all infinite generation history. Must be &gt;= 0;
+        /// negative values are clamped to 0. If <c>window_size</c> is greater than 0 but
+        /// less than <c>no_repeat_ngram_size</c>, it is automatically clamped to
+        /// <c>no_repeat_ngram_size</c> so that the ngrams can fit and be tracked.
+        /// </param>
+        public void SetWindowSize(int windowSize)
+        {
+            ThrowIfDisposed();
+            NativeAPI.NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_set_window_size(Native, windowSize);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_delete(Native);
+        }
+    }
+
+    public sealed class SuppressTokensConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a LiteRT LM Suppress Tokens Config with default values (an empty set
+        /// of suppressed tokens, which means token suppression is disabled).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <c>suppress_tokens</c> is configured with one or more token IDs, the logits
+        /// corresponding to those exact token IDs will be set directly to -inf during
+        /// generation. This guarantees that those tokens can never be sampled by the model.
+        /// </para>
+        /// <para>
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public SuppressTokensConfig()
+        {
+            Native = NativeAPI.SuppressTokensConfig.litert_lm_suppress_tokens_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native suppress tokens config.");
+        }
+        /// <summary>Sets the list of token IDs to suppress for the suppress tokens config.</summary>
+        /// <param name="suppressTokens">
+        /// An array of integer token IDs that should be banned
+        /// from generation. During every decode step, each listed token ID's candidate
+        /// logit will be forced to -inf. If <c>suppress_tokens</c> is <see langword="null"/>
+        /// or empty, any previously set suppressed tokens are cleared
+        /// and token suppression is disabled.
+        /// </param>
+        public void SetSuppressTokens(int[]? suppressTokens)
+        {
+            ThrowIfDisposed();
+            NativeAPI.SuppressTokensConfig.litert_lm_suppress_tokens_config_set_suppress_tokens(Native, suppressTokens, (UIntPtr)(suppressTokens?.Length ?? 0));
+        }
+
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.SuppressTokensConfig.litert_lm_suppress_tokens_config_delete(Native);
         }
     }
     
@@ -467,12 +636,54 @@ namespace Uralstech.UAI.LiteRTLM
                 throw new InvalidOperationException("Failed to create native conversation optional args.");
         }
 
-        /// <summary>Sets the repetition penalty configuration for the conversation optional args.</summary>
-        /// <param name="repetitionPenaltyConfig">The repetition penalty config to set. If <see langword="null"/>, clears any previously set repetition penalty config.</param>
+        /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
+        /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
+        /// generated during the current <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="repetitionPenaltyConfig">The repetition penalty configuration.
+        /// The contents are deep-copied when set. If <see langword="null"/>, clears any
+        /// previously set repetition penalty config so no penalties apply.
+        /// </param>
         public void SetRepetitionPenaltyConfig(RepetitionPenaltyConfig? repetitionPenaltyConfig)
         {
             ThrowIfDisposed();
             NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_repetition_penalty_config(Native, repetitionPenaltyConfig);
+        }
+
+        /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
+        /// exclusively to the output sequence generated during the current
+        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="noRepeatNgramConfig">
+        /// The no repeat ngram configuration.
+        /// The contents are deep-copied when set. If <see langword="null"/>, clears any previously
+        /// set no repeat ngram config so no repeat ngram banning applies.
+        /// </param>
+        public void SetNoRepeatNgramConfig(NoRepeatNgramConfig? noRepeatNgramConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_no_repeat_ngram_config(Native, noRepeatNgramConfig);
+        }
+
+        /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured list of suppressed tokens applies
+        /// exclusively to the output sequence generated during the current
+        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="suppressTokensConfig">
+        /// The suppress tokens configuration. The contents are deep-copied when
+        /// set. If <see langword="null"/> or if the inner token set is disabled/empty, clears any
+        /// previously set suppress tokens config so no token suppression applies.
+        /// </param>
+        public void SetSuppressTokensConfig(SuppressTokensConfig? suppressTokensConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_suppress_tokens_config(Native, suppressTokensConfig);
         }
 
         /// <summary>Sets the visual token budget for the conversation optional arguments.</summary>
@@ -500,6 +711,15 @@ namespace Uralstech.UAI.LiteRTLM
             ThrowIfDisposed();
             NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_thinking_config(Native, thinkingConfig);
         }
+
+        /// <summary>Sets the constraint for the conversation optional args.</summary>
+        /// <param name="constraintType">The type of constraint.</param>
+        /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
+        public void SetConstraint(ConstraintType constraintType, string constraintString)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_constraint(Native, constraintType, constraintString);
+        }
         
         protected override void ReleaseUnmanagedResources()
         {
@@ -522,8 +742,9 @@ namespace Uralstech.UAI.LiteRTLM
         /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public InputData(InputDataType dataType, IntPtr nativeData, UIntPtr size)
         {
-            if (nativeData == IntPtr.Zero || size == UIntPtr.Zero)
-                throw new ArgumentException("Invalid data and/or size.");
+            if ((nativeData == IntPtr.Zero || size == UIntPtr.Zero)
+                && dataType is not InputDataType.ImageEnd and not InputDataType.AudioEnd)
+                throw new ArgumentException("Data is IntPtr.Zero or size is 0. This is invalid unless dataType is InputDataType.ImageEnd or InputDataType.AudioEnd.");
             
             Native = NativeAPI.InputData.litert_lm_input_data_create(dataType, nativeData, size);
             if (Native == IntPtr.Zero)
@@ -561,9 +782,10 @@ namespace Uralstech.UAI.LiteRTLM
         /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
         public unsafe InputData(InputDataType dataType, ReadOnlySpan<byte> data)
         {
-            if (data.IsEmpty)
-                throw new ArgumentException("Data cannot be empty.", nameof(data));
-            
+            if (data.IsEmpty
+                && dataType is not InputDataType.ImageEnd and not InputDataType.AudioEnd)
+                throw new ArgumentException("Data cannot be empty unless dataType is InputDataType.ImageEnd or InputDataType.AudioEnd.", nameof(data));
+
             fixed (byte* dataPtr = data)
                 Native = NativeAPI.InputData.litert_lm_input_data_create(dataType, (IntPtr)dataPtr, (UIntPtr)data.Length);
             
@@ -738,6 +960,45 @@ namespace Uralstech.UAI.LiteRTLM
         {
             ThrowIfDisposed();
             NativeAPI.EngineSettings.litert_lm_engine_settings_set_enable_speculative_decoding(Native, enableSpeculativeDecoding);
+        }
+
+        /// <summary>Sets the number of decode steps per sync for the GPU backend.</summary>
+        /// <remarks>Note: This setting is currently only supported for the Artisan GPU backend (<see cref="BackendNames.GPUArtisan"/>).</remarks>
+        /// <param name="numDecodeStepsPerSync">The number of decode steps per sync.</param>
+        public void SetGPUDecodeStepsPerSync(int numDecodeStepsPerSync)
+        {
+            ThrowIfDisposed();
+            NativeAPI.EngineSettings.litert_lm_engine_settings_set_gpu_decode_steps_per_sync(Native, numDecodeStepsPerSync);
+        }
+
+        /// <summary>Sets whether to wait for weight uploads for the GPU backend.</summary>
+        /// <remarks>Note: This setting is currently only supported for the Artisan GPU backend (<see cref="BackendNames.GPUArtisan"/>).</remarks>
+        /// <param name="waitForWeightUploads">Whether to wait for weight uploads.</param>
+        public void SetGPUWaitForWeightUploads(bool waitForWeightUploads)
+        {
+            ThrowIfDisposed();
+            NativeAPI.EngineSettings.litert_lm_engine_settings_set_gpu_wait_for_weight_uploads(Native, waitForWeightUploads);
+        }
+
+        /// <summary>Sets whether to use ringbuffers for local attention KV cache.</summary>
+        /// <remarks>
+        /// <para>
+        /// When enabled for supported models, a ringbuffer stores only necessary KV
+        /// cache memory for local attention layers, minimizing memory usage. When
+        /// disabled, memory is allocated for the full context length, enabling instant
+        /// rewinding at the cost of higher memory usage.
+        /// </para>
+        /// <para>
+        /// Note: This feature is backend-agnostic in interface design, but currently
+        /// only supported by the GPU Artisan backend. Enabling it on unsupported models
+        /// or backends will be ignored with a warning.
+        /// </para>
+        ///</remarks>
+        /// <param name="useRingbuffersLocalAttention">Whether to use ringbuffers for local attention.</param>
+        public void SetUseRingbuffersLocalAttention(bool useRingbuffersLocalAttention)
+        {
+            ThrowIfDisposed();
+            NativeAPI.EngineSettings.litert_lm_engine_settings_set_use_ringbuffers_local_attention(Native, useRingbuffersLocalAttention);
         }
         
         /// <summary>Sets the LoRA rank for the engine.</summary>
@@ -1323,7 +1584,14 @@ namespace Uralstech.UAI.LiteRTLM
             _native = native;
         }
         
-        public static implicit operator IntPtr(StreamChunk? handle) => handle?._native ?? IntPtr.Zero;
+        public static implicit operator IntPtr(StreamChunk? handle)
+        {
+            if (handle == null)
+                return IntPtr.Zero;
+            
+            handle.ThrowIfInvalid();
+            return handle._native;
+        }
 
         /// <summary>Gets the text content of the chunk.</summary>
         /// <returns>Returns <see langword="null"/> if there is no text content in this chunk (e.g. if it is an error or metadata-only chunk).</returns>

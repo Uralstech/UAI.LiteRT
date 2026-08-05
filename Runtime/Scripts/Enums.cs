@@ -79,9 +79,9 @@ namespace Uralstech.UAI.LiteRTLM
     // Represents the type of constraint for constrained decoding.
     public enum ConstraintType : int
     {
-        None = 0,
-        Regex = 1,
-        JsonSchema = 2,
+        None        = 0,
+        Regex       = 1,
+        JsonSchema  = 2,
     }
 
     /// Represents the type of constraint provider.

@@ -75,6 +75,20 @@ namespace Uralstech.UAI.LiteRTLM
         String  = 0,
         Ids     = 1,
     }
+    
+    // Represents the type of constraint for constrained decoding.
+    public enum ConstraintType : int
+    {
+        None = 0,
+        Regex = 1,
+        JsonSchema = 2,
+    }
+
+    /// Represents the type of constraint provider.
+    public enum ConstraintProviderType : int 
+    {
+        LlGuidance = 1,
+    }
 
     public static class BackendNames
     {

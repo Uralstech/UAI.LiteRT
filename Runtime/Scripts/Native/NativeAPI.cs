@@ -169,12 +169,27 @@ namespace Uralstech.UAI.LiteRTLM.Native
             public static extern void litert_lm_conversation_config_set_extra_context(IntPtr config,
                 [MarshalAs(UnmanagedType.LPUTF8Str)] string extraContextJson);
 
+            /// <summary>Sets the prompt template for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="promptTemplate">
+            /// The prompt template string (e.g. Jinja template).
+            /// If not set, use the default provided by the model or the engine.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_prompt_template(IntPtr config, [MarshalAs(UnmanagedType.LPUTF8Str)] string promptTemplate);
+                
             /// <summary>Sets whether to enable constrained decoding for this conversation config.</summary>
             /// <param name="config">The config to modify.</param>
             /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_config_set_enable_constrained_decoding(IntPtr config,
                 [MarshalAs(UnmanagedType.I1)] bool enableConstrainedDecoding);
+            
+            /// <summary>Sets the constraint provider type for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="providerType">A pointer to the constraint provider type to use (<see cref="ConstraintProviderType"/>), or <see cref="IntPtr.Zero"/> to unset.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_constraint_provider(IntPtr config, IntPtr providerType);
 
             /// <summary>Sets whether to filter channel content from the KV cache.</summary>
             /// <param name="config">The config to modify.</param>
@@ -239,9 +254,20 @@ namespace Uralstech.UAI.LiteRTLM.Native
         public static class RepetitionPenaltyConfig
         {
             /// <summary>
-            /// Creates a LiteRT LM Repetition Penalty Config. The caller is responsible
-            /// for destroying the config using <see cref="litert_lm_repetition_penalty_config_delete"/>.
+            /// Creates a LiteRT LM Repetition Penalty Config with default values
+            /// (<c>repetition_penalty</c> = 1.0f, <c>presence_penalty</c> = 0.0f,
+            /// <c>frequency_penalty</c> = 0.0f, <c>window_size</c> = 0, which means all history with
+            /// no penalties active).
             /// </summary>
+            /// <remarks>
+            /// When multiple penalties are configured and active, the order of application
+            /// to output logits during decoding is:
+            /// <list type="number">
+            /// <item><description>Multiplicative penalty (<c>repetition_penalty</c>)</description></item>
+            /// <item><description>Subtractive penalties (<c>presence_penalty</c> and <c>frequency_penalty</c>).</description></item>
+            /// </list>
+            /// The caller is responsible for destroying the config using <see cref="litert_lm_repetition_penalty_config_delete"/>.
+            /// </remarks>
             /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr litert_lm_repetition_penalty_config_create();
@@ -251,33 +277,152 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_repetition_penalty_config_delete(IntPtr config);
 
-            /// <summary>Sets the repetition penalty for the repetition penalty config.</summary>
+            /// <summary>Sets the multiplicative repetition penalty for the repetition penalty config.</summary>
             /// <param name="config">The config to modify.</param>
-            /// <param name="repetitionPenalty">A multiplicative penalty for any token already generated.</param>
+            /// <param name="repetitionPenalty">
+            /// A multiplicative penalty applied to a token's logit
+            /// if that token has appeared at least once inside the generated window history
+            /// (e.g., 1.0 = no penalty, 1.2 = moderate penalty). Positive logits are divided
+            /// by this parameter, and negative logits are multiplied (HuggingFace style).
+            /// The parameter must be &gt;= 1.0f; values less than 1.0f are automatically
+            /// clamped to 1.0f during execution.
+            /// </param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_repetition_penalty_config_set_repetition_penalty(
                 IntPtr config, float repetitionPenalty);
 
-            /// <summary>Sets the presence penalty for the repetition penalty config.</summary>
+            /// <summary>Sets the subtractive presence penalty for the repetition penalty config.</summary>
             /// <param name="config">The config to modify.</param>
-            /// <param name="presencePenalty">A scalar subtracted from a logit if a token has appeared at least once.</param>
+            /// <param name="presencePenalty">
+            /// A scalar subtracted from a token's logit if that
+            /// token has appeared at least once inside the generated window history.
+            /// Positive values discourage repetition, while negative values reward repeating
+            /// tokens (OpenAI style). Defaults to 0.0f.
+            /// </param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_repetition_penalty_config_set_presence_penalty(
                 IntPtr config, float presencePenalty);
 
-            /// Sets the frequency penalty for the repetition penalty config.
+            /// <summary>Sets the subtractive frequency penalty for the repetition penalty config.</summary>
             /// <param name="config">The config to modify.</param>
-            /// <param name="frequencyPenalty">A scalar subtracted from a token's logit scaled by previous appearances.</param>
+            /// <param name="frequencyPenalty">
+            /// A scalar subtracted from a token's logit, scaled
+            /// linearly by the number of times that token has previously appeared inside the
+            /// generated window history. Positive values discourage repetition, while
+            /// negative values reward repeating tokens (OpenAI style). Defaults to 0.0f.
+            /// </param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_repetition_penalty_config_set_frequency_penalty(
                 IntPtr config, float frequencyPenalty);
 
             /// <summary>Sets the window size for the repetition penalty config.</summary>
             /// <param name="config">The config to modify.</param>
-            /// <param name="windowSize">The maximum number of recent tokens to consider.</param>
+            /// <param name="windowSize">
+            /// The maximum number of recent tokens in generation history
+            /// to consider when computing penalization. Tokens generated prior to this
+            /// window are forgotten. A value of 0 means tracking all infinite generation
+            /// history. Must be >= 0; negative values are clamped to 0 during execution.
+            /// </param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_repetition_penalty_config_set_window_size(
                 IntPtr config, int windowSize);
+        }
+        
+        public static class NoRepeatNgramConfig
+        {
+            /// <summary>
+            /// Creates a LiteRT LM No Repeat Ngram Config with default values
+            /// (<c>no_repeat_ngram_size</c> = 0, <c>window_size</c> = 0, which means no repeat ngram
+            /// banning is disabled).
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// When <c>no_repeat_ngram_size</c> is set greater than 0, any sequence of tokens (an
+            /// ngram of that exact length) generated during decoding or present inside the
+            /// window history can only occur at most once. If generating a candidate token
+            /// would complete a repeating ngram, that candidate token's logit is set to
+            /// -inf.
+            ///</para>
+            /// <para>
+            /// The caller is responsible for destroying the config using
+            /// <see cref="litert_lm_no_repeat_ngram_config_delete"/>.
+            /// </para>
+            /// </remarks>
+            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_no_repeat_ngram_config_create();
+
+            /// <summary>Destroys a LiteRT LM No Repeat Ngram Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_no_repeat_ngram_config_delete(IntPtr config);
+
+            /// <summary>Sets the no repeat ngram size for the no repeat ngram config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="noRepeatNgramSize">
+            /// The size of ngrams (consecutive token sequences) that are banned from
+            /// repeating within the generation history window. If set &gt; 0, when generating
+            /// the next token would complete an already observed <c>no_repeat_ngram_size</c>
+            /// sequence, the logit of the candidate token is set to -inf. If set &lt;= 0,
+            /// no repeat ngram banning is disabled. Negative values are
+            /// automatically clamped to 0 during execution.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_no_repeat_ngram_config_set_no_repeat_ngram_size(IntPtr config, int noRepeatNgramSize);
+
+            /// <summary>Sets the window size for the no repeat ngram config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="windowSize">
+            /// The maximum number of recent tokens in generation history to consider
+            /// when checking for repeating ngrams. Tokens generated prior to this window are forgotten.
+            /// A value of 0 means tracking all infinite generation history. Must be &gt;= 0;
+            /// negative values are clamped to 0. If <c>window_size</c> is greater than 0 but
+            /// less than <c>no_repeat_ngram_size</c>, it is automatically clamped to
+            /// <c>no_repeat_ngram_size</c> so that the ngrams can fit and be tracked.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_no_repeat_ngram_config_set_window_size(IntPtr config, int windowSize);
+        }
+        
+        public static class SuppressTokensConfig
+        {
+            /// <summary>
+            /// Creates a LiteRT LM Suppress Tokens Config with default values (an empty set
+            /// of suppressed tokens, which means token suppression is disabled).
+            /// </summary>
+            /// <remarks>
+            /// <para>
+            /// When <c>suppress_tokens</c> is configured with one or more token IDs, the logits
+            /// corresponding to those exact token IDs will be set directly to -inf during
+            /// generation. This guarantees that those tokens can never be sampled by the model.
+            /// </para>
+            /// <para>
+            /// The caller is responsible for destroying the config using
+            /// <see cref="litert_lm_suppress_tokens_config_delete"/>.
+            /// </para>
+            /// </remarks>
+            /// <returns>A pointer to the created config, or IntPtr.Zero on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_suppress_tokens_config_create();
+            
+            /// <summary>Destroys a LiteRT LM Suppress Tokens Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_suppress_tokens_config_delete(IntPtr config);
+            
+            /// <summary>Sets the list of token IDs to suppress for the suppress tokens config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="suppressTokens">
+            /// An array of integer token IDs that should be banned
+            /// from generation. During every decode step, each listed token ID's candidate
+            /// logit will be forced to -inf. If <c>suppress_tokens</c> is <see langword="null"/> or
+            /// <c>num_tokens</c> is 0, any previously set suppressed tokens are cleared
+            /// and token suppression is disabled.
+            /// </param>
+            /// <param name="numTokens">The number of token IDs in the <c>suppress_tokens</c> array.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_suppress_tokens_config_set_suppress_tokens(IntPtr config,
+                int[]? suppressTokens, UIntPtr numTokens);
         }
         
         public static class ConversationOptionalArgs
@@ -296,13 +441,53 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_optional_args_delete(IntPtr optionalArgs);
 
-            /// <summary>Sets the repetition penalty configuration for the conversation optional args.</summary>
-            /// <param name="optionalArgs">The optional args to modify.</param>
-            /// <param name="repetitionPenaltyConfig">The repetition penalty config to set. If <see cref="IntPtr.Zero"/>, clears any previously set repetition penalty config.</param>
+            /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
+            /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
+            /// generated during the current <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="repetitionPenaltyConfig">The repetition penalty configuration struct
+            /// (<c>LiteRtLmRepetitionPenaltyConfig</c>) created via <see cref="RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_create"/>.
+            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously set repetition penalty config so no penalties apply.
+            /// </param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_optional_args_set_repetition_penalty_config(
                 IntPtr optionalArgs, IntPtr repetitionPenaltyConfig);
                 
+            /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
+            /// exclusively to the output sequence generated during the current
+            /// <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="noRepeatNgramConfig">
+            /// The no repeat ngram configuration struct (<c>LiteRtLmNoRepeatNgramConfig</c>)
+            /// created via <see cref="NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_create"/>.
+            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously
+            /// set no repeat ngram config so no repeat ngram banning applies.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_no_repeat_ngram_config(IntPtr optionalArgs, IntPtr noRepeatNgramConfig);
+
+            /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured list of suppressed tokens applies
+            /// exclusively to the output sequence generated during the current
+            /// <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="suppressTokensConfig">
+            /// The suppress tokens configuration struct (<c>LiteRtLmSuppressTokensConfig</c>) created via
+            /// <see cref="SuppressTokensConfig.litert_lm_suppress_tokens_config_create"/>. The contents are deep-copied when
+            /// set. If <see cref="IntPtr.Zero"/> or if the inner token set is disabled/empty, clears any
+            /// previously set suppress tokens config so no token suppression applies.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_suppress_tokens_config(IntPtr optionalArgs, IntPtr suppressTokensConfig);
+        
             /// <summary>Sets the visual token budget for the conversation optional args.</summary>
             /// <param name="optionalArgs">The optional args to modify.</param>
             /// <param name="visualTokenBudget">The visual token budget.</param>
@@ -323,6 +508,14 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_conversation_optional_args_set_thinking_config(
                 IntPtr optionalArgs, IntPtr thinkingConfig);
+            
+            /// <summary>Sets the constraint for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="constraintType">The type of constraint.</param>
+            /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_constraint(IntPtr optionalArgs,
+                ConstraintType constraintType, [MarshalAs(UnmanagedType.LPUTF8Str)] string constraintString);
         }
 
         public static class InputData
@@ -477,6 +670,41 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_engine_settings_set_enable_speculative_decoding(IntPtr settings,
                 [MarshalAs(UnmanagedType.I1)] bool enableSpeculativeDecoding);
+            
+            /// <summary>Sets the number of decode steps per sync for the GPU backend.</summary>
+            /// <remarks>Note: This setting is currently only supported for the Artisan GPU backend (<see cref="BackendNames.GPUArtisan"/>).</remarks>
+            /// <param name="settings">The engine settings.</param>
+            /// <param name="numDecodeStepsPerSync">The number of decode steps per sync.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_engine_settings_set_gpu_decode_steps_per_sync(IntPtr settings, int numDecodeStepsPerSync);
+            
+            /// <summary>Sets whether to wait for weight uploads for the GPU backend.</summary>
+            /// <remarks>Note: This setting is currently only supported for the Artisan GPU backend (<see cref="BackendNames.GPUArtisan"/>).</remarks>
+            /// <param name="settings">The engine settings.</param>
+            /// <param name="waitForWeightUploads">Whether to wait for weight uploads.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_engine_settings_set_gpu_wait_for_weight_uploads(IntPtr settings,
+                [MarshalAs(UnmanagedType.I1)] bool waitForWeightUploads);
+            
+            /// <summary>Sets whether to use ringbuffers for local attention KV cache.</summary>
+            /// <remarks>
+            /// <para>
+            /// When enabled for supported models, a ringbuffer stores only necessary KV
+            /// cache memory for local attention layers, minimizing memory usage. When
+            /// disabled, memory is allocated for the full context length, enabling instant
+            /// rewinding at the cost of higher memory usage.
+            /// </para>
+            /// <para>
+            /// Note: This feature is backend-agnostic in interface design, but currently
+            /// only supported by the GPU Artisan backend. Enabling it on unsupported models
+            /// or backends will be ignored with a warning.
+            /// </para>
+            ///</remarks>
+            /// <param name="settings">The engine settings.</param>
+            /// <param name="useRingbuffersLocalAttention">Whether to use ringbuffers for local attention.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_engine_settings_set_use_ringbuffers_local_attention(IntPtr settings,
+                [MarshalAs(UnmanagedType.I1)] bool useRingbuffersLocalAttention);
 
             /// <summary>Sets the LoRA rank for the engine.</summary>
             /// <param name="settings">The engine settings.</param>

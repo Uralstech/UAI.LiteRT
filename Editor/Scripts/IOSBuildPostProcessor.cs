@@ -14,6 +14,7 @@
 
 #if UNITY_IOS
 
+using System;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -27,6 +28,9 @@ namespace Uralstech.UAI.LiteRTLM.Editor
         private const string DeviceLibPath = "$(PROJECT_DIR)/Libraries/ARM64/Packages/com.uralstech.uai.litertlm/Runtime/Plugins/iOS/arm64";
         private const string SimLibPath = "$(PROJECT_DIR)/Libraries/ARM64Simulator/Packages/com.uralstech.uai.litertlm/Runtime/Plugins/iOS/sim_arm64";
         
+        private const string SwiftDeviceLibPath = "$(PROJECT_DIR)/UnityFramework/Libraries/ARM64/Packages/com.uralstech.uai.litertlm/Runtime/Plugins/iOS/arm64";
+        private const string SwiftSimLibPath = "$(PROJECT_DIR)/UnityFramework/Libraries/ARM64Simulator/Packages/com.uralstech.uai.litertlm/Runtime/Plugins/iOS/sim_arm64";
+
         public int callbackOrder => 0;
         
         public void OnPostprocessBuild(BuildReport report)
@@ -41,10 +45,16 @@ namespace Uralstech.UAI.LiteRTLM.Editor
             
             PBXProject project = new();
             project.ReadFromFile(projectPath);
-            
-            string libPath = PlayerSettings.iOS.sdkVersion == iOSSdkVersion.DeviceSDK
-                ? DeviceLibPath : SimLibPath;
-            
+
+            string libPath = (PlayerSettings.iOS.sdkVersion, PlayerSettings.xcodeProjectType) switch
+            {
+                (iOSSdkVersion.DeviceSDK, XcodeProjectType.ObjectiveC) => DeviceLibPath,
+                (iOSSdkVersion.SimulatorSDK, XcodeProjectType.ObjectiveC) => SimLibPath,
+                (iOSSdkVersion.DeviceSDK, XcodeProjectType.Swift) => SwiftDeviceLibPath,
+                (iOSSdkVersion.SimulatorSDK, XcodeProjectType.Swift) => SwiftSimLibPath,
+                _ => throw new NotImplementedException($"Unknown iOS SDK/Xcode Project Type combination."),
+            };
+  
             string mainTargetGuid = project.GetUnityFrameworkTargetGuid();
             project.AddBuildProperty(mainTargetGuid, "LIBRARY_SEARCH_PATHS", libPath);
             

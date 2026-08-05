@@ -114,7 +114,14 @@ namespace Uralstech.UAI.LiteRTLM
         
         protected abstract void ReleaseUnmanagedResources();
         
-        public static implicit operator IntPtr(LiteRTLMNativeHandle? handle) => handle?.Native ?? IntPtr.Zero;
+        public static implicit operator IntPtr(LiteRTLMNativeHandle? handle)
+        {
+            if (handle == null)
+                return IntPtr.Zero;
+            
+            handle.ThrowIfDisposed();
+            return handle.Native;
+        }
         
         /// <summary>Destroys the native LiteRT LM object.</summary>
         public void Dispose()

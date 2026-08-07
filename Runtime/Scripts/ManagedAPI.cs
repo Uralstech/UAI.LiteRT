@@ -1281,7 +1281,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <param name="HasTokenScores">Does the response have a valid <see cref="TokenScores"/>?</param>
         /// <param name="TokenScores">The token scores for this response.</param>
         public record Candidate(
-            string Text,
+            string? Text,
             bool HasScore, float Score,
             bool HasTokenLength, int TokenLength,
             bool HasTokenScores, float[]? TokenScores
@@ -1319,7 +1319,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         private Candidate GetCandidateAt(int index)
         {
-            string response = GetResponseTextAt(index);
+            string? response = GetResponseTextAt(index);
                 
             bool hasScore = HasScoreAt(index);
             float score = hasScore ? GetScoreAt(index) : 0.0f;

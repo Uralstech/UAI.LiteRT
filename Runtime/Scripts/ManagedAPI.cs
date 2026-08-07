@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using AOT;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
 using Uralstech.UAI.LiteRTLM.Native;
 
 #nullable enable
@@ -52,7 +50,9 @@ namespace Uralstech.UAI.LiteRTLM
         public static void Deregister(IntPtr key) =>
             s_callbacks.TryRemove(key, out _);
 
-        [MonoPInvokeCallback(typeof(NativeAPI.StreamCallback))]
+#if UNITY_5_3_OR_NEWER
+        [AOT.MonoPInvokeCallback(typeof(NativeAPI.StreamCallback))]
+#endif
         private static void GlobalStreamCallbackListener(IntPtr key, IntPtr chunk)
         {
             StreamChunk? managedChunk = null;
@@ -68,7 +68,7 @@ namespace Uralstech.UAI.LiteRTLM
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                PackageLogger.LogException(ex);
             }
             finally
             {
@@ -135,12 +135,12 @@ namespace Uralstech.UAI.LiteRTLM
         {
             try
             {
-                Debug.LogWarning($"{GetType().Name}: Object not disposed using IDisposable interface.");
+                PackageLogger.LogWarning($"{GetType().Name}: Object not disposed using IDisposable interface.");
                 ReleaseUnmanagedResources();
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                PackageLogger.LogException(ex);
             }
         }
         
@@ -770,7 +770,7 @@ namespace Uralstech.UAI.LiteRTLM
             if (string.IsNullOrEmpty(data))
                 throw new ArgumentException("Data cannot be null or empty.", nameof(data));
             
-            using UnsafeUtils.TempMem tempMem = UnsafeUtils.AllocateStringUTF8(data);
+            using PackageUnsafeUtils.TempMem tempMem = PackageUnsafeUtils.AllocateStringUTF8(data);
             Native = NativeAPI.InputData.litert_lm_input_data_create(InputDataType.Text, tempMem.Ptr, tempMem.Size);
             
             if (Native == IntPtr.Zero)

@@ -1354,7 +1354,7 @@ namespace Uralstech.UAI.LiteRTLM
         /// <param name="index">The index of the response.</param>
         /// <returns>The response text.</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown if the index is out of bounds.</exception>
-        private string GetResponseTextAt(int index)
+        private string? GetResponseTextAt(int index)
         {
             ThrowIfDisposed();
             
@@ -1786,7 +1786,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the JSON response string.</summary>
         /// <returns>The response JSON string.</returns>
-        public string GetString()
+        public string? GetString()
         {
             ThrowIfDisposed();
             IntPtr ptr = NativeAPI.JsonResponse.litert_lm_json_response_get_string(Native);
@@ -1865,7 +1865,7 @@ namespace Uralstech.UAI.LiteRTLM
 
         /// <summary>Returns the string.</summary>
         /// <returns>The detokenized string.</returns>
-        public string GetString()
+        public string? GetString()
         {
             ThrowIfDisposed();
             

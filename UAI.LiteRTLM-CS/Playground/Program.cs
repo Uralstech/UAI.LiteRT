@@ -30,7 +30,7 @@ engineSettings.EnableBenchmark();
 
 using Engine engine = new(engineSettings);
 using ThinkingConfig thinkingConfig = new();
-thinkingConfig.SetEnableThinking(true);
+thinkingConfig.SetEnableThinking(false);
 
 using ConversationConfig conversationConfig = new();
 conversationConfig.SetThinkingConfig(thinkingConfig);

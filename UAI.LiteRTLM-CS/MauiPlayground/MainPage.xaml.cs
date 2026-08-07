@@ -14,6 +14,7 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
         await RunInferenceAsync();
+        Console.WriteLine("Inference completed.");
     }
 
     private async Task RunInferenceAsync()
@@ -36,7 +37,7 @@ public partial class MainPage : ContentPage
         
         using Engine engine = new(engineSettings);
         using ThinkingConfig thinkingConfig = new();
-        thinkingConfig.SetEnableThinking(true);
+        thinkingConfig.SetEnableThinking(false);
         
         using ConversationConfig conversationConfig = new();
         conversationConfig.SetThinkingConfig(thinkingConfig);

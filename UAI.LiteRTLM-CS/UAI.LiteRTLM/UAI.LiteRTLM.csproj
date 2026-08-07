@@ -9,6 +9,9 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
+        <IsTrimmable>true</IsTrimmable>
+        <IsAotCompatible>true</IsAotCompatible>
+        
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 

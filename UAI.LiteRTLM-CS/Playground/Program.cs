@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Uralstech.UAI.LiteRTLM;
 
 LiteRTLMNativeLogging.SetMinLogLevel(LogSeverity.Verbose);
+Accelerators.LoadNativeLibraries();
 
 string modelPath = args[0];
 Console.WriteLine("Loading model: " + modelPath);

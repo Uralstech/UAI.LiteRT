@@ -10,5 +10,4 @@
     <ItemGroup>
       <PackageReference Include="Uralstech.UAI.LiteRTLM" Version="2.2.0-preview.1" />
     </ItemGroup>
-
 </Project>

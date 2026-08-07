@@ -13,18 +13,24 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        
-        LiteRTLMNativeLogging.SetMinLogLevel(LogSeverity.Verbose);
+        await RunInferenceAsync();
+    }
+
+    private async Task RunInferenceAsync()
+    {
         Accelerators.LoadNativeLibraries();
+        LiteRTLMNativeLogging.SetMinLogLevel(LogSeverity.Verbose);
         
         #if ANDROID
         string modelPath = Path.Join(Android.App.Application.Context.GetExternalFilesDir(null)!.AbsolutePath, "model.litertlm");
+        #else
+        string modelPath = Path.Join(FileSystem.AppDataDirectory, "model.litertlm");
         #endif
 
         Console.WriteLine("Loading model: " + modelPath);
         
         using EngineSettings engineSettings = new(modelPath, BackendNames.GPU);
-        engineSettings.SetEnableSpeculativeDecoding(true);
+        //engineSettings.SetEnableSpeculativeDecoding(true);
         engineSettings.SetCacheDir(":nocache");
         engineSettings.EnableBenchmark();
         

@@ -34,11 +34,18 @@ namespace Uralstech.UAI.LiteRTLM
 #endif
         private static readonly ConcurrentDictionary<IntPtr, StreamCallback> s_callbacks = new();
 
+#if UNITY_5_3_OR_NEWER
         private static readonly NativeAPI.StreamCallback s_globalCallbackListenerInst =
             GlobalStreamCallbackListener;
         
-        public static readonly IntPtr GlobalStreamCallbackListenerPtr =
+        private static readonly IntPtr s_globalStreamCallbackListenerPtr =
             UnsafeUtils.MarshalDelegate(s_globalCallbackListenerInst);
+#else
+        private static readonly unsafe IntPtr s_globalStreamCallbackListenerPtr =
+            (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, IntPtr, void>)(&GlobalStreamCallbackListener);
+#endif
+
+        public static IntPtr GetGlobalStreamCallbackListenerPtr() => s_globalStreamCallbackListenerPtr;
 
         public static IntPtr Register(StreamCallback callback)
         {
@@ -52,6 +59,8 @@ namespace Uralstech.UAI.LiteRTLM
 
 #if UNITY_5_3_OR_NEWER
         [AOT.MonoPInvokeCallback(typeof(NativeAPI.StreamCallback))]
+#else
+        [System.Runtime.InteropServices.UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
 #endif
         private static void GlobalStreamCallbackListener(IntPtr key, IntPtr chunk)
         {
@@ -75,7 +84,7 @@ namespace Uralstech.UAI.LiteRTLM
                 if (isFinal)
                     s_callbacks.TryRemove(key, out _);
                 
-                managedChunk?.Invalidate();
+                managedChunk?.Dispose();
             }
         }
     }
@@ -1237,7 +1246,7 @@ namespace Uralstech.UAI.LiteRTLM
             
             IntPtr callbackData = StreamCallbackHandler.Register(callback);
             int result = NativeAPI.Session.litert_lm_session_run_decode_async(Native,
-                StreamCallbackHandler.GlobalStreamCallbackListenerPtr, callbackData);
+                StreamCallbackHandler.GetGlobalStreamCallbackListenerPtr(), callbackData);
             
             if (result != 0)
                 StreamCallbackHandler.Deregister(callbackData);
@@ -1257,7 +1266,7 @@ namespace Uralstech.UAI.LiteRTLM
             
             IntPtr callbackData = StreamCallbackHandler.Register(callback);
             int result = NativeAPI.Session.litert_lm_session_generate_content_stream(Native,
-                inputs.GetPtrs(), (UIntPtr)inputs.Length, StreamCallbackHandler.GlobalStreamCallbackListenerPtr, callbackData);
+                inputs.GetPtrs(), (UIntPtr)inputs.Length, StreamCallbackHandler.GetGlobalStreamCallbackListenerPtr(), callbackData);
             
             if (result != 0)
                 StreamCallbackHandler.Deregister(callbackData);
@@ -1580,7 +1589,7 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
 
-    public sealed class StreamChunk
+    public sealed class StreamChunk : IDisposable
     {
         private readonly IntPtr _native;
         private bool _isValid = true;
@@ -1626,7 +1635,7 @@ namespace Uralstech.UAI.LiteRTLM
             return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
         }
 
-        internal void Invalidate() =>
+        public void Dispose() =>
             _isValid = false;
 
         private void ThrowIfInvalid()
@@ -1709,7 +1718,7 @@ namespace Uralstech.UAI.LiteRTLM
             
             IntPtr callbackData = StreamCallbackHandler.Register(callback);
             int result = NativeAPI.Conversation.litert_lm_conversation_send_message_stream(Native,
-                messageJson, extraContext, optionalArgs, StreamCallbackHandler.GlobalStreamCallbackListenerPtr, callbackData);
+                messageJson, extraContext, optionalArgs, StreamCallbackHandler.GetGlobalStreamCallbackListenerPtr(), callbackData);
             
             if (result != 0)
                 StreamCallbackHandler.Deregister(callbackData);

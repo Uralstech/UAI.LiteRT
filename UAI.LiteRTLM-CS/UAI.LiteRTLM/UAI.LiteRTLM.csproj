@@ -4,10 +4,13 @@
         <AssemblyName>UAI.LiteRTLM</AssemblyName>
         <Version>2.2.0-preview.1</Version>
         
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
         <ProjectRoot>$(MSBuildThisFileDirectory)../..</ProjectRoot>
         <ScriptsDir>$(ProjectRoot)/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Scripts</ScriptsDir>

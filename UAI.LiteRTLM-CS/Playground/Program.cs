@@ -13,76 +13,77 @@
 // limitations under the License.
 
 using System;
-using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 using Uralstech.UAI.LiteRTLM;
-using Uralstech.UAI.LiteRTLM.Native;
 
-NativeAPI.litert_lm_set_min_log_level(LogSeverity.Info);
+LiteRTLMNativeLogging.SetMinLogLevel(LogSeverity.Verbose);
 
 string modelPath = args[0];
-string cacheDir = ":nocache";
+Console.WriteLine("Loading model: " + modelPath);
 
-IntPtr engineSettings = IntPtr.Zero;
-IntPtr engine = IntPtr.Zero;
+using EngineSettings engineSettings = new(modelPath, BackendNames.GPU);
+engineSettings.SetEnableSpeculativeDecoding(true);
+engineSettings.SetCacheDir(":nocache");
+engineSettings.EnableBenchmark();
 
-IntPtr thinkingConfig = IntPtr.Zero;
-IntPtr conversationConfig = IntPtr.Zero;
-IntPtr conversation = IntPtr.Zero;
+using Engine engine = new(engineSettings);
+using ThinkingConfig thinkingConfig = new();
+thinkingConfig.SetEnableThinking(true);
 
-IntPtr jsonResponse = IntPtr.Zero;
-IntPtr benchmarkInfo = IntPtr.Zero;
+using ConversationConfig conversationConfig = new();
+conversationConfig.SetThinkingConfig(thinkingConfig);
 
-try
+using Conversation conversation = new(engine, conversationConfig);
+Console.WriteLine("Engine and conversation created.");
+
+const string message = "{\"role\":\"user\",\"content\":\"Give me 10 random dates in \\\"dd-yyyy-mm\\\" format.\"}";
+TaskCompletionSource<bool> completionSource = new();
+
+StringBuilder sb = new();
+void OnChunk(StreamChunk chunk)
 {
-    engineSettings = NativeAPI.EngineSettings.litert_lm_engine_settings_create(modelPath, BackendNames.GPU, null, null);
-    NativeAPI.EngineSettings.litert_lm_engine_settings_set_enable_speculative_decoding(engineSettings, true);
-    NativeAPI.EngineSettings.litert_lm_engine_settings_set_cache_dir(engineSettings, cacheDir);
-    NativeAPI.EngineSettings.litert_lm_engine_settings_enable_benchmark(engineSettings);
+    Console.WriteLine("Got chunk:"
+              + $"\n\tText: {chunk.GetText()}"
+              + $"\n\tIsFinal: {chunk.IsFinal()}"
+              + $"\n\tError: {chunk.GetError()}"
+    );
 
-    engine = NativeAPI.Engine.litert_lm_engine_create(engineSettings);
-
-    thinkingConfig = NativeAPI.ThinkingConfig.litert_lm_thinking_config_create();
-    NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_enable_thinking(thinkingConfig, false);
-    
-    conversationConfig = NativeAPI.ConversationConfig.litert_lm_conversation_config_create();
-    NativeAPI.ConversationConfig.litert_lm_conversation_config_set_thinking_config(conversationConfig, thinkingConfig);
-
-    conversation = NativeAPI.Conversation.litert_lm_conversation_create(engine, conversationConfig);
-    Console.WriteLine("Engine and conversation created.");
-    
-    const string message = "{\"role\":\"user\",\"content\":\"What is the tallest building in the world?\"}";
-    jsonResponse = NativeAPI.Conversation.litert_lm_conversation_send_message(conversation, message, null, IntPtr.Zero);
-
-    IntPtr responsePtr = NativeAPI.JsonResponse.litert_lm_json_response_get_string(jsonResponse);
-    Console.WriteLine($"AI response: {Marshal.PtrToStringUTF8(responsePtr)}");
-    
-    benchmarkInfo = NativeAPI.Conversation.litert_lm_conversation_get_benchmark_info(conversation);
-    if (benchmarkInfo == IntPtr.Zero)
+    string? text = chunk.GetText();
+    int index = text?.IndexOf("text\":") ?? -1;
+    if (index >= 0)
     {
-        Console.WriteLine("No benchmark info found.");
-        return;
+        int start = index + 7;
+        int end = text!.IndexOf('\"', start);
+        
+        sb.Append(text.Substring(start, end - start));
     }
-
-    double prefillTps = NativeAPI.BenchmarkInfo.litert_lm_benchmark_info_get_prefill_tokens_per_sec_at(benchmarkInfo, 0);
-    double decodeTps = NativeAPI.BenchmarkInfo.litert_lm_benchmark_info_get_decode_tokens_per_sec_at(benchmarkInfo, 0);
     
-    Console.WriteLine($"Prefill: {prefillTps} t/s, decode: {decodeTps} t/s");
-}
-finally
-{
-    InvokeSafe(benchmarkInfo, NativeAPI.BenchmarkInfo.litert_lm_benchmark_info_delete);
-    InvokeSafe(jsonResponse, NativeAPI.JsonResponse.litert_lm_json_response_delete);
-    
-    InvokeSafe(conversation, NativeAPI.Conversation.litert_lm_conversation_delete);
-    InvokeSafe(conversationConfig, NativeAPI.ConversationConfig.litert_lm_conversation_config_delete);
-    InvokeSafe(thinkingConfig, NativeAPI.ThinkingConfig.litert_lm_thinking_config_delete);
-    
-    InvokeSafe(engine, NativeAPI.Engine.litert_lm_engine_delete);
-    InvokeSafe(engineSettings, NativeAPI.EngineSettings.litert_lm_engine_settings_delete);
+    if (chunk.IsFinal())
+        completionSource.TrySetResult(true);
 }
 
-static void InvokeSafe(IntPtr ptr, Action<IntPtr> action)
+int result = conversation.SendMessageStream(OnChunk, message);
+Console.WriteLine("Message sent: " + (result == 0));
+
+if (result == 0)
+    await completionSource.Task;
+
+Console.WriteLine("result: " + sb);
+
+using BenchmarkInfo? benchmarkInfo = conversation.GetBenchmarkInfo();
+if (benchmarkInfo == null)
 {
-    if (ptr != IntPtr.Zero)
-        action(ptr);
+    Console.WriteLine("No benchmark info found.");
+    return;
 }
+
+BenchmarkInfo.Turn[] prefillTurns = benchmarkInfo.GetPrefillTurns();
+BenchmarkInfo.Turn[] decodeTurns = benchmarkInfo.GetDecodeTurns();
+
+Console.WriteLine("Benchmark info:"
+          + $"\n\tInitialization time: {benchmarkInfo.GetTotalInitTime()}"
+          + $"\n\tTime to first token: {benchmarkInfo.GetTimeToFirstToken()}"
+          + $"\n\tPrefill tokens per second: {prefillTurns[0].TokensPerSecond}, for total: {prefillTurns[0].TokenCount} tokens"
+          + $"\n\tDecode tokens per second: {decodeTurns[0].TokensPerSecond}, for total: {decodeTurns[0].TokenCount} tokens"
+);

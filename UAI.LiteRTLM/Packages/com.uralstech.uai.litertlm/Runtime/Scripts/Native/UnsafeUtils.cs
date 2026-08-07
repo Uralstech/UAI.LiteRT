@@ -14,37 +14,13 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 #nullable enable
 namespace Uralstech.UAI.LiteRTLM.Native
 {
     internal static class UnsafeUtils
     {
-        private static readonly int s_byteAlignment = UnsafeUtility.AlignOf<byte>();
-        
-        /// <remarks>Use EXCLUSIVELY in <c>using</c> statements</remarks>
-        internal readonly struct TempMem : IDisposable
-        {
-            public readonly IntPtr Ptr;
-            public readonly UIntPtr Size;
-            private readonly Allocator _allocator;
-
-            public TempMem(IntPtr ptr, UIntPtr size, Allocator allocator)
-            {
-                Ptr = ptr;
-                Size = size;
-                _allocator = allocator;
-            }
-
-            public unsafe void Dispose() =>
-                UnsafeUtility.Free((void*)Ptr, _allocator);
-        }
-
-        public static string MarshalStringUTF8(IntPtr ptr) =>
+        public static string? MarshalStringUTF8(IntPtr ptr) =>
             Marshal.PtrToStringUTF8(ptr);
 
         public static IntPtr MarshalDelegate<T>(T @delegate) where T : Delegate =>
@@ -64,39 +40,12 @@ namespace Uralstech.UAI.LiteRTLM.Native
         public static unsafe long CopyTo<T>(IntPtr src, UIntPtr length, Span<T> dst)
             where T : unmanaged
         {
-            long copyLength = (long)length <= dst.Length
-                ? (long)length : dst.Length;
-
-            fixed (T* dstPtr = dst)
-                UnsafeUtility.MemCpy(dstPtr, (T*)src, copyLength * UnsafeUtility.SizeOf<T>());
-
+            int copyLength = (int)length <= dst.Length
+                ? (int)length : dst.Length;
+            
+            ReadOnlySpan<T> srcSpan = new((void*)src, copyLength);
+            srcSpan.CopyTo(dst);
             return copyLength;
-        }
-        
-        /// <remarks>Allocates memory for SHORT-TERM usage.</remarks>
-        public static unsafe TempMem AllocateStringUTF8(ReadOnlySpan<char> str)
-        {
-            int strSize = Encoding.UTF8.GetByteCount(str);
-            int totalSize = strSize + 1;
-            
-            Allocator allocator = ChooseAllocator(totalSize);
-            void* allocated = UnsafeUtility.Malloc(totalSize, s_byteAlignment, allocator);
-            Span<byte> allocatedSpan = new(allocated, totalSize);
-            
-            Encoding.UTF8.GetBytes(str, allocatedSpan[..strSize]);
-            allocatedSpan[strSize] = 0;
-
-            return new TempMem((IntPtr)allocated, (UIntPtr)totalSize, allocator);
-        }
-
-        private static Allocator ChooseAllocator(int dataSize)
-        {
-            return dataSize switch
-            {
-                <= 5 * 1024 when Awaitable.MainThreadAsync().IsCompleted => Allocator.Temp,
-                > 20 * 1024 * 1024 => Allocator.TempJob,
-                _ => Allocator.Persistent,
-            };
         }
     }
 }

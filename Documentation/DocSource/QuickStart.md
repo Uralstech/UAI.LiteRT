@@ -5,7 +5,7 @@ It may not represent best practices for production use. This quick start was las
 
 ## Aim
 
-UAI.LiteRTLM aims to provide a 1:1 interface to the LiteRT-LM multiplatform C API.
+UAI.LiteRTLM aims to provide a 1:1 interface to the LiteRT-LM cross-platform C API.
 Since LiteRT-LM's C API is highly unstable and not intended for public use, this section
 explains the breaking changes policy and LiteRT-LM version support for UAI.LiteRTLM.
 

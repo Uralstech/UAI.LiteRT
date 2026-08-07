@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>UAI.LiteRTLM</AssemblyName>
+        <Version>2.2.0-preview.1</Version>
+        
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <ProjectRoot>$(MSBuildThisFileDirectory)../..</ProjectRoot>
+        <ScriptsDir>$(ProjectRoot)/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Scripts</ScriptsDir>
+        <PluginsDir>$(ProjectRoot)/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Plugins</PluginsDir>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>Uralstech.UAI.LiteRTLM</PackageId>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        
+        <Title>LiteRT-LM bindings for cross-platform .NET apps.</Title>
+        <Description>Bindings for the cross-platform LiteRT-LM C API for .NET apps.</Description>
+        <PackageTags>LiteRT-LM;AI;LiteRT;LLM</PackageTags>
+        
+        <Authors>Udayshankar Ravikumar</Authors>
+        <Company>URAV ADVANCED LEARNING SYSTEMS PRIVATE LIMITED</Company>
+        <Copyright>Copyright 2026 URAV ADVANCED LEARNING SYSTEMS PRIVATE LIMITED</Copyright>
+
+        <PackageProjectUrl>https://uralstech.github.io/UAI.LiteRTLM</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Uralstech/UAI.LiteRTLM</RepositoryUrl>
+        
+        <PackageReleaseNotes>See https://github.com/Uralstech/UAI.LiteRTLM/releases/tag/$(Version)</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <Compile Include="$(ScriptsDir)/Enums.cs" />
+        <Compile Include="$(ScriptsDir)/Native/NativeAPI.cs" />
+
+        <None Include="$(PluginsDir)/macOS/arm64/*.dylib" Pack="true" PackagePath="runtimes/osx-arm64/native/"/>
+        <None Include="$(PluginsDir)/Windows/x86_64/*.dll" Pack="true" PackagePath="runtimes/win-x64/native/"/>
+        
+        <None Include="$(PluginsDir)/Android/arm64/*.so" Pack="true" PackagePath="runtimes/android-arm64/native/"/>
+        
+        <None Include="$(PluginsDir)/iOS/arm64/*.dylib" Pack="true" PackagePath="runtimes/ios-arm64/native/"/>
+        <None Include="$(PluginsDir)/iOS/sim_arm64/*.dylib" Pack="true" PackagePath="runtimes/iossimulator-arm64/native/"/>
+        
+        <None Include="$(ProjectRoot)/THIRD-PARTY-LICENSES.md" Pack="true" PackagePath="" />
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Condition="$([MSBuild]::IsOSPlatform('OSX'))" Include="$(PluginsDir)/macOS/arm64/*.dylib" Pack="false">
+            <Link>%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        
+        <None Condition="$([MSBuild]::IsOSPlatform('Windows'))" Include="$(PluginsDir)/Windows/x86_64/*.dll" Pack="false">
+            <Link>%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+</Project>

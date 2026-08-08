@@ -8,6 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Uralstech.UAI.LiteRTLM" Version="2.2.0-preview.1" />
+      <PackageReference Include="Uralstech.UAI.LiteRTLM" Version="2.2.0-preview.2" />
     </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ The following third-party components are included in this package. The relevant 
 ## LiteRT-LM
 
 **Source**: <https://github.com/google-ai-edge/LiteRT-LM>
-**Usage**: This package redistributes prebuilt LiteRT-LM native libraries and provides Unity bindings for them.
+**Usage**: This package redistributes prebuilt LiteRT-LM native libraries and provides C# bindings for them.
 **License**: Apache License, Version 2.0
 **Copyright**: Copyright 2026 The ODML Authors
 

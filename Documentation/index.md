@@ -4,14 +4,15 @@ _layout: landing
 
 # UAI.LiteRTLM
 
-LiteRT-LM model inference support for Unity apps.
+Cross-platform LiteRT-LM bindings for Unity & .NET apps.
 
 [![openupm](https://img.shields.io/npm/v/com.uralstech.uai.litertlm?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.uralstech.uai.litertlm/)
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Fcom.uralstech.uai.litertlm)](https://openupm.com/packages/com.uralstech.uai.litertlm/)
+[![nuget](https://img.shields.io/nuget/v/Uralstech.UAI.LiteRTLM?label=NuGet)](https://www.nuget.org/packages/Uralstech.UAI.LiteRTLM)
 
 ## Installation
 
-This package was designed for Unity 6.0 and above. Built and tested in Unity 6.5.
+This package was designed for Unity 6.0+ and .NET 8+. Built and tested in Unity 6.5 and .NET 10.
 
 # [OpenUPM](#tab/openupm)
 
@@ -37,6 +38,12 @@ This package was designed for Unity 6.0 and above. Built and tested in Unity 6.5
 
 1. Clone or download the repository from the desired branch (master, preview/unstable) or tag
 2. Drag the package folder `UAI.LiteRTLM/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm` into your Unity project's `Packages` folder
+
+# [NuGet](#tab/nuget)
+
+See [NuGet](https://www.nuget.org/packages/Uralstech.UAI.LiteRTLM) for install instructions.
+Please read the [Quick Start](https://uralstech.github.io/UAI.LiteRTLM/DocSource/QuickStart.html#nuget-package--net-8)
+for APIs specific to the NuGet version of UAI.LiteRTLM.
 
 ---
 

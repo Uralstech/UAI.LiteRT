@@ -29,6 +29,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-		<PackageReference Include="Uralstech.UAI.LiteRTLM" Version="2.2.0-preview.1" />
+		<PackageReference Include="Uralstech.UAI.LiteRTLM" Version="2.2.0-preview.2" />
 	</ItemGroup>
 </Project>

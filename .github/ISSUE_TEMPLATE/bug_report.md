@@ -21,7 +21,8 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Development environment:**
- - Unity version: [e.g. 6.1, 6.0]
+ - [For Unity apps] Unity version: [e.g. 6.1, 6.0]
+ - [For .NET apps] .NET version: [e.g. 9.0, 10.0]
  - Build target: [e.g. iOS, Android, Editor]
  - Package version: [e.g. 1.0.0]
 

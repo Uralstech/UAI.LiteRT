@@ -1,9 +1,9 @@
 {
   "name": "com.uralstech.uai.litertlm",
   "displayName": "UAI.LiteRTLM",
-  "description": "LiteRT-LM model inference support for Unity apps.",
+  "description": "Cross-platform LiteRT-LM bindings for Unity & .NET apps.",
   "keywords": [],
-  "version": "2.2.0-preview.1",
+  "version": "2.2.0-preview.2",
   "unity": "6000.0",
   "hideInEditor": false,
   "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",

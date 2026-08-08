@@ -84,6 +84,16 @@ To enable GPU acceleration on Android, add the following to the `<application>` 
 <uses-native-library android:name="libOpenCL.so" android:required="false"/>
 ```
 
+## NuGet Package / .NET 8+
+
+Starting with `2.2.0-preview.2`, UAI.LiteRTLM is also available on NuGet for .NET 8+! It supports all the same platforms as the Unity package, and
+works with MAUI. The Unity package is still the main development target, so the NuGet/.NET package may sometimes lag behind and not have all the
+latest features yet.
+
+Because the package includes some Unity-specific workarounds, using the NuGet package requires a small amount of additional setup.
+Before creating the `Engine`, call `Accelerators.LoadNativeLibraries()` to pre-load the native accelerator libraries.
+You only need to call this method once; subsequent calls are no-ops.
+
 ## Example Script
 
 Documentation for this package is still a WIP.

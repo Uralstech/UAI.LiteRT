@@ -36,16 +36,33 @@ jobs:
 
     - name: Copy Files
       run: |
-        mkdir -p "UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Documentation~"
-        cp -f "Documentation/_site/api/APIReferenceManual.pdf" "UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Documentation~"
-        cp -f "Documentation/_site/DocSource/Documentation.pdf" "UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Documentation~"
-        cp -f "THIRD-PARTY-LICENSES.md" "UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm"
+        PACKAGE_DIR="UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm"
+
+        mkdir -p "$PACKAGE_DIR/Documentation~"
+        cp -f "Documentation/_site/api/APIReferenceManual.pdf" "$PACKAGE_DIR/Documentation~"
+        cp -f "Documentation/_site/DocSource/Documentation.pdf" "$PACKAGE_DIR/Documentation~"
+        cp -f "THIRD-PARTY-LICENSES.md" "$PACKAGE_DIR"
+        cat > "$PACKAGE_DIR/THIRD-PARTY-LICENSES.md.meta" <<'EOF'
+        fileFormatVersion: 2
+        guid: b3787837ff20a4fee8accc29925b3cf2
+        TextScriptImporter:
+          externalObjects: {}
+          userData: 
+          assetBundleName: 
+          assetBundleVariant: 
+        EOF
 
     - name: Commit Files *locally*
       run: |
+        PACKAGE_DIR="UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm"
+
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add "UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Documentation~"
+        
+        git add "$PACKAGE_DIR/Documentation~"
+        git add "$PACKAGE_DIR/THIRD-PARTY-LICENSES.md"
+        git add "$PACKAGE_DIR/THIRD-PARTY-LICENSES.md.meta"
+        
         git commit -m "chore: include generated PDFs & 3rd party licenses notice in package" || echo "No changes to commit"
 
     - name: Upload artifact

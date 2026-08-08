@@ -1816,6 +1816,9 @@ namespace Uralstech.UAI.LiteRTLM
             Native = native;
         }
 
+        /// <summary>The number of token ids from the tokenize result.</summary>
+        public int Length => (int)GetNumTokens();
+
         /// <summary>Returns a span of the token ids.</summary>
         /// <remarks>
         /// The returned span is only valid for the lifetime of this

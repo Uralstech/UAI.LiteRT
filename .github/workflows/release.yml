@@ -1,9 +1,17 @@
-name: UPM Release
+name: Release
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Must match 'version' in package.json and Version in UAI.LiteRTLM-CS/Directory.Build.props"
+        required: true
+      nuget-publish:
+        required: true
+        default: true
+        type: boolean
 
 concurrency:
-  group: upm-release
+  group: release
   cancel-in-progress: true
 
 jobs:
@@ -76,6 +84,9 @@ jobs:
 
     - name: Clean up untracked DocFX files
       run: git clean -fdx
+      
+    - name: Save current commit
+      run: echo "ORIGINAL_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
     - name: Publish Release
       uses: RageAgainstThePixel/upm-release@v2
@@ -86,3 +97,31 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           package-json: 'UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/package.json'
           split-upm-branch: 'upm'
+
+    - name: Pack NuGet package
+      run: |
+        git checkout -f "$ORIGINAL_SHA"
+        dotnet pack UAI.LiteRTLM-CS/UAI.LiteRTLM/UAI.LiteRTLM.csproj -c Release
+
+    - name: NuGet login
+      id: nuget-login
+      if: ${{ inputs.nuget-publish }}
+      uses: NuGet/login@v1
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
+    - name: Upload NuGet package
+      run: |
+        PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
+
+        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.nupkg"
+        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.snupkg"
+      
+    - name: Publish NuGet package
+      if: ${{ inputs.nuget-publish }}
+      env:
+        NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+      run: |
+        PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
+        dotnet nuget push "$PACKAGE_BIN.nupkg" --source https://api.nuget.org/v3/index.json
+        dotnet nuget push "$PACKAGE_BIN.snupkg" --source https://api.nuget.org/v3/index.json

@@ -30,6 +30,9 @@ jobs:
       with:
         ref: ${{ github.ref }}
         fetch-depth: 0
+      
+    - name: Save current commit
+      run: echo "ORIGINAL_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
     - name: Dotnet Setup
       uses: actions/setup-dotnet@v6
@@ -84,11 +87,8 @@ jobs:
 
     - name: Clean up untracked DocFX files
       run: git clean -fdx
-      
-    - name: Save current commit
-      run: echo "ORIGINAL_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
-    - name: Publish Release
+    - name: Pack UPM package
       uses: RageAgainstThePixel/upm-release@v2
       with:
           organization-id: ${{ secrets.UNITY_ORG_ID }}
@@ -111,6 +111,9 @@ jobs:
         user: ${{ secrets.NUGET_USER }}
 
     - name: Upload NuGet package
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # auto generated token
+        GH_REPO: ${{ github.repository }}
       run: |
         PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
 

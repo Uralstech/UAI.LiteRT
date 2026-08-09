@@ -118,7 +118,7 @@ jobs:
         PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
 
         gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.nupkg"
-        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.snupkg"
+        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.snupkg" --skip-duplicate
       
     - name: Publish NuGet package
       if: ${{ inputs.nuget-publish }}

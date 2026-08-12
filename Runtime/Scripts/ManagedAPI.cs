@@ -945,6 +945,14 @@ namespace Uralstech.UAI.LiteRTLM
             ThrowIfDisposed();
             NativeAPI.EngineSettings.litert_lm_engine_settings_set_prefill_chunk_size(Native, prefillChunkSize);
         }
+
+        /// <summary>Sets whether YNNPACK should delegate supported operations before XNNPACK.</summary>
+        /// <param name="enableYNNPACK">Whether to enable YNNPACK.</param>
+        public void SetEnableYNNPACK(bool enableYNNPACK)
+        {
+            ThrowIfDisposed();
+            NativeAPI.EngineSettings.litert_lm_engine_settings_set_enable_ynnpack(Native, enableYNNPACK);
+        }
         
         /// <summary>Enables benchmarking for the engine.</summary>
         public void EnableBenchmark()
@@ -1161,6 +1169,33 @@ namespace Uralstech.UAI.LiteRTLM
         {
             ThrowIfDisposed();
             NativeAPI.Session.litert_lm_session_cancel_process(Native);
+        }
+
+        /// <summary>Saves the current state of the session to a checkpoint with the given label.</summary>
+        /// <param name="label">Label for the checkpoint.</param>
+        /// <returns>0 on success, non-zero on failure.</returns>
+        public int SaveCheckpoint(string label)
+        {
+            ThrowIfDisposed();
+            return NativeAPI.Session.litert_lm_session_save_checkpoint(Native, label);
+        }
+
+        /// <summary>Rewinds the session to the given checkpoint label.</summary>
+        /// <param name="label">Label of the checkpoint to rewind to.</param>
+        /// <returns>0 on success, non-zero on failure.</returns>
+        public int RewindToCheckpoint(string label)
+        {
+            ThrowIfDisposed();
+            return NativeAPI.Session.litert_lm_session_rewind_to_checkpoint(Native, label);
+        }
+
+        /// <summary>Rewinds the session to a specific step number.</summary>
+        /// <param name="step">The step number to rewind to.</param>
+        /// <returns>0 on success, non-zero on failure.</returns>
+        public int RewindToStep(int step)
+        {
+            ThrowIfDisposed();
+            return NativeAPI.Session.litert_lm_session_rewind_to_step(Native, step);
         }
 
         /// <summary>

@@ -275,171 +275,6 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
 
-    public sealed class ConversationConfig : LiteRTLMNativeHandle
-    {
-        /// <summary>
-        /// Creates a managed wrapper around a LiteRT LM conversation configuration.
-        /// The caller is responsible for disposing the wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
-        public ConversationConfig()
-        {
-            Native = NativeAPI.ConversationConfig.litert_lm_conversation_config_create();
-            if (Native == IntPtr.Zero)
-                throw new InvalidOperationException("Failed to create native conversation config.");
-        }
-
-        /// <summary>Sets the session config for this conversation configuration.</summary>
-        /// <param name="sessionConfig">The session config to use.</param>
-        public void SetSessionConfig(SessionConfig sessionConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_session_config(Native, sessionConfig);
-        }
-
-        /// <summary>Sets the system message for this conversation configuration.</summary>
-        /// <param name="systemMessageJson">The system message in JSON format.</param>
-        public void SetSystemMessage(string systemMessageJson)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_system_message(Native, systemMessageJson);
-        }
-
-        /// <summary>Sets the tools for this conversation configuration.</summary>
-        /// <param name="toolsJson">The tools description in JSON array format.</param>
-        public void SetTools(string toolsJson)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_tools(Native, toolsJson);
-        }
-        
-        /// <summary>Sets the initial messages for this conversation configuration.</summary>
-        /// <param name="messagesJson">The initial messages in JSON array format.</param>
-        public void SetMessages(string messagesJson)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_messages(Native, messagesJson);
-        }
-        
-        /// <summary>Sets the extra context for the conversation preface.</summary>
-        /// <param name="extraContextJson">A JSON string representing the extra context object.</param>
-        public void SetExtraContext(string extraContextJson)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_extra_context(Native, extraContextJson);
-        }
-
-        /// <summary>Sets the prompt template for this conversation config.</summary>
-        /// <param name="promptTemplate">
-        /// The prompt template string (e.g. Jinja template).
-        /// If not set, use the default provided by the model or the engine.
-        /// </param>
-        public void SetPromptTemplate(string promptTemplate)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_prompt_template(Native, promptTemplate);
-        }
-        
-        /// <summary>Sets whether to enable constrained decoding for this conversation configuration.</summary>
-        /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
-        public void SetEnableConstrainedDecoding(bool enableConstrainedDecoding)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_enable_constrained_decoding(Native, enableConstrainedDecoding);
-        }
-
-        /// <summary>Sets the constraint provider type for this conversation config.</summary>
-        /// <param name="providerType">The constraint provider type to use, or <see langword="null"/> to unset.</param>
-        public unsafe void SetConstraintProvider(ConstraintProviderType? providerType)
-        {
-            ThrowIfDisposed();
-            if (!providerType.HasValue)
-            {
-                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, IntPtr.Zero);
-                return;
-            }
-            
-            Span<ConstraintProviderType> providerTypeSpan = stackalloc ConstraintProviderType[1] { providerType.Value };
-            fixed (ConstraintProviderType* providerTypePtr = providerTypeSpan)
-                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, (IntPtr)providerTypePtr);
-        }
-        
-        /// <summary>Sets whether to filter channel content from the KV cache.</summary>
-        /// <param name="filterChannelContentFromKvCache">Whether to filter channel content.</param>
-        public void SetFilterChannelContentFromKvCache(bool filterChannelContentFromKvCache)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_filter_channel_content_from_kv_cache(Native, filterChannelContentFromKvCache);
-        }
-        
-        /// <summary>Sets whether to stream tool call tokens.</summary>
-        /// <param name="streamToolCalls">Whether to stream tool call tokens.</param>
-        /// <param name="channelName">The channel name to use for tool call tokens.</param>
-        public void SetStreamToolCalls(bool streamToolCalls, string channelName)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_stream_tool_calls(Native, streamToolCalls, channelName);
-        }
-
-        /// <summary>Sets the thinking config for this conversation config.</summary>
-        /// <param name="thinkingConfig">
-        /// The thinking config to set. If <see langword="null"/>,
-        /// clears any previously set thinking config.
-        /// </param>
-        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_thinking_config(Native, thinkingConfig);
-        }
-        
-        protected override void ReleaseUnmanagedResources()
-        {
-            if (Native != IntPtr.Zero)
-                NativeAPI.ConversationConfig.litert_lm_conversation_config_delete(Native);
-        }
-    }
-
-    public sealed class ThinkingConfig : LiteRTLMNativeHandle
-    {
-        /// <summary>
-        /// Creates a managed wrapper around a LiteRT LM thinking configuration.
-        /// The caller is responsible for disposing the wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
-        public ThinkingConfig()
-        {
-            Native = NativeAPI.ThinkingConfig.litert_lm_thinking_config_create();
-            if (Native == IntPtr.Zero)
-                throw new InvalidOperationException("Failed to create native thinking config.");
-        }
-
-        /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
-        /// <param name="enableThinking">Whether thinking is enabled.</param>
-        public void SetEnableThinking(bool enableThinking)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_enable_thinking(Native, enableThinking);
-        }
-
-        /// <summary>Sets the thinking token budget.</summary>
-        /// <param name="thinkingTokenBudget">
-        /// Budget for token-by-token reasoning generation (-1 for infinite).
-        /// </param>
-        public void SetThinkingTokenBudget(int thinkingTokenBudget)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_thinking_token_budget(Native, thinkingTokenBudget);
-        }
-        
-        protected override void ReleaseUnmanagedResources()
-        {
-            if (Native != IntPtr.Zero)
-                NativeAPI.ThinkingConfig.litert_lm_thinking_config_delete(Native);
-        }
-    }
-
     public sealed class RepetitionPenaltyConfig : LiteRTLMNativeHandle
     {
         /// <summary>
@@ -636,113 +471,6 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
     
-    public sealed class ConversationOptionalArgs : LiteRTLMNativeHandle
-    {
-        /// <summary>
-        /// Creates a managed wrapper around the optional arguments for conversation APIs.
-        /// The caller is responsible for disposing the wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
-        public ConversationOptionalArgs()
-        {
-            Native = NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_create();
-            if (Native == IntPtr.Zero)
-                throw new InvalidOperationException("Failed to create native conversation optional args.");
-        }
-
-        /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments.</summary>
-        /// <remarks>
-        /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
-        /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
-        /// generated during the current <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
-        /// </remarks>
-        /// <param name="repetitionPenaltyConfig">The repetition penalty configuration.
-        /// The contents are deep-copied when set. If <see langword="null"/>, clears any
-        /// previously set repetition penalty config so no penalties apply.
-        /// </param>
-        public void SetRepetitionPenaltyConfig(RepetitionPenaltyConfig? repetitionPenaltyConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_repetition_penalty_config(Native, repetitionPenaltyConfig);
-        }
-
-        /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments.</summary>
-        /// <remarks>
-        /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
-        /// exclusively to the output sequence generated during the current
-        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
-        /// </remarks>
-        /// <param name="noRepeatNgramConfig">
-        /// The no repeat ngram configuration.
-        /// The contents are deep-copied when set. If <see langword="null"/>, clears any previously
-        /// set no repeat ngram config so no repeat ngram banning applies.
-        /// </param>
-        public void SetNoRepeatNgramConfig(NoRepeatNgramConfig? noRepeatNgramConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_no_repeat_ngram_config(Native, noRepeatNgramConfig);
-        }
-
-        /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments.</summary>
-        /// <remarks>
-        /// The configured list of suppressed tokens applies
-        /// exclusively to the output sequence generated during the current
-        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
-        /// </remarks>
-        /// <param name="suppressTokensConfig">
-        /// The suppress tokens configuration. The contents are deep-copied when
-        /// set. If <see langword="null"/> or if the inner token set is disabled/empty, clears any
-        /// previously set suppress tokens config so no token suppression applies.
-        /// </param>
-        public void SetSuppressTokensConfig(SuppressTokensConfig? suppressTokensConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_suppress_tokens_config(Native, suppressTokensConfig);
-        }
-
-        /// <summary>Sets the visual token budget for the conversation optional arguments.</summary>
-        /// <param name="visualTokenBudget">The visual token budget.</param>
-        public void SetVisualTokenBudget(int visualTokenBudget)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_visual_token_budget(
-                Native, visualTokenBudget);
-        }
-        
-        /// <summary>Sets the maximum number of output tokens for the conversation optional arguments.</summary>
-        /// <param name="maxOutputTokens">The maximum number of output tokens.</param>
-        public void SetMaxOutputTokens(int maxOutputTokens)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_max_output_tokens(
-                Native, maxOutputTokens);
-        }
-
-        /// <summary>Sets the thinking config for the conversation optional args.</summary>
-        /// <param name="thinkingConfig">The thinking config to set. If <see langword="null"/>, clears any previously set thinking config.</param>
-        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_thinking_config(Native, thinkingConfig);
-        }
-
-        /// <summary>Sets the constraint for the conversation optional args.</summary>
-        /// <param name="constraintType">The type of constraint.</param>
-        /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
-        public void SetConstraint(ConstraintType constraintType, string constraintString)
-        {
-            ThrowIfDisposed();
-            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_constraint(Native, constraintType, constraintString);
-        }
-        
-        protected override void ReleaseUnmanagedResources()
-        {
-            if (Native != IntPtr.Zero)
-                NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_delete(Native);
-        }
-    }
-
     public sealed class InputData : LiteRTLMNativeHandle
     {
         /// <summary>
@@ -1680,170 +1408,6 @@ namespace Uralstech.UAI.LiteRTLM
         }
     }
     
-    public sealed class Conversation : LiteRTLMNativeHandle
-    {
-        /// <summary>
-        /// Creates a managed wrapper around a LiteRT LM conversation.
-        /// The caller is responsible for disposing the wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
-        /// </summary>
-        /// <param name="engine">The engine to create the conversation from.</param>
-        /// <param name="config">The conversation configuration to use. If <see langword="null"/>, the default configuration is used.</param>
-        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
-        public Conversation(Engine engine, ConversationConfig? config = null)
-        {
-            Native = NativeAPI.Conversation.litert_lm_conversation_create(engine, config);
-            if (Native == IntPtr.Zero)
-                throw new InvalidOperationException("Failed to create native conversation.");
-        }
-
-        private Conversation(IntPtr native)
-        {
-            Native = native;
-        }
-
-        /// <summary>
-        /// Clones a LiteRT LM conversation, duplicating its prefilled state.
-        /// The caller is responsible for disposing the cloned wrapper using
-        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
-        /// </summary>
-        /// <returns>The cloned conversation wrapper, or <see langword="null"/> on failure.</returns>
-        public Conversation? Clone()
-        {
-            ThrowIfDisposed();
-            
-            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_clone(Native);
-            return ptr != IntPtr.Zero ? new Conversation(ptr) : null;
-        }
-
-        /// <summary>
-        /// Sends a message to the conversation and returns the response.
-        /// This is a blocking call.
-        /// </summary>
-        /// <param name="messageJson">A JSON string representing the message to send.</param>
-        /// <param name="extraContext">A JSON string representing the extra context to use.</param>
-        /// <param name="optionalArgs">The optional arguments to use.</param>
-        /// <returns>
-        /// A JSON response wrapper, or <see langword="null"/> on failure.
-        /// The caller is responsible for disposing the returned wrapper.
-        /// </returns>
-        public JsonResponse? SendMessage(string messageJson,
-            string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
-        {
-            ThrowIfDisposed();
-            
-            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_send_message(Native, messageJson, extraContext, optionalArgs);
-            return ptr != IntPtr.Zero ? new JsonResponse(ptr) : null;
-        }
-
-        /// <summary>
-        /// Sends a message to the conversation and streams the response through a
-        /// callback. This is a non-blocking call that invokes the callback from a
-        /// background thread for each chunk.
-        /// </summary>
-        /// <param name="messageJson">A JSON string representing the message to send.</param>
-        /// <param name="extraContext">A JSON string representing the extra context to use.</param>
-        /// <param name="optionalArgs">The optional arguments to use.</param>
-        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) that receives response chunks.</param>
-        /// <returns>0 on success, non-zero on failure to start the stream.</returns>
-        public int SendMessageStream(StreamCallback callback, string messageJson,
-            string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
-        {
-            ThrowIfDisposed();
-            
-            IntPtr callbackData = StreamCallbackHandler.Register(callback);
-            int result = NativeAPI.Conversation.litert_lm_conversation_send_message_stream(Native,
-                messageJson, extraContext, optionalArgs, StreamCallbackHandler.GetGlobalStreamCallbackListenerPtr(), callbackData);
-            
-            if (result != 0)
-                StreamCallbackHandler.Deregister(callbackData);
-            return result;
-        }
-
-        /// <summary>Renders the message into a string according to the template.</summary>
-        /// <remarks>
-        /// This function does not need to be called for actual message sending, as
-        /// <see cref="SendMessage"/> and <see cref="SendMessageStream"/> render
-        /// messages internally.
-        /// </remarks>
-        /// <param name="messageJson">A JSON string representing the message to render.</param>
-        /// <returns>The rendered string, or <see langword="null"/> on failure.</returns>
-        public string? RenderMessageToString(string messageJson)
-        {
-            ThrowIfDisposed();
-            
-            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_render_message_to_string(Native, messageJson);
-            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
-        }
-        
-        /// <summary>Renders the preface into a string according to the template.</summary>
-        /// <returns>The rendered string, or <see langword="null"/> on failure.</returns>
-        public string? RenderPrefaceToString()
-        {
-            ThrowIfDisposed();
-            
-            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_render_preface_to_string(Native);
-            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
-        }
-
-        /// <summary>Cancels the ongoing inference process for asynchronous inference.</summary>
-        public void CancelProcess()
-        {
-            ThrowIfDisposed();
-            NativeAPI.Conversation.litert_lm_conversation_cancel_process(Native);
-        }
-
-        /// <summary>
-        /// Retrieves benchmark information from the conversation.
-        /// The caller is responsible for disposing the returned wrapper.
-        /// </summary>
-        /// <returns>The benchmark information wrapper, or <see langword="null"/> on failure.</returns>
-        public BenchmarkInfo? GetBenchmarkInfo()
-        {
-            ThrowIfDisposed();
-            
-            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_get_benchmark_info(Native);
-            return ptr != IntPtr.Zero ? new BenchmarkInfo(ptr) : null;
-        }
-
-        /// <summary>Gets the number of tokens in the conversation KV cache (prefill + decode).</summary>
-        /// <returns>The number of tokens, or a negative value on failure.</returns>
-        public int GetTokenCount()
-        {
-            ThrowIfDisposed();
-            return NativeAPI.Conversation.litert_lm_conversation_get_token_count(Native);
-        }
-
-        protected override void ReleaseUnmanagedResources()
-        {
-            if (Native != IntPtr.Zero)
-                NativeAPI.Conversation.litert_lm_conversation_delete(Native);
-        }
-    }
-
-    public sealed class JsonResponse : LiteRTLMNativeHandle
-    {
-        internal JsonResponse(IntPtr native)
-        {
-            Native = native;
-        }
-
-        /// <summary>Returns the JSON response string.</summary>
-        /// <returns>The response JSON string.</returns>
-        public string? GetString()
-        {
-            ThrowIfDisposed();
-            IntPtr ptr = NativeAPI.JsonResponse.litert_lm_json_response_get_string(Native);
-            return UnsafeUtils.MarshalStringUTF8(ptr);
-        }
-
-        protected override void ReleaseUnmanagedResources()
-        {
-            if (Native != IntPtr.Zero)
-                NativeAPI.JsonResponse.litert_lm_json_response_delete(Native);
-        }
-    }
-
     public sealed class TokenizeResult : LiteRTLMNativeHandle
     {
         internal TokenizeResult(IntPtr native)
@@ -2023,6 +1587,442 @@ namespace Uralstech.UAI.LiteRTLM
         {
             if (Native != IntPtr.Zero)
                 NativeAPI.TokenUnions.litert_lm_token_unions_delete(Native);
+        }
+    }
+    
+    public sealed class ConversationConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around a LiteRT LM conversation configuration.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public ConversationConfig()
+        {
+            Native = NativeAPI.ConversationConfig.litert_lm_conversation_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native conversation config.");
+        }
+
+        /// <summary>Sets the session config for this conversation configuration.</summary>
+        /// <param name="sessionConfig">The session config to use.</param>
+        public void SetSessionConfig(SessionConfig sessionConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_session_config(Native, sessionConfig);
+        }
+
+        /// <summary>Sets the system message for this conversation configuration.</summary>
+        /// <param name="systemMessageJson">The system message in JSON format.</param>
+        public void SetSystemMessage(string systemMessageJson)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_system_message(Native, systemMessageJson);
+        }
+
+        /// <summary>Sets the tools for this conversation configuration.</summary>
+        /// <param name="toolsJson">The tools description in JSON array format.</param>
+        public void SetTools(string toolsJson)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_tools(Native, toolsJson);
+        }
+        
+        /// <summary>Sets the initial messages for this conversation configuration.</summary>
+        /// <param name="messagesJson">The initial messages in JSON array format.</param>
+        public void SetMessages(string messagesJson)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_messages(Native, messagesJson);
+        }
+        
+        /// <summary>Sets the extra context for the conversation preface.</summary>
+        /// <param name="extraContextJson">A JSON string representing the extra context object.</param>
+        public void SetExtraContext(string extraContextJson)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_extra_context(Native, extraContextJson);
+        }
+
+        /// <summary>Sets the prompt template for this conversation config.</summary>
+        /// <param name="promptTemplate">
+        /// The prompt template string (e.g. Jinja template).
+        /// If not set, use the default provided by the model or the engine.
+        /// </param>
+        public void SetPromptTemplate(string promptTemplate)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_prompt_template(Native, promptTemplate);
+        }
+        
+        /// <summary>Sets whether to enable constrained decoding for this conversation configuration.</summary>
+        /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
+        public void SetEnableConstrainedDecoding(bool enableConstrainedDecoding)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_enable_constrained_decoding(Native, enableConstrainedDecoding);
+        }
+
+        /// <summary>Sets the constraint provider type for this conversation config.</summary>
+        /// <param name="providerType">The constraint provider type to use, or <see langword="null"/> to unset.</param>
+        public unsafe void SetConstraintProvider(ConstraintProviderType? providerType)
+        {
+            ThrowIfDisposed();
+            if (!providerType.HasValue)
+            {
+                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, IntPtr.Zero);
+                return;
+            }
+            
+            Span<ConstraintProviderType> providerTypeSpan = stackalloc ConstraintProviderType[1] { providerType.Value };
+            fixed (ConstraintProviderType* providerTypePtr = providerTypeSpan)
+                NativeAPI.ConversationConfig.litert_lm_conversation_config_set_constraint_provider(Native, (IntPtr)providerTypePtr);
+        }
+        
+        /// <summary>Sets whether to filter channel content from the KV cache.</summary>
+        /// <param name="filterChannelContentFromKvCache">Whether to filter channel content.</param>
+        public void SetFilterChannelContentFromKvCache(bool filterChannelContentFromKvCache)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_filter_channel_content_from_kv_cache(Native, filterChannelContentFromKvCache);
+        }
+        
+        /// <summary>Sets whether to stream tool call tokens.</summary>
+        /// <param name="streamToolCalls">Whether to stream tool call tokens.</param>
+        /// <param name="channelName">The channel name to use for tool call tokens.</param>
+        public void SetStreamToolCalls(bool streamToolCalls, string channelName)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_stream_tool_calls(Native, streamToolCalls, channelName);
+        }
+
+        /// <summary>Sets the thinking config for this conversation config.</summary>
+        /// <param name="thinkingConfig">
+        /// The thinking config to set. If <see langword="null"/>,
+        /// clears any previously set thinking config.
+        /// </param>
+        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationConfig.litert_lm_conversation_config_set_thinking_config(Native, thinkingConfig);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.ConversationConfig.litert_lm_conversation_config_delete(Native);
+        }
+    }
+
+    public sealed class ThinkingConfig : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around a LiteRT LM thinking configuration.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public ThinkingConfig()
+        {
+            Native = NativeAPI.ThinkingConfig.litert_lm_thinking_config_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native thinking config.");
+        }
+
+        /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
+        /// <param name="enableThinking">Whether thinking is enabled.</param>
+        public void SetEnableThinking(bool enableThinking)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_enable_thinking(Native, enableThinking);
+        }
+
+        /// <summary>Sets the thinking token budget.</summary>
+        /// <param name="thinkingTokenBudget">
+        /// Budget for token-by-token reasoning generation (-1 for infinite).
+        /// </param>
+        public void SetThinkingTokenBudget(int thinkingTokenBudget)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ThinkingConfig.litert_lm_thinking_config_set_thinking_token_budget(Native, thinkingTokenBudget);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.ThinkingConfig.litert_lm_thinking_config_delete(Native);
+        }
+    }
+
+    public sealed class ConversationOptionalArgs : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around the optional arguments for conversation APIs.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose()"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public ConversationOptionalArgs()
+        {
+            Native = NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_create();
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native conversation optional args.");
+        }
+
+        /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
+        /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
+        /// generated during the current <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="repetitionPenaltyConfig">The repetition penalty configuration.
+        /// The contents are deep-copied when set. If <see langword="null"/>, clears any
+        /// previously set repetition penalty config so no penalties apply.
+        /// </param>
+        public void SetRepetitionPenaltyConfig(RepetitionPenaltyConfig? repetitionPenaltyConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_repetition_penalty_config(Native, repetitionPenaltyConfig);
+        }
+
+        /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
+        /// exclusively to the output sequence generated during the current
+        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="noRepeatNgramConfig">
+        /// The no repeat ngram configuration.
+        /// The contents are deep-copied when set. If <see langword="null"/>, clears any previously
+        /// set no repeat ngram config so no repeat ngram banning applies.
+        /// </param>
+        public void SetNoRepeatNgramConfig(NoRepeatNgramConfig? noRepeatNgramConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_no_repeat_ngram_config(Native, noRepeatNgramConfig);
+        }
+
+        /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments.</summary>
+        /// <remarks>
+        /// The configured list of suppressed tokens applies
+        /// exclusively to the output sequence generated during the current
+        /// <see cref="Conversation.SendMessage"/> or <see cref="Conversation.SendMessageStream"/> call.
+        /// </remarks>
+        /// <param name="suppressTokensConfig">
+        /// The suppress tokens configuration. The contents are deep-copied when
+        /// set. If <see langword="null"/> or if the inner token set is disabled/empty, clears any
+        /// previously set suppress tokens config so no token suppression applies.
+        /// </param>
+        public void SetSuppressTokensConfig(SuppressTokensConfig? suppressTokensConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_suppress_tokens_config(Native, suppressTokensConfig);
+        }
+
+        /// <summary>Sets the visual token budget for the conversation optional arguments.</summary>
+        /// <param name="visualTokenBudget">The visual token budget.</param>
+        public void SetVisualTokenBudget(int visualTokenBudget)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_visual_token_budget(
+                Native, visualTokenBudget);
+        }
+        
+        /// <summary>Sets the maximum number of output tokens for the conversation optional arguments.</summary>
+        /// <param name="maxOutputTokens">The maximum number of output tokens.</param>
+        public void SetMaxOutputTokens(int maxOutputTokens)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_max_output_tokens(
+                Native, maxOutputTokens);
+        }
+
+        /// <summary>Sets the thinking config for the conversation optional args.</summary>
+        /// <param name="thinkingConfig">The thinking config to set. If <see langword="null"/>, clears any previously set thinking config.</param>
+        public void SetThinkingConfig(ThinkingConfig? thinkingConfig)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_thinking_config(Native, thinkingConfig);
+        }
+
+        /// <summary>Sets the constraint for the conversation optional args.</summary>
+        /// <param name="constraintType">The type of constraint.</param>
+        /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
+        public void SetConstraint(ConstraintType constraintType, string constraintString)
+        {
+            ThrowIfDisposed();
+            NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_set_constraint(Native, constraintType, constraintString);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.ConversationOptionalArgs.litert_lm_conversation_optional_args_delete(Native);
+        }
+    }
+
+    public sealed class Conversation : LiteRTLMNativeHandle
+    {
+        /// <summary>
+        /// Creates a managed wrapper around a LiteRT LM conversation.
+        /// The caller is responsible for disposing the wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// </summary>
+        /// <param name="engine">The engine to create the conversation from.</param>
+        /// <param name="config">The conversation configuration to use. If <see langword="null"/>, the default configuration is used.</param>
+        /// <exception cref="InvalidOperationException">Thrown if the native object could not be created.</exception>
+        public Conversation(Engine engine, ConversationConfig? config = null)
+        {
+            Native = NativeAPI.Conversation.litert_lm_conversation_create(engine, config);
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to create native conversation.");
+        }
+
+        private Conversation(IntPtr native)
+        {
+            Native = native;
+        }
+
+        /// <summary>
+        /// Clones a LiteRT LM conversation, duplicating its prefilled state.
+        /// The caller is responsible for disposing the cloned wrapper using
+        /// <see cref="LiteRTLMNativeHandle.Dispose"/>.
+        /// </summary>
+        /// <returns>The cloned conversation wrapper, or <see langword="null"/> on failure.</returns>
+        public Conversation? Clone()
+        {
+            ThrowIfDisposed();
+            
+            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_clone(Native);
+            return ptr != IntPtr.Zero ? new Conversation(ptr) : null;
+        }
+
+        /// <summary>
+        /// Sends a message to the conversation and returns the response.
+        /// This is a blocking call.
+        /// </summary>
+        /// <param name="messageJson">A JSON string representing the message to send.</param>
+        /// <param name="extraContext">A JSON string representing the extra context to use.</param>
+        /// <param name="optionalArgs">The optional arguments to use.</param>
+        /// <returns>
+        /// A JSON response wrapper, or <see langword="null"/> on failure.
+        /// The caller is responsible for disposing the returned wrapper.
+        /// </returns>
+        public JsonResponse? SendMessage(string messageJson,
+            string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
+        {
+            ThrowIfDisposed();
+            
+            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_send_message(Native, messageJson, extraContext, optionalArgs);
+            return ptr != IntPtr.Zero ? new JsonResponse(ptr) : null;
+        }
+
+        /// <summary>
+        /// Sends a message to the conversation and streams the response through a
+        /// callback. This is a non-blocking call that invokes the callback from a
+        /// background thread for each chunk.
+        /// </summary>
+        /// <param name="messageJson">A JSON string representing the message to send.</param>
+        /// <param name="extraContext">A JSON string representing the extra context to use.</param>
+        /// <param name="optionalArgs">The optional arguments to use.</param>
+        /// <param name="callback">The callback function (<see cref="StreamCallback"/>) that receives response chunks.</param>
+        /// <returns>0 on success, non-zero on failure to start the stream.</returns>
+        public int SendMessageStream(StreamCallback callback, string messageJson,
+            string? extraContext = null, ConversationOptionalArgs? optionalArgs = null)
+        {
+            ThrowIfDisposed();
+            
+            IntPtr callbackData = StreamCallbackHandler.Register(callback);
+            int result = NativeAPI.Conversation.litert_lm_conversation_send_message_stream(Native,
+                messageJson, extraContext, optionalArgs, StreamCallbackHandler.GetGlobalStreamCallbackListenerPtr(), callbackData);
+            
+            if (result != 0)
+                StreamCallbackHandler.Deregister(callbackData);
+            return result;
+        }
+
+        /// <summary>Renders the message into a string according to the template.</summary>
+        /// <remarks>
+        /// This function does not need to be called for actual message sending, as
+        /// <see cref="SendMessage"/> and <see cref="SendMessageStream"/> render
+        /// messages internally.
+        /// </remarks>
+        /// <param name="messageJson">A JSON string representing the message to render.</param>
+        /// <returns>The rendered string, or <see langword="null"/> on failure.</returns>
+        public string? RenderMessageToString(string messageJson)
+        {
+            ThrowIfDisposed();
+            
+            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_render_message_to_string(Native, messageJson);
+            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
+        }
+        
+        /// <summary>Renders the preface into a string according to the template.</summary>
+        /// <returns>The rendered string, or <see langword="null"/> on failure.</returns>
+        public string? RenderPrefaceToString()
+        {
+            ThrowIfDisposed();
+            
+            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_render_preface_to_string(Native);
+            return ptr != IntPtr.Zero ? UnsafeUtils.MarshalStringUTF8(ptr) : null;
+        }
+
+        /// <summary>Cancels the ongoing inference process for asynchronous inference.</summary>
+        public void CancelProcess()
+        {
+            ThrowIfDisposed();
+            NativeAPI.Conversation.litert_lm_conversation_cancel_process(Native);
+        }
+
+        /// <summary>
+        /// Retrieves benchmark information from the conversation.
+        /// The caller is responsible for disposing the returned wrapper.
+        /// </summary>
+        /// <returns>The benchmark information wrapper, or <see langword="null"/> on failure.</returns>
+        public BenchmarkInfo? GetBenchmarkInfo()
+        {
+            ThrowIfDisposed();
+            
+            IntPtr ptr = NativeAPI.Conversation.litert_lm_conversation_get_benchmark_info(Native);
+            return ptr != IntPtr.Zero ? new BenchmarkInfo(ptr) : null;
+        }
+
+        /// <summary>Gets the number of tokens in the conversation KV cache (prefill + decode).</summary>
+        /// <returns>The number of tokens, or a negative value on failure.</returns>
+        public int GetTokenCount()
+        {
+            ThrowIfDisposed();
+            return NativeAPI.Conversation.litert_lm_conversation_get_token_count(Native);
+        }
+
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.Conversation.litert_lm_conversation_delete(Native);
+        }
+    }
+
+    public sealed class JsonResponse : LiteRTLMNativeHandle
+    {
+        internal JsonResponse(IntPtr native)
+        {
+            Native = native;
+        }
+
+        /// <summary>Returns the JSON response string.</summary>
+        /// <returns>The response JSON string.</returns>
+        public string? GetString()
+        {
+            ThrowIfDisposed();
+            IntPtr ptr = NativeAPI.JsonResponse.litert_lm_json_response_get_string(Native);
+            return UnsafeUtils.MarshalStringUTF8(ptr);
+        }
+
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.JsonResponse.litert_lm_json_response_delete(Native);
         }
     }
 }

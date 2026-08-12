@@ -118,139 +118,6 @@ namespace Uralstech.UAI.LiteRTLM.Native
                 [MarshalAs(UnmanagedType.LPUTF8Str)] string audioLoraPath);
         }
 
-        public static class ConversationConfig
-        {
-            /// <summary>
-            /// Creates a LiteRT LM Conversation Config.
-            /// The caller is responsible for destroying the config using
-            /// <see cref="litert_lm_conversation_config_delete"/>.
-            /// </summary>
-            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_conversation_config_create();
-
-            /// <summary>Destroys a LiteRT LM Conversation Config.</summary>
-            /// <param name="config">The config to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_delete(IntPtr config);
-
-            /// <summary>Sets the session config for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="sessionConfig">The session config to use.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_session_config(IntPtr config,
-                IntPtr sessionConfig);
-
-            /// <summary>Sets the system message for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="systemMessageJson">The system message in JSON format.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_system_message(IntPtr config,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string systemMessageJson);
-
-            /// <summary>Sets the tools for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="toolsJson">The tools description in JSON array format.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_tools(IntPtr config,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string toolsJson);
-
-            /// <summary>Sets the initial messages for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="messagesJson">The initial messages in JSON array format.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_messages(IntPtr config,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string messagesJson);
-
-            /// <summary>Sets the extra context for the conversation preface.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="extraContextJson">A JSON string representing the extra context object.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_extra_context(IntPtr config,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string extraContextJson);
-
-            /// <summary>Sets the prompt template for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="promptTemplate">
-            /// The prompt template string (e.g. Jinja template).
-            /// If not set, use the default provided by the model or the engine.
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_prompt_template(IntPtr config, [MarshalAs(UnmanagedType.LPUTF8Str)] string promptTemplate);
-                
-            /// <summary>Sets whether to enable constrained decoding for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_enable_constrained_decoding(IntPtr config,
-                [MarshalAs(UnmanagedType.I1)] bool enableConstrainedDecoding);
-            
-            /// <summary>Sets the constraint provider type for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="providerType">A pointer to the constraint provider type to use (<see cref="ConstraintProviderType"/>), or <see cref="IntPtr.Zero"/> to unset.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_constraint_provider(IntPtr config, IntPtr providerType);
-
-            /// <summary>Sets whether to filter channel content from the KV cache.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="filterChannelContentFromKvCache">Whether to filter channel content.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_filter_channel_content_from_kv_cache(
-                IntPtr config, [MarshalAs(UnmanagedType.I1)] bool filterChannelContentFromKvCache);
-
-            /// <summary>Sets whether to stream tool call tokens.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="streamToolCalls">Whether to stream tool call tokens.</param>
-            /// <param name="channelName">The channel name to use for tool call tokens.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_stream_tool_calls(IntPtr config,
-                [MarshalAs(UnmanagedType.I1)] bool streamToolCalls,
-                [MarshalAs(UnmanagedType.LPUTF8Str)] string channelName);
-            
-            /// <summary>Sets the thinking config for this conversation config.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="thinkingConfig">
-            /// The thinking config to set. If <see cref="IntPtr.Zero"/>,
-            /// clears any previously set thinking config.
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_config_set_thinking_config(
-                IntPtr config, IntPtr thinkingConfig);
-        }
-
-        public static class ThinkingConfig
-        {
-            /// <summary>
-            /// Creates a default LiteRT LM Thinking Config (enabled with infinite budget -1).
-            /// The caller is responsible for destroying the config using
-            /// <see cref="litert_lm_thinking_config_delete"/>.
-            /// </summary>
-            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_thinking_config_create();
-
-            /// <summary>Destroys a LiteRT LM Thinking Config.</summary>
-            /// <param name="config">The config to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_thinking_config_delete(IntPtr config);
-
-            /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="enableThinking">Whether thinking is enabled.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_thinking_config_set_enable_thinking(
-                IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enableThinking);
-
-            /// <summary>Sets the thinking token budget.</summary>
-            /// <param name="config">The config to modify.</param>
-            /// <param name="thinkingTokenBudget">
-            /// Budget for token-by-token reasoning generation (-1 for infinite).
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_thinking_config_set_thinking_token_budget(
-                IntPtr config, int thinkingTokenBudget);
-        }
-
         public static class RepetitionPenaltyConfig
         {
             /// <summary>
@@ -425,99 +292,6 @@ namespace Uralstech.UAI.LiteRTLM.Native
                 int[]? suppressTokens, UIntPtr numTokens);
         }
         
-        public static class ConversationOptionalArgs
-        {
-            /// <summary>
-            /// Creates a LiteRT LM Conversation Optional Args. The caller
-            /// is responsible for destroying the optional args using
-            /// <see cref="litert_lm_conversation_optional_args_delete"/>.
-            /// </summary>
-            /// <returns>A pointer to the created optional args, or <see cref="IntPtr.Zero"/> on failure.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_conversation_optional_args_create();
-
-            /// <summary>Destroys a LiteRT LM Conversation Optional Args.</summary>
-            /// <param name="optionalArgs">The optional args to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_delete(IntPtr optionalArgs);
-
-            /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
-            /// <remarks>
-            /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
-            /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
-            /// generated during the current <c>send_message</c> or <c>send_message_async</c> call.
-            /// </remarks>
-            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
-            /// <param name="repetitionPenaltyConfig">The repetition penalty configuration struct
-            /// (<c>LiteRtLmRepetitionPenaltyConfig</c>) created via <see cref="RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_create"/>.
-            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously set repetition penalty config so no penalties apply.
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_repetition_penalty_config(
-                IntPtr optionalArgs, IntPtr repetitionPenaltyConfig);
-                
-            /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
-            /// <remarks>
-            /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
-            /// exclusively to the output sequence generated during the current
-            /// <c>send_message</c> or <c>send_message_async</c> call.
-            /// </remarks>
-            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
-            /// <param name="noRepeatNgramConfig">
-            /// The no repeat ngram configuration struct (<c>LiteRtLmNoRepeatNgramConfig</c>)
-            /// created via <see cref="NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_create"/>.
-            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously
-            /// set no repeat ngram config so no repeat ngram banning applies.
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_no_repeat_ngram_config(IntPtr optionalArgs, IntPtr noRepeatNgramConfig);
-
-            /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
-            /// <remarks>
-            /// The configured list of suppressed tokens applies
-            /// exclusively to the output sequence generated during the current
-            /// <c>send_message</c> or <c>send_message_async</c> call.
-            /// </remarks>
-            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
-            /// <param name="suppressTokensConfig">
-            /// The suppress tokens configuration struct (<c>LiteRtLmSuppressTokensConfig</c>) created via
-            /// <see cref="SuppressTokensConfig.litert_lm_suppress_tokens_config_create"/>. The contents are deep-copied when
-            /// set. If <see cref="IntPtr.Zero"/> or if the inner token set is disabled/empty, clears any
-            /// previously set suppress tokens config so no token suppression applies.
-            /// </param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_suppress_tokens_config(IntPtr optionalArgs, IntPtr suppressTokensConfig);
-        
-            /// <summary>Sets the visual token budget for the conversation optional args.</summary>
-            /// <param name="optionalArgs">The optional args to modify.</param>
-            /// <param name="visualTokenBudget">The visual token budget.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_visual_token_budget(IntPtr optionalArgs,
-                int visualTokenBudget);
-
-            /// <summary>Sets the maximum number of output tokens for the conversation optional args.</summary>
-            /// <param name="optionalArgs">The optional args to modify.</param>
-            /// <param name="maxOutputTokens">The maximum number of output tokens.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_max_output_tokens(IntPtr optionalArgs,
-                int maxOutputTokens);
-            
-            /// <summary>Sets the thinking config for the conversation optional args.</summary>
-            /// <param name="optionalArgs">The optional args to modify.</param>
-            /// <param name="thinkingConfig">The thinking config to set. If <see cref="IntPtr.Zero"/>, clears any previously set thinking config.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_thinking_config(
-                IntPtr optionalArgs, IntPtr thinkingConfig);
-            
-            /// <summary>Sets the constraint for the conversation optional args.</summary>
-            /// <param name="optionalArgs">The optional args to modify.</param>
-            /// <param name="constraintType">The type of constraint.</param>
-            /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_conversation_optional_args_set_constraint(IntPtr optionalArgs,
-                ConstraintType constraintType, [MarshalAs(UnmanagedType.LPUTF8Str)] string constraintString);
-        }
-
         public static class InputData
         {
             /// <summary>
@@ -1115,6 +889,329 @@ namespace Uralstech.UAI.LiteRTLM.Native
             public static extern IntPtr litert_lm_stream_chunk_get_error(IntPtr chunk);
         }
 
+        public static class TokenizeResult
+        {
+            /// <summary>Destroys a LiteRT LM Tokenize Result.</summary>
+            /// <param name="result">The tokenize result to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_tokenize_result_delete(IntPtr result);
+
+            /// <summary>Returns the token ids from a tokenize result.</summary>
+            /// <param name="result">The tokenize result.</param>
+            /// <returns>
+            /// A pointer to the internal array of token ids. The returned pointer
+            /// is valid only for the lifetime of the <paramref name="result"/> object.
+            /// </returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_tokenize_result_get_tokens(IntPtr result);
+
+            /// <summary>Returns the number of token ids from a tokenize result.</summary>
+            /// <param name="result">The tokenize result.</param>
+            /// <returns>The number of token ids.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern UIntPtr litert_lm_tokenize_result_get_num_tokens(IntPtr result);
+        }
+
+        public static class DetokenizeResult
+        {
+            /// <summary>Destroys a LiteRT LM Detokenize Result.</summary>
+            /// <param name="result">The detokenize result to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_detokenize_result_delete(IntPtr result);
+
+            /// <summary>Returns the string from a detokenize result.</summary>
+            /// <param name="result">The detokenize result.</param>
+            /// <returns>
+            /// The detokenized string. The returned string is owned by the
+            /// DetokenizeResult object and is valid only for its lifetime.
+            /// </returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_detokenize_result_get_string(IntPtr result);
+        }
+
+        public static class TokenUnion
+        {
+            /// <summary>Destroys a LiteRT LM Token Union.</summary>
+            /// <param name="tokenUnion">The token union to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_token_union_delete(IntPtr tokenUnion);
+
+            /// <summary>Returns the type of the token union.</summary>
+            /// <param name="tokenUnion">The token union.</param>
+            /// <returns>The type of the token union.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern TokenUnionType litert_lm_token_union_get_type(IntPtr tokenUnion);
+
+            /// <summary>Returns the string value from a token union.</summary>
+            /// <param name="tokenUnion">The token union.</param>
+            /// <returns>
+            /// The string value, or <see cref="IntPtr.Zero"/> if the type is not <see cref="TokenUnionType.String"/>.
+            /// The returned string is owned by the TokenUnion object and is valid only for its lifetime.
+            /// </returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_token_union_get_string(IntPtr tokenUnion);
+
+            /// <summary>Returns the token ids from a token union.</summary>
+            /// <param name="tokenUnion">The token union.</param>
+            /// <param name="outTokens">A pointer to receive the internal array of token ids. The received pointer is valid only for the lifetime of the TokenUnion object.</param>
+            /// <param name="outNumTokens">A pointer to receive the number of token ids.</param>
+            /// <returns>0 on success, non-zero if the type is not <see cref="TokenUnionType.Ids"/>.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int litert_lm_token_union_get_ids(IntPtr tokenUnion, out IntPtr outTokens,
+                out UIntPtr outNumTokens);
+        }
+
+        public static class TokenUnions
+        {
+            /// <summary>Destroys a LiteRT LM Token Unions object.</summary>
+            /// <param name="tokens">The token unions object to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_token_unions_delete(IntPtr tokens);
+
+            /// <summary>Returns the number of token unions in the collection.</summary>
+            /// <param name="tokens">The token unions object.</param>
+            /// <returns>The number of token unions.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern UIntPtr litert_lm_token_unions_get_num_tokens(IntPtr tokens);
+
+            /// <summary>Returns the token union at a given index from a collection.</summary>
+            /// <param name="tokens">The token unions collection.</param>
+            /// <param name="index">The index of the token union.</param>
+            /// <returns>
+            /// A pointer to the token union at the given index, or <see cref="IntPtr.Zero"/> if the index
+            /// is out of bounds. The caller is responsible for deleting the result using
+            /// <see cref="TokenUnion.litert_lm_token_union_delete"/>.
+            /// </returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_token_unions_get_token_at(IntPtr tokens, UIntPtr index);
+        }
+        
+        public static class ConversationConfig
+        {
+            /// <summary>
+            /// Creates a LiteRT LM Conversation Config.
+            /// The caller is responsible for destroying the config using
+            /// <see cref="litert_lm_conversation_config_delete"/>.
+            /// </summary>
+            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_conversation_config_create();
+
+            /// <summary>Destroys a LiteRT LM Conversation Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_delete(IntPtr config);
+
+            /// <summary>Sets the session config for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="sessionConfig">The session config to use.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_session_config(IntPtr config,
+                IntPtr sessionConfig);
+
+            /// <summary>Sets the system message for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="systemMessageJson">The system message in JSON format.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_system_message(IntPtr config,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string systemMessageJson);
+
+            /// <summary>Sets the tools for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="toolsJson">The tools description in JSON array format.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_tools(IntPtr config,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string toolsJson);
+
+            /// <summary>Sets the initial messages for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="messagesJson">The initial messages in JSON array format.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_messages(IntPtr config,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string messagesJson);
+
+            /// <summary>Sets the extra context for the conversation preface.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="extraContextJson">A JSON string representing the extra context object.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_extra_context(IntPtr config,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string extraContextJson);
+
+            /// <summary>Sets the prompt template for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="promptTemplate">
+            /// The prompt template string (e.g. Jinja template).
+            /// If not set, use the default provided by the model or the engine.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_prompt_template(IntPtr config, [MarshalAs(UnmanagedType.LPUTF8Str)] string promptTemplate);
+                
+            /// <summary>Sets whether to enable constrained decoding for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="enableConstrainedDecoding">Whether to enable constrained decoding.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_enable_constrained_decoding(IntPtr config,
+                [MarshalAs(UnmanagedType.I1)] bool enableConstrainedDecoding);
+            
+            /// <summary>Sets the constraint provider type for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="providerType">A pointer to the constraint provider type to use (<see cref="ConstraintProviderType"/>), or <see cref="IntPtr.Zero"/> to unset.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_constraint_provider(IntPtr config, IntPtr providerType);
+
+            /// <summary>Sets whether to filter channel content from the KV cache.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="filterChannelContentFromKvCache">Whether to filter channel content.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_filter_channel_content_from_kv_cache(
+                IntPtr config, [MarshalAs(UnmanagedType.I1)] bool filterChannelContentFromKvCache);
+
+            /// <summary>Sets whether to stream tool call tokens.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="streamToolCalls">Whether to stream tool call tokens.</param>
+            /// <param name="channelName">The channel name to use for tool call tokens.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_stream_tool_calls(IntPtr config,
+                [MarshalAs(UnmanagedType.I1)] bool streamToolCalls,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string channelName);
+            
+            /// <summary>Sets the thinking config for this conversation config.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="thinkingConfig">
+            /// The thinking config to set. If <see cref="IntPtr.Zero"/>,
+            /// clears any previously set thinking config.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_config_set_thinking_config(
+                IntPtr config, IntPtr thinkingConfig);
+        }
+
+        public static class ThinkingConfig
+        {
+            /// <summary>
+            /// Creates a default LiteRT LM Thinking Config (enabled with infinite budget -1).
+            /// The caller is responsible for destroying the config using
+            /// <see cref="litert_lm_thinking_config_delete"/>.
+            /// </summary>
+            /// <returns>A pointer to the created config, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_thinking_config_create();
+
+            /// <summary>Destroys a LiteRT LM Thinking Config.</summary>
+            /// <param name="config">The config to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_delete(IntPtr config);
+
+            /// <summary>Sets whether thinking/reasoning generation is enabled.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="enableThinking">Whether thinking is enabled.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_set_enable_thinking(
+                IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enableThinking);
+
+            /// <summary>Sets the thinking token budget.</summary>
+            /// <param name="config">The config to modify.</param>
+            /// <param name="thinkingTokenBudget">
+            /// Budget for token-by-token reasoning generation (-1 for infinite).
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_thinking_config_set_thinking_token_budget(
+                IntPtr config, int thinkingTokenBudget);
+        }
+        
+        public static class ConversationOptionalArgs
+        {
+            /// <summary>
+            /// Creates a LiteRT LM Conversation Optional Args. The caller
+            /// is responsible for destroying the optional args using
+            /// <see cref="litert_lm_conversation_optional_args_delete"/>.
+            /// </summary>
+            /// <returns>A pointer to the created optional args, or <see cref="IntPtr.Zero"/> on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_conversation_optional_args_create();
+
+            /// <summary>Destroys a LiteRT LM Conversation Optional Args.</summary>
+            /// <param name="optionalArgs">The optional args to destroy.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_delete(IntPtr optionalArgs);
+
+            /// <summary>Sets the repetition penalty configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured penalties (<c>repetition_penalty</c>, <c>presence_penalty</c>,
+            /// <c>frequency_penalty</c>, <c>window_size</c>) apply exclusively to the output sequence
+            /// generated during the current <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="repetitionPenaltyConfig">The repetition penalty configuration struct
+            /// (<c>LiteRtLmRepetitionPenaltyConfig</c>) created via <see cref="RepetitionPenaltyConfig.litert_lm_repetition_penalty_config_create"/>.
+            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously set repetition penalty config so no penalties apply.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_repetition_penalty_config(
+                IntPtr optionalArgs, IntPtr repetitionPenaltyConfig);
+                
+            /// <summary>Sets the no repeat ngram configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured parameters (<c>no_repeat_ngram_size</c>, <c>window_size</c>) apply
+            /// exclusively to the output sequence generated during the current
+            /// <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="noRepeatNgramConfig">
+            /// The no repeat ngram configuration struct (<c>LiteRtLmNoRepeatNgramConfig</c>)
+            /// created via <see cref="NoRepeatNgramConfig.litert_lm_no_repeat_ngram_config_create"/>.
+            /// The contents are deep-copied when set. If <see cref="IntPtr.Zero"/>, clears any previously
+            /// set no repeat ngram config so no repeat ngram banning applies.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_no_repeat_ngram_config(IntPtr optionalArgs, IntPtr noRepeatNgramConfig);
+
+            /// <summary>Sets the suppress tokens configuration for the per-turn conversation optional arguments (<c>OptionalArgs</c>).</summary>
+            /// <remarks>
+            /// The configured list of suppressed tokens applies
+            /// exclusively to the output sequence generated during the current
+            /// <c>send_message</c> or <c>send_message_async</c> call.
+            /// </remarks>
+            /// <param name="optionalArgs">The optional arguments structure (<c>OptionalArgs</c>) to modify.</param>
+            /// <param name="suppressTokensConfig">
+            /// The suppress tokens configuration struct (<c>LiteRtLmSuppressTokensConfig</c>) created via
+            /// <see cref="SuppressTokensConfig.litert_lm_suppress_tokens_config_create"/>. The contents are deep-copied when
+            /// set. If <see cref="IntPtr.Zero"/> or if the inner token set is disabled/empty, clears any
+            /// previously set suppress tokens config so no token suppression applies.
+            /// </param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_suppress_tokens_config(IntPtr optionalArgs, IntPtr suppressTokensConfig);
+        
+            /// <summary>Sets the visual token budget for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="visualTokenBudget">The visual token budget.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_visual_token_budget(IntPtr optionalArgs,
+                int visualTokenBudget);
+
+            /// <summary>Sets the maximum number of output tokens for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="maxOutputTokens">The maximum number of output tokens.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_max_output_tokens(IntPtr optionalArgs,
+                int maxOutputTokens);
+            
+            /// <summary>Sets the thinking config for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="thinkingConfig">The thinking config to set. If <see cref="IntPtr.Zero"/>, clears any previously set thinking config.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_thinking_config(
+                IntPtr optionalArgs, IntPtr thinkingConfig);
+            
+            /// <summary>Sets the constraint for the conversation optional args.</summary>
+            /// <param name="optionalArgs">The optional args to modify.</param>
+            /// <param name="constraintType">The type of constraint.</param>
+            /// <param name="constraintString">The constraint pattern/schema/grammar string.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_conversation_optional_args_set_constraint(IntPtr optionalArgs,
+                ConstraintType constraintType, [MarshalAs(UnmanagedType.LPUTF8Str)] string constraintString);
+        }
+        
         public static class Conversation
         {
             /// <summary>
@@ -1241,103 +1338,6 @@ namespace Uralstech.UAI.LiteRTLM.Native
             /// </returns>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr litert_lm_json_response_get_string(IntPtr response);
-        }
-
-        public static class TokenizeResult
-        {
-            /// <summary>Destroys a LiteRT LM Tokenize Result.</summary>
-            /// <param name="result">The tokenize result to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_tokenize_result_delete(IntPtr result);
-
-            /// <summary>Returns the token ids from a tokenize result.</summary>
-            /// <param name="result">The tokenize result.</param>
-            /// <returns>
-            /// A pointer to the internal array of token ids. The returned pointer
-            /// is valid only for the lifetime of the <paramref name="result"/> object.
-            /// </returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_tokenize_result_get_tokens(IntPtr result);
-
-            /// <summary>Returns the number of token ids from a tokenize result.</summary>
-            /// <param name="result">The tokenize result.</param>
-            /// <returns>The number of token ids.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern UIntPtr litert_lm_tokenize_result_get_num_tokens(IntPtr result);
-        }
-
-        public static class DetokenizeResult
-        {
-            /// <summary>Destroys a LiteRT LM Detokenize Result.</summary>
-            /// <param name="result">The detokenize result to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_detokenize_result_delete(IntPtr result);
-
-            /// <summary>Returns the string from a detokenize result.</summary>
-            /// <param name="result">The detokenize result.</param>
-            /// <returns>
-            /// The detokenized string. The returned string is owned by the
-            /// DetokenizeResult object and is valid only for its lifetime.
-            /// </returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_detokenize_result_get_string(IntPtr result);
-        }
-
-        public static class TokenUnion
-        {
-            /// <summary>Destroys a LiteRT LM Token Union.</summary>
-            /// <param name="tokenUnion">The token union to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_token_union_delete(IntPtr tokenUnion);
-
-            /// <summary>Returns the type of the token union.</summary>
-            /// <param name="tokenUnion">The token union.</param>
-            /// <returns>The type of the token union.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern TokenUnionType litert_lm_token_union_get_type(IntPtr tokenUnion);
-
-            /// <summary>Returns the string value from a token union.</summary>
-            /// <param name="tokenUnion">The token union.</param>
-            /// <returns>
-            /// The string value, or <see cref="IntPtr.Zero"/> if the type is not <see cref="TokenUnionType.String"/>.
-            /// The returned string is owned by the TokenUnion object and is valid only for its lifetime.
-            /// </returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_token_union_get_string(IntPtr tokenUnion);
-
-            /// <summary>Returns the token ids from a token union.</summary>
-            /// <param name="tokenUnion">The token union.</param>
-            /// <param name="outTokens">A pointer to receive the internal array of token ids. The received pointer is valid only for the lifetime of the TokenUnion object.</param>
-            /// <param name="outNumTokens">A pointer to receive the number of token ids.</param>
-            /// <returns>0 on success, non-zero if the type is not <see cref="TokenUnionType.Ids"/>.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern int litert_lm_token_union_get_ids(IntPtr tokenUnion, out IntPtr outTokens,
-                out UIntPtr outNumTokens);
-        }
-
-        public static class TokenUnions
-        {
-            /// <summary>Destroys a LiteRT LM Token Unions object.</summary>
-            /// <param name="tokens">The token unions object to destroy.</param>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern void litert_lm_token_unions_delete(IntPtr tokens);
-
-            /// <summary>Returns the number of token unions in the collection.</summary>
-            /// <param name="tokens">The token unions object.</param>
-            /// <returns>The number of token unions.</returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern UIntPtr litert_lm_token_unions_get_num_tokens(IntPtr tokens);
-
-            /// <summary>Returns the token union at a given index from a collection.</summary>
-            /// <param name="tokens">The token unions collection.</param>
-            /// <param name="index">The index of the token union.</param>
-            /// <returns>
-            /// A pointer to the token union at the given index, or <see cref="IntPtr.Zero"/> if the index
-            /// is out of bounds. The caller is responsible for deleting the result using
-            /// <see cref="TokenUnion.litert_lm_token_union_delete"/>.
-            /// </returns>
-            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
-            public static extern IntPtr litert_lm_token_unions_get_token_at(IntPtr tokens, UIntPtr index);
         }
     }
 }

@@ -118,7 +118,7 @@ jobs:
         PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
 
         gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.nupkg"
-        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.snupkg" --skip-duplicate
+        gh release upload ${{ inputs.tag }} "$PACKAGE_BIN.snupkg"
       
     - name: Publish NuGet package
       if: ${{ inputs.nuget-publish }}
@@ -127,4 +127,4 @@ jobs:
       run: |
         PACKAGE_BIN="UAI.LiteRTLM-CS/UAI.LiteRTLM/bin/Release/Uralstech.UAI.LiteRTLM.${{ inputs.tag }}"
         dotnet nuget push "$PACKAGE_BIN.nupkg" --source https://api.nuget.org/v3/index.json
-        dotnet nuget push "$PACKAGE_BIN.snupkg" --source https://api.nuget.org/v3/index.json
+        dotnet nuget push "$PACKAGE_BIN.snupkg" --source https://api.nuget.org/v3/index.json --skip-duplicate

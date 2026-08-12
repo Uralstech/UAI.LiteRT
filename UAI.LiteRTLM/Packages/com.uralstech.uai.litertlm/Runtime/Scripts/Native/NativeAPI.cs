@@ -645,6 +645,13 @@ namespace Uralstech.UAI.LiteRTLM.Native
             public static extern void litert_lm_engine_settings_set_prefill_chunk_size(IntPtr settings,
                 int prefillChunkSize);
 
+            /// <summary>Sets whether YNNPACK should delegate supported operations before XNNPACK.</summary>
+            /// <param name="settings">The engine settings.</param>
+            /// <param name="enableYnnpack">Whether to enable YNNPACK.</param>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_engine_settings_set_enable_ynnpack(IntPtr settings,
+                [MarshalAs(UnmanagedType.I1)] bool enableYnnpack);
+
             /// <summary>Enables benchmarking for the engine.</summary>
             /// <param name="settings">The engine settings.</param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
@@ -818,6 +825,29 @@ namespace Uralstech.UAI.LiteRTLM.Native
             /// <param name="session">The session to cancel processing on.</param>
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern void litert_lm_session_cancel_process(IntPtr session);
+
+            /// <summary>Saves the current state of the session to a checkpoint with the given label.</summary>
+            /// <param name="session">The session to save checkpoint for.</param>
+            /// <param name="label">Label for the checkpoint.</param>
+            /// <returns>0 on success, non-zero on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int litert_lm_session_save_checkpoint(IntPtr session,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string label);
+            
+            /// <summary>Rewinds the session to the given checkpoint label.</summary>
+            /// <param name="session">The session to rewind.</param>
+            /// <param name="label">Label of the checkpoint to rewind to.</param>
+            /// <returns>0 on success, non-zero on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int litert_lm_session_rewind_to_checkpoint(IntPtr session,
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string label);
+            
+            /// <summary>Rewinds the session to a specific step number.</summary>
+            /// <param name="session">The session to rewind.</param>
+            /// <param name="step">The step number to rewind to.</param>
+            /// <returns>0 on success, non-zero on failure.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern int litert_lm_session_rewind_to_step(IntPtr session, int step);
 
             /// <summary>
             /// Adds the input prompt/query to the model for starting the prefilling

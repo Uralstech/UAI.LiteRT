@@ -64,16 +64,18 @@ data to streamed operations because the wrappers use their own data to track man
 
 | UAI.LiteRTLM     | LiteRT-LM                  | Included Platforms             | Included Accelerators                |
 | ---------------- | -------------------------- | ------------------------------ | ------------------------------------ |
+| 2.3.0-preview.1+ | v0.16.0 (`740f122`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows\*) |
 | 2.2.0-preview.1+ | v0.15.0 (`2117fc4`\*\*)    | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows) |
-| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*)<br/>WebGPU (Windows) |
-| 2.1.0-preview.4  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*) |
+| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*\*\*)<br/>WebGPU (Windows) |
+| 2.1.0-preview.4  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*\*\*) |
 | 2.1.0-preview.3  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS) |
 | 2.1.0-preview.2  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>OpenCL                          |
 | 2.1.0-preview.1  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>WebGPU                          |
 | 2.0.0-preview.1  | v0.14.0 (`80f301f`)        | Android (arm64)                | CPU<br/>WebGPU                          |
 
-\* Complete Metal acceleration is available on iOS devices, but this LiteRT-LM version does not provide a Metal-accelerated `TopKSampler` for iOS simulators.<br/>
-\*\* LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.
+\* LiteRT-LM v0.16.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Windows.<br/>
+\*\* LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.<br/>
+\*\*\* Complete Metal acceleration is available on iOS devices, but this LiteRT-LM version does not provide a Metal-accelerated `TopKSampler` for iOS simulators.
 
 ## Android GPU Acceleration
 
@@ -110,8 +112,13 @@ private async Awaitable RunConversation()
     string cacheDir = Path.Join(Application.temporaryCachePath, "modelCache");
     Directory.CreateDirectory(cacheDir);
     
+    // Speculative decoding performs badly on WebGPU on Windows.
+    bool isWindows = Application.platform is RuntimePlatform.WindowsEditor
+                                          or RuntimePlatform.WindowsPlayer
+                                          or RuntimePlatform.WindowsServer;
+    
     using EngineSettings engineSettings = new(modelPath, BackendNames.GPU);
-    engineSettings.SetEnableSpeculativeDecoding(true); // Can perform badly on WebGPU on Windows.
+    engineSettings.SetEnableSpeculativeDecoding(!isWindows);
     engineSettings.SetCacheDir(cacheDir);
     engineSettings.EnableBenchmark();
     

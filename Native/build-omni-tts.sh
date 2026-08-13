@@ -16,6 +16,14 @@ build() {
         //c/tts:litert-omni-tts || return 1
 }
 
+force_copy_file() {
+    local src_file="$1"
+    local dst_file="$2"
+
+    rm -f "${dst_file}"
+    cp "${src_file}" "${dst_file}"
+}
+
 copy_build() {
     local platform="$1"
     local arch="$2"
@@ -28,14 +36,6 @@ copy_build() {
     force_copy_file                                 \
         "${BUILD_DIR}/${BUILT_SYMBOL}.${extension}" \
         "${dst}/${BUILT_SYMBOL}.${extension}"
-}
-
-force_copy_file() {
-    local src_file="$1"
-    local dst_file="$2"
-
-    rm -f "${dst_file}"
-    cp "${src_file}" "${dst_file}"
 }
 
 # Set ANDROID_NDK_HOME before running this

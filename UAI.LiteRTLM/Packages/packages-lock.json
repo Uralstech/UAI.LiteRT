@@ -59,6 +59,12 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.uralstech.uai.litertlm.omni": {
+      "version": "file:com.uralstech.uai.litertlm.omni",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.modules.audio": {
       "version": "1.0.0",
       "depth": 1,

@@ -1,0 +1,16 @@
+{
+    "name": "UAI.LiteRTLM.Omni.Editor",
+    "rootNamespace": "Uralstech.UAI.LiteRTLM.Omni.Editor",
+    "references": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

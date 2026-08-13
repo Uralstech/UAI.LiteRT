@@ -1,0 +1,21 @@
+{
+  "name": "com.uralstech.uai.litertlm.omni",
+  "displayName": "UAI.LiteRTLM.Omni",
+  "description": "Cross-platform LiteRT-LM Omni bindings for Unity & .NET apps.",
+  "keywords": [],
+  "version": "1.0.0-alpha.1",
+  "unity": "6000.0",
+  "hideInEditor": false,
+  "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",
+  "changelogUrl": "https://github.com/Uralstech/UAI.LiteRTLM/releases",
+  "licensesUrl": "https://github.com/Uralstech/UAI.LiteRTLM/blob/master/LICENSE",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "repository": "https://github.com/Uralstech/UAI.LiteRTLM.git"
+  },
+  "author": {
+    "name": "Udayshankar Ravikumar",
+    "url": "https://github.com/Uralstech"
+  }
+}

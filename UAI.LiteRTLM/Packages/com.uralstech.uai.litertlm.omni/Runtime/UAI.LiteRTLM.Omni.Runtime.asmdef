@@ -1,0 +1,14 @@
+{
+    "name": "UAI.LiteRTLM.Omni.Runtime",
+    "rootNamespace": "Uralstech.UAI.LiteRTLM.Omni",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -16,6 +16,23 @@
       "filter": "filterConfig.yml",
       "includePrivateMembers": false,
       "allowCompilationErrors": true
+    },
+    {
+      "src": [
+        {
+          "src": "../UAI.LiteRTLM",
+          "files": [
+            "Packages/com.uralstech.uai.litertlm.omni/Runtime/**/*.cs"
+          ]
+        }
+      ],
+      "properties": {
+        "DefineConstants": "UNITY_5_3_OR_NEWER;UNITY_6000_5_OR_NEWER"
+      },
+      "dest": "omniApi",
+      "filter": "filterConfig.yml",
+      "includePrivateMembers": false,
+      "allowCompilationErrors": true
     }
   ],
   "build": {
@@ -49,16 +66,20 @@
     },
     "fileMetadata": {
       "pdf": {
-        "api/toc.yml": true
+        "api/toc.yml": true,
+        "omniApi/toc.yml": true
       },
       "pdfPrintBackground": {
-        "api/toc.yml": true
+        "api/toc.yml": true,
+        "omniApi/toc.yml": true
       },
       "pdfTocPage": {
-        "api/toc.yml": true
+        "api/toc.yml": true,
+        "omniApi/toc.yml": true
       },
       "pdfFileName": {
-        "api/toc.yml": "APIReferenceManual.pdf"
+        "api/toc.yml": "APIReferenceManual.pdf",
+        "omniApi/toc.yml": "OmniAPIReferenceManual.pdf"
       }
     },
     "sitemap": {

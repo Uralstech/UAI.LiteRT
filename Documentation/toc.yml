@@ -2,3 +2,7 @@
   href: DocSource/
 - name: API Reference
   href: api/
+- name: LiteRT-Omni
+  href: OmniDocSource/
+- name: LiteRT-Omni (Reference)
+  href: omniApi/

@@ -1,7 +1,7 @@
 # Quick Start
 
 The example code in this quick start guide is provided for educational and demonstration purposes only.
-It may not represent best practices for production use. This quick start was last updated for **UAI.LiteRTLM v2.1.0-preview.5**.
+It may not represent best practices for production use.
 
 ## Aim
 

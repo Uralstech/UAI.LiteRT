@@ -62,20 +62,19 @@ data to streamed operations because the wrappers use their own data to track man
 
 ### Version - LiteRT-LM - Platforms - Accelerators Table
 
-| UAI.LiteRTLM     | LiteRT-LM                  | Included Platforms             | Included Accelerators                |
-| ---------------- | -------------------------- | ------------------------------ | ------------------------------------ |
-| 2.3.0-preview.1+ | v0.16.0 (`740f122`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows\*) |
-| 2.2.0-preview.1+ | v0.15.0 (`2117fc4`\*\*)    | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows) |
-| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*\*\*)<br/>WebGPU (Windows) |
-| 2.1.0-preview.4  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS\*\*\*) |
-| 2.1.0-preview.3  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64) | CPU<br/>OpenCL (Android)<br/>Metal (macOS) |
-| 2.1.0-preview.2  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>OpenCL                          |
-| 2.1.0-preview.1  | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)                | CPU<br/>WebGPU                          |
-| 2.0.0-preview.1  | v0.14.0 (`80f301f`)        | Android (arm64)                | CPU<br/>WebGPU                          |
+| UAI.LiteRTLM     | LiteRT-LM                  | Included Platforms                                                                | Included Accelerators                                                 |
+| ---------------- | -------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 2.4.0-preview.1+ | v0.16.0 (`924e79c`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.3.0-preview.1+ | v0.16.0 (`740f122`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.2.0-preview.1+ | v0.15.0 (`2117fc4`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
 
-\* LiteRT-LM v0.16.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Windows.<br/>
-\*\* LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.<br/>
-\*\*\* Complete Metal acceleration is available on iOS devices, but this LiteRT-LM version does not provide a Metal-accelerated `TopKSampler` for iOS simulators.
+#### Notes
+
+- `2.4.0-preview.1` and `2.3.0-preview.1` target the same tag but different commits as the upstream tag was edited after `2.3.0-preview.1` was released.
+- LiteRT-LM v0.16.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Windows.
+- LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.
+- LiteRT-LM v0.15.0-alpha0 provides Metal acceleration on iOS devices, but the iOS simulator uses CPU-only TopK sampling.
 
 ## Android GPU Acceleration
 

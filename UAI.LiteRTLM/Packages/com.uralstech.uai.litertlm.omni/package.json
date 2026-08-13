@@ -6,8 +6,7 @@
   "version": "1.0.0-alpha.1",
   "unity": "6000.0",
   "hideInEditor": false,
-  "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",
-  "changelogUrl": "https://github.com/Uralstech/UAI.LiteRTLM/releases",
+  "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/OmniDocSource/QuickStart.html",
   "licensesUrl": "https://github.com/Uralstech/UAI.LiteRTLM/blob/master/LICENSE",
   "license": "Apache-2.0",
   "repository": {

@@ -3,6 +3,8 @@
 cd LiteRT-LM || exit /b 1
 set "DRIVE=%~d0"
 
+for /f %%H in ('git rev-parse HEAD') do set HEAD_COMMIT=%%H
+
 set "PLUGIN_DIR=../../UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Plugins"
 set "BUILD_DIR=./bazel-bin/c"
 set "BAZEL_OUT=%DRIVE%\bzl"
@@ -99,5 +101,7 @@ if errorlevel 1 exit /b 1
 
 call :copy_libs "litert-lm" windows x86_64 dll Windows "%PREBUILT_LIBS_PC%"
 call :copy_windows_x64_libs
+
+echo LITERT_LM_REV = "%HEAD_COMMIT%" > "%PLUGIN_DIR%\.build_sources.windows_x64.txt"
 
 exit /b 0

@@ -1,5 +1,7 @@
 cd LiteRT-LM || exit 1
 
+HEAD_COMMIT=$(git rev-parse HEAD)
+
 PLUGIN_DIR="../../UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Plugins"
 BUILT_SYMBOL="liblitert-lm"
 BUILD_DIR="./bazel-bin/c"
@@ -97,3 +99,5 @@ patch_lib_ios arm64
 build ios_sim_arm64 || exit 1
 copy_libs ios sim_arm64 dylib iOS "${PREBUILT_LIBS_APPLE}"
 patch_lib_ios sim_arm64
+
+echo "LITERT_LM_REV = \"${HEAD_COMMIT}\"" > "${PLUGIN_DIR}/.build_sources.arm64.txt"

@@ -53,6 +53,9 @@
         
         <None Include="$(PluginsDir)/iOS/arm64/*.dylib" Pack="true" PackagePath="runtimes/ios-arm64/native/"/>
         <None Include="$(PluginsDir)/iOS/sim_arm64/*.dylib" Pack="true" PackagePath="runtimes/iossimulator-arm64/native/"/>
+
+        <None Include="$(PluginsDir)/.build_sources.arm64.txt" Pack="true" PackagePath="" />
+        <None Include="$(PluginsDir)/.build_sources.windows_x64.txt" Pack="true" PackagePath="" />
         
         <None Include="$(ProjectRoot)/THIRD-PARTY-LICENSES.md" Pack="true" PackagePath="" />
         <None Include="README.md" Pack="true" PackagePath="" />

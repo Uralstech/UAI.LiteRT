@@ -1,0 +1,40 @@
+name: Update GitHub Pages
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Dotnet Setup
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: 10.x
+
+    - name: Install DocFX
+      run: dotnet tool update -g docfx
+        
+    - name: Generate Documentation
+      run: docfx Documentation/docfx.json
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: 'Documentation/_site'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

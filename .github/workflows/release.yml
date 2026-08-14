@@ -30,6 +30,7 @@ jobs:
       with:
         ref: ${{ github.ref }}
         fetch-depth: 0
+        lfs: true
       
     - name: Save current commit
       run: echo "ORIGINAL_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"

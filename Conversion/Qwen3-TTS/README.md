@@ -67,3 +67,47 @@ The conversion script has been verified with:
 The resulting converted model is available here:
 
 * [uralstech/Qwen3-TTS-12Hz-0.6B-Base-litert-lm-omni](https://huggingface.co/uralstech/Qwen3-TTS-12Hz-0.6B-Base-litert-lm-omni)
+
+## Voice cloning
+
+You can build a custom voice for the TTS using the Qwen3-TTS speaker encoder.
+This voice-cloning workflow has been tested in Google Colab.
+
+The speaker embedding extraction is based on the original Google AI Edge
+[`extract_speaker_embedding.py`](https://github.com/john-rocky/litert-samples/blob/a1f5edf3948e9575824bf6ea568fc90ad6a8fef0/compiled_model_api/text_to_speech_lm/conversion/extract_speaker_embedding.py)
+implementation by [john-rocky](https://github.com/john-rocky).
+
+Install the required dependencies:
+
+```
+!pip install qwen-tts==0.1.1 transformers==4.57.3 torchaudio librosa soundfile sox onnxruntime
+```
+
+Then provide a reference audio file and extract the speaker embedding:
+
+```python
+import torch
+import librosa
+import numpy as np
+from qwen_tts import Qwen3TTSModel
+
+MODEL_ID = "Qwen/Qwen3-TTS-12Hz-0.6B-Base"
+AUDIO_SRC = "/content/source.wav"
+DST = "/content/demo_speaker.bin"
+
+wrapper = Qwen3TTSModel.from_pretrained(MODEL_ID, device_map='cpu', dtype=torch.float32)
+audio, sample_rate = librosa.load(AUDIO_SRC, sr=24000, mono=True)
+
+embedding = wrapper.model.extract_speaker_embedding(audio=audio.astype(np.float32), sr=sample_rate)
+weights = embedding.detach().numpy().astype(np.float32).reshape(-1)
+weights.tofile(DST)
+
+try:
+    from google.colab import files
+    files.download(DST)
+finally:
+    pass
+```
+
+The resulting `demo_speaker.bin` contains the speaker embedding as 1024 raw float32 values (4096 bytes)
+and can be used as the custom speaker embedding for the TTS pipeline.

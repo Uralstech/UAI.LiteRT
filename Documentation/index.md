@@ -35,8 +35,8 @@ This package was designed for Unity 6.0+ and .NET 8+. Built and tested in Unity 
 
 1. Open the Unity Package Manager window (`Window` -> `Package Manager`)
 2. Select the `+` icon and `Add package from git URL...`
-3. Paste the UPM branch URL and press enter:
-    - `https://github.com/Uralstech/UAI.LiteRTLM.git#upm`
+3. Paste the package URL and press enter:
+    - `https://github.com/Uralstech/UAI.LiteRTLM.git?path=UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm`
 
 # [GitHub Clone](#tab/github)
 

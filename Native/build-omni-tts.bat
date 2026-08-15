@@ -55,7 +55,6 @@ exit /b 0
 :: Note: Set $env:BAZEL_SH, JAVA_HOME before running.
 
 call :build windows                             ^
-    "--define=litert_link_capi_so=true"         ^
     "--define=litert_runtime_link_mode=dynamic" ^
     "--define=resolve_symbols_in_exec=false"
 

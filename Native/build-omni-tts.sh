@@ -48,7 +48,6 @@ copy_build android arm64 so Android
 # # ------------------------------  macOS  ------------------------------
 
 build macos_arm64 --linkopt=-Wl,-rpath,@loader_path \
-    --define=litert_link_capi_so=true               \
     --define=litert_runtime_link_mode=dynamic       \
     --define=resolve_symbols_in_exec=false || exit 1
 

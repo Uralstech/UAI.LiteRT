@@ -93,7 +93,6 @@ exit /b 0
 :: litert-lm.dll to register it.
 
 call :build windows                             ^
-    "--define=litert_link_capi_so=true"         ^
     "--define=litert_runtime_link_mode=dynamic" ^
     "--define=resolve_symbols_in_exec=false"
 

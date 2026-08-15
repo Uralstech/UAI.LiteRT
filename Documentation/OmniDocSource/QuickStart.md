@@ -17,7 +17,17 @@ Due to the ***highly*** unstable, and I mean ***seriously unstable*** nature of 
 
 ## Download
 
-Clone or download the [UAI.LiteRTLM](https://github.com/Uralstech/UAI.LiteRTLM) repository, then copy the `UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm.omni` folder into the `Packages` folder of your Unity project.
+### Unity Package Manager
+
+1. Open the Unity Package Manager window (`Window` -> `Package Manager`)
+2. Select the `+` icon and `Add package from git URL...`
+3. Paste the package URL and press enter:
+    - `https://github.com/Uralstech/UAI.LiteRTLM.git?path=UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm.omni`
+
+### GitHub Clone
+
+1. Clone or download the repository from the desired branch (master, preview/unstable) or tag
+2. Drag the package folder `UAI.LiteRTLM/UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm.omni` into your Unity project's `Packages` folder
 
 ## Usage
 

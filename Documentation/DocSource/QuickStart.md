@@ -71,7 +71,7 @@ data to streamed operations because the wrappers use their own data to track man
 
 #### Notes
 
-- `2.4.0-preview.1` and `2.3.0-preview.1` target the same tag but different commits as the upstream tag was edited after `2.3.0-preview.1` was released.
+- `2.4.0-preview.x` and `2.3.0-preview.x` target the same tag but different commits as the upstream tag was edited after `2.3.0-preview.1` was released.
 - LiteRT-LM v0.16.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Windows.
 - LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.
 - LiteRT-LM v0.15.0-alpha0 provides Metal acceleration on iOS devices, but the iOS simulator uses CPU-only TopK sampling.

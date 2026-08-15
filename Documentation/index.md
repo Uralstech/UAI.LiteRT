@@ -11,6 +11,9 @@ Cross-platform LiteRT-LM bindings for Unity & .NET apps.
 [![nuget](https://img.shields.io/nuget/v/Uralstech.UAI.LiteRTLM?label=NuGet)](https://www.nuget.org/packages/Uralstech.UAI.LiteRTLM)
 [![nuget](https://img.shields.io/nuget/dt/Uralstech.UAI.LiteRTLM?color=brightgreen&label=Downloads)](https://www.nuget.org/packages/Uralstech.UAI.LiteRTLM)
 
+> [!NOTE]
+> This repository recently underwent a Git LFS migration. Following the migration, all commits were fully re-signed to ensure the rewritten history has verified signatures.
+
 ## Installation
 
 This package was designed for Unity 6.0+ and .NET 8+. Built and tested in Unity 6.5 and .NET 10.

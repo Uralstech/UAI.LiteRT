@@ -117,8 +117,12 @@ private async Awaitable RunConversation()
                                           or RuntimePlatform.WindowsPlayer
                                           or RuntimePlatform.WindowsServer;
     
+    bool supportsSpeculativeDecoding;
+    using (Capabilities modelCapabilities = new(modelPath))
+        supportsSpeculativeDecoding = modelCapabilities.HasSpeculativeDecodingSupport();
+
     using EngineSettings engineSettings = new(modelPath, BackendNames.GPU);
-    engineSettings.SetEnableSpeculativeDecoding(!isWindows);
+    engineSettings.SetEnableSpeculativeDecoding(!isWindows && supportsSpeculativeDecoding);
     engineSettings.SetCacheDir(cacheDir);
     engineSettings.EnableBenchmark();
     

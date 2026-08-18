@@ -62,15 +62,16 @@ data to streamed operations because the wrappers use their own data to track man
 
 ### Version - LiteRT-LM - Platforms - Accelerators Table
 
-| UAI.LiteRTLM     | LiteRT-LM                  | Included Platforms                                                                | Included Accelerators                                                 |
-| ---------------- | -------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 2.4.0-preview.1+ | v0.16.0 (`924e79c`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
-| 2.3.0-preview.1+ | v0.16.0 (`740f122`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
-| 2.2.0-preview.1+ | v0.15.0 (`2117fc4`)        | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
-| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`) | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| UAI.LiteRTLM     | LiteRT-LM                      | Included Platforms                                                                | Included Accelerators                                                 |
+| ---------------- | ------------------------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| 2.4.0-preview.1+ | v0.16.1 / v0.16.0 (`924e79c`)  | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.3.0-preview.1+ | v0.16.0 (`740f122`)            | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.2.0-preview.1+ | v0.15.0 (`2117fc4`)            | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
+| 2.1.0-preview.5+ | v0.15.0-alpha0 (`ad53ed1`)     | Android (arm64)<br/>macOS (arm64)<br/>iOS (arm64, sim_arm64)<br/>Windows (x64)    | CPU<br/>OpenCL (Android)<br/>Metal (macOS, iOS)<br/>WebGPU (Windows)  |
 
 #### Notes
 
+- Both LiteRT-LM v0.16.1 and v0.16.0 target the same commit as of 19/08/2026
 - `2.4.0-preview.x` and `2.3.0-preview.x` target the same tag but different commits as the upstream tag was edited after `2.3.0-preview.1` was released.
 - LiteRT-LM v0.16.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Windows.
 - LiteRT-LM v0.15.0 GPU sampling is [bugged](https://github.com/google-ai-edge/LiteRT-LM/issues/3135) on Android (arm64) and Windows, so this release contains a patched prebuilt dependency (`libLiteRtTopKOpenClSampler.so`) from commit `8bee4dd`. There is no patch for Windows as the latest upstream prebuilt still has the issue.

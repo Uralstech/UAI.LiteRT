@@ -2025,4 +2025,29 @@ namespace Uralstech.UAI.LiteRTLM
                 NativeAPI.JsonResponse.litert_lm_json_response_delete(Native);
         }
     }
+
+    public sealed class Capabilities : LiteRTLMNativeHandle
+    {
+        /// <summary>Loads a LiteRT-LM file from the given path for capability queries.</summary>
+        /// <exception cref="InvalidOperationException">Thrown if the file cannot be opened.</exception>
+        public Capabilities(string modelPath)
+        {
+            Native = NativeAPI.Capabilities.litert_lm_loaded_file_create(modelPath);
+            if (Native == IntPtr.Zero)
+                throw new InvalidOperationException("Failed to load model file.");
+        }
+
+        /// <summary>Returns <see langword="true"/> if the loaded LiteRT-LM file supports speculative decoding.</summary>
+        public bool HasSpeculativeDecodingSupport()
+        {
+            ThrowIfDisposed();
+            return NativeAPI.Capabilities.litert_lm_loaded_file_has_speculative_decoding_support(Native);
+        }
+        
+        protected override void ReleaseUnmanagedResources()
+        {
+            if (Native != IntPtr.Zero)
+                NativeAPI.Capabilities.litert_lm_loaded_file_delete(Native);
+        }
+    }
 }

@@ -1,10 +1,15 @@
+BUILD_SCRIPTS_DIR=$(pwd)
 cd LiteRT-LM || exit 1
 
 HEAD_COMMIT=$(git rev-parse HEAD)
 
 PLUGIN_DIR="../../UAI.LiteRTLM/Packages/com.uralstech.uai.litertlm/Runtime/Plugins"
+
 BUILT_SYMBOL="liblitert-lm"
 BUILD_DIR="./bazel-bin/c"
+
+BUILD_FILE="./c/BUILD"
+BUILD_FILE_BACKUP="$(mktemp)"
 
 PREBUILT_LIBS_COMMON="libLiteRt libGemmaModelConstraintProvider"
 PREBUILT_LIBS_ANDROID="libLiteRtTopKOpenClSampler libLiteRtOpenClAccelerator"
@@ -46,6 +51,12 @@ force_copy_file() {
     cp "${src_file}" "${dst_file}"
 }
 
+patch_capabilities() {
+    cp "${BUILD_FILE}" "${BUILD_FILE_BACKUP}" || return 1
+    trap 'force_copy_file "${BUILD_FILE_BACKUP}" "${BUILD_FILE}"; rm -f "${BUILD_FILE_BACKUP}"' EXIT
+    python3 "${BUILD_SCRIPTS_DIR}/patch_capabilities.py" "$BUILD_FILE" || return 1
+}
+
 copy_libs() {
     local platform="$1"
     local arch="$2"
@@ -68,6 +79,8 @@ copy_libs() {
         "${BUILD_DIR}/${BUILT_SYMBOL}.${extension}" \
         "${dst}/${BUILT_SYMBOL}.${extension}"
 }
+
+patch_capabilities || exit 1
 
 # Set ANDROID_NDK_HOME before running this
 # ------------------------------ Android ------------------------------

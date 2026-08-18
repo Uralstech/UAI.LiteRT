@@ -1339,5 +1339,23 @@ namespace Uralstech.UAI.LiteRTLM.Native
             [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
             public static extern IntPtr litert_lm_json_response_get_string(IntPtr response);
         }
+        
+        public static class Capabilities
+        {
+            /// <summary>Loads a LiteRT-LM file from the given path for capability queries.</summary>
+            /// <returns>Returns <see cref="IntPtr.Zero"/> if the file cannot be opened.</returns>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern IntPtr litert_lm_loaded_file_create(
+                [MarshalAs(UnmanagedType.LPUTF8Str)] string litertlmPath);
+
+            /// <summary>Deletes a loaded LiteRT-LM file.</summary>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            public static extern void litert_lm_loaded_file_delete(IntPtr loadedFile);
+
+            /// <summary>Returns <see langword="true"/> if the loaded LiteRT-LM file supports speculative decoding.</summary>
+            [DllImport(LibLiteRTLM, CallingConvention = CallingConvention.Cdecl)]
+            [return: MarshalAs(UnmanagedType.I1)]
+            public static extern bool litert_lm_loaded_file_has_speculative_decoding_support(IntPtr loadedFile);
+        }
     }
 }

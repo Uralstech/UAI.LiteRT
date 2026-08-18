@@ -17,6 +17,10 @@ Due to the ***highly*** unstable, and I mean ***seriously unstable*** nature of 
 
 ## Download
 
+> [!WARNING]
+> uai.litertlm.omni ***IS NOT*** compatible with uai.litertlm!
+> ***DO NOT*** use both APIs at the same time. This will crash the editor/player due to some symbols being present in both packages' native plugins.
+
 ### Unity Package Manager
 
 1. Open the Unity Package Manager window (`Window` -> `Package Manager`)

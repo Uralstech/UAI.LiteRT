@@ -3,7 +3,7 @@
   "displayName": "UAI.LiteRTLM",
   "description": "Cross-platform LiteRT-LM bindings for Unity & .NET apps.",
   "keywords": [],
-  "version": "2.4.0-preview.2",
+  "version": "2.4.0-preview.3",
   "unity": "6000.0",
   "hideInEditor": false,
   "documentationUrl": "https://uralstech.github.io/UAI.LiteRTLM/",

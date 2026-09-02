@@ -11,7 +11,7 @@ Cross-platform LiteRT-LM bindings for Unity & .NET apps.
 
 ## Installation
 
-This package was designed for Unity 6.0+ and .NET 8+. Built and tested in Unity 6.5 and .NET 10.
+This package was designed for Unity 6.0+ and .NET 6+. Built and tested in Unity 6.5 and .NET 10.
 
 ### OpenUPM
 
